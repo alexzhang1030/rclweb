@@ -58,6 +58,8 @@ curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/i
 rclwebd
 ```
 
+Host systemd units (`--systemd`) are in [deploy](./docs/deploy.md#systemd).
+
 Or build from source (needs Rust plus the ROS 2 development libraries):
 
 ```bash

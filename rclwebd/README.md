@@ -17,6 +17,9 @@ Prebuilt binaries for a sourced Jazzy / Humble environment:
 curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/install-rclwebd.sh | bash
 ```
 
+Host systemd units: [`docs/deploy.md#systemd`](../docs/deploy.md#systemd)
+(`./scripts/install-rclwebd.sh --systemd`).
+
 Building from source requires `--features ros` and a sourced ROS 2
 prefix (`ROS_PREFIX` / `AMENT_PREFIX_PATH`). Add `webtransport` for the
 HTTP/3 accept loop (intranet: `RCLWEBD_OFFER_WEBTRANSPORT=1`). Default

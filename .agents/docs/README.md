@@ -32,7 +32,7 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | Humble scheme / corpus / ROS package names | [ADR 0012](../../docs/adr/0012-rclweb-schema-identifiers.md), [gotchas](./gotchas.md#bundle-files-are-named-by-type) |
 | Local WebTransport TLS | [ADR 0011](../../docs/adr/0011-local-dev-webtransport-tls.md) |
 | Intranet / lab WebTransport | [Deploy — Intranet WebTransport](../../docs/deploy.md#intranet-webtransport), [certificates](../../docs/deploy.md#intranet-certificates), [gotchas](./gotchas.md#intranet-webtransport-is-one-env-not-production-tls) |
-| Runtime images and operations endpoints | [Deploy](../../docs/deploy.md) |
+| Runtime images, operations endpoints, and systemd units | [Deploy](../../docs/deploy.md), [systemd](../../docs/deploy.md#systemd) |
 | Support-matrix status | [Support matrix](../../docs/support-matrix.md) (do not stamp **Qualified**) |
 | Wide ACL reference | [acl-reference.json](../../docs/acl-reference.json), [security](../../docs/security.md) |
 | Open work | [Open work](../../tasks/plan.md), [checklist](../../tasks/todo.md) |
@@ -52,7 +52,8 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | `rclwebd/**` | [Architecture](./architecture.md), [`rclwebd`](../../docs/gateway/rclwebd.md), [security](../../docs/security.md), [deploy](../../docs/deploy.md), [ADR 0011](../../docs/adr/0011-local-dev-webtransport-tls.md). crates.io publish ([release](../../docs/release.md)) |
 | `rclwebd/src/local_dev_tls.rs`, `wt.rs` | [ADR 0011](../../docs/adr/0011-local-dev-webtransport-tls.md), [gotchas](./gotchas.md#webtransport-local-certs-are-14-days-by-browser-rule), [intranet recipe](../../docs/deploy.md#intranet-webtransport) |
 | `rclwebd/src/config.rs` | [ADR 0008](../../docs/adr/0008-one-adapter-row-per-gateway-process.md), [gotchas](./gotchas.md#one-gateway-process-binds-one-support-row). Unset `RCLWEBD_SUPPORT_ROW` derives the row from the sourced env ([ADR 0018](../../docs/adr/0018-prebuilt-gateway-distribution.md)). Unset `RCLWEBD_WT_BIND` copies the HTTP bind host to UDP 4433 ([intranet recipe](../../docs/deploy.md#intranet-webtransport)) |
-| `scripts/install-rclwebd.sh` | Prebuilt-binary installer over GitHub Releases ([ADR 0018](../../docs/adr/0018-prebuilt-gateway-distribution.md), [deploy](../../docs/deploy.md#prebuilt-artifacts)); retries per [gotchas](./gotchas.md#github-releases-downloads-need-retries) |
+| `scripts/install-rclwebd.sh` | Prebuilt-binary installer over GitHub Releases ([ADR 0018](../../docs/adr/0018-prebuilt-gateway-distribution.md), [deploy](../../docs/deploy.md#prebuilt-artifacts)); `--systemd` / `--systemd-only` rewrite unit placeholders. `curl \| bash` fetches units from `RCLWEBD_UNIT_REF` (default `main`). Retries per [gotchas](./gotchas.md#github-releases-downloads-need-retries) |
+| `packaging/systemd/**`, `scripts/rclwebd-ros.sh` | Host systemd units ExecStart the ROS wrapper; `EnvironmentFile` is not a prefix ([deploy](../../docs/deploy.md#systemd), [gotchas](./gotchas.md#systemd-environmentfile-is-not-a-sourced-ros-prefix)) |
 | `rclwebd/src/ros/**` | [technology stack](./technology-stack.md), [adapter ABI](../../docs/gateway/rclwebd.md) |
 | `rclwebd/src/ros/backend.rs` | Same-thread loopback must pump ([gotchas](./gotchas.md#same-thread-ros-loopback-must-pump)) |
 | `rclwebd/src/ros/rcl.rs` | Action wait-set index ([gotchas](./gotchas.md#action-client-wait-set-ready-is-not-the-first-client-slot)) |

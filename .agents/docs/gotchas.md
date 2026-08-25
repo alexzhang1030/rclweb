@@ -172,6 +172,21 @@ Canonical CDR bundles for `*_Request` / `*_Response` / `*_Goal` / `*_Result` / `
 
 `float64[<=4] bounded_f64` and `string<=16 name` contain `=`. Treating any `=` as a ROS constant drops those fields (`scripts/generated-types.ts` `parseFieldNames` still does this for metadata names). `scripts/rosidl-dts.ts` strips `<=` before looking for `TYPE NAME = value`. Do not copy the metadata skip into the DTS parser — Collections would lose `bounded_f64`, `bounded_string`, and `bounded_wstring`.
 
+## systemd EnvironmentFile is not a sourced ROS prefix
+
+systemd `EnvironmentFile=` assigns variables. It does not run
+`setup.bash`, so `AMENT_PREFIX_PATH` / `LD_LIBRARY_PATH` / `ROS_DISTRO`
+stay empty and typesupport dlopen plus row auto-detect
+([ADR 0018](../../docs/adr/0018-prebuilt-gateway-distribution.md)) fail.
+`ExecStart` must be [`scripts/rclwebd-ros.sh`](../../scripts/rclwebd-ros.sh)
+(or the installed copy), which turns nounset off around `source` — same
+trap as [`docker/rclwebd-entrypoint.sh`](../../docker/rclwebd-entrypoint.sh).
+Do not `ExecStart=` the binary directly, and do not default
+`RCLWEBD_SUPPORT_ROW` in the host wrapper (images bake a row; host
+binaries derive it). `ProtectSystem=strict` would also block `/opt/ros`.
+Units: [`packaging/systemd/`](../../packaging/systemd/),
+[deploy](../../docs/deploy.md#systemd).
+
 ## GitHub Releases downloads need retries
 
 Foundation CI installs Bun with SHA-pinned `oven-sh/setup-bun` (`.bun-version`) and just with SHA-pinned `extractions/setup-just` (`.just-version`); a failed just step waits 15s and retries once. `dtolnay/rust-toolchain` installs the channel in `rust-toolchain.toml`. E2e images copy `/usr/local/bin/bun` from digest-pinned `oven/bun` (must match `.bun-version`); do not pipe `bun.sh/install`. Cloud-agent setup has no Actions, so it uses [`scripts/install-pinned-bun.sh`](../../scripts/install-pinned-bun.sh) and [`scripts/github-release-curl.sh`](../../scripts/github-release-curl.sh). Paid flakes were GitHub Releases 503/curl 56, not a broken setup-just. Landed in [`45cacd5`](https://github.com/alexzhang1030/rclweb/commit/45cacd5) (#19).

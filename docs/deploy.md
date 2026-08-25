@@ -36,6 +36,8 @@ against a sourced matching prefix:
 curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/install-rclwebd.sh | bash
 ```
 
+Optional host unit (`--systemd`, does not enable or start): [systemd](#systemd).
+
 ## Artifact
 
 One support row per process ([ADR 0008](./adr/0008-one-adapter-row-per-gateway-process.md)).
@@ -218,8 +220,50 @@ robot-edge shape, not a cloud overlay network.
 `RCLWEBD_OFFER_WEBTRANSPORT=1` on the `rclwebd` service (`just gateway-wt` /
 `just gateway-wt-h-ft`).
 
+## systemd
+
+Host binaries need a sourced ROS prefix before `exec rclwebd`. systemd
+`EnvironmentFile=` only assigns variables — it cannot run `setup.bash` —
+so typesupport dlopen and row auto-detect would fail if `ExecStart` were
+the binary. Units therefore start
+[`scripts/rclwebd-ros.sh`](../scripts/rclwebd-ros.sh) (installed next to
+`rclwebd`). Templates live in [`packaging/systemd/`](../packaging/systemd/).
+The installer rewrites `@EXEC@` / `@ENVFILE@` and copies the env example
+only when the destination does not exist. It does not enable or start
+the service.
+
+```bash
+# from a clone; also downloads the binary unless --systemd-only
+./scripts/install-rclwebd.sh --distro jazzy --systemd user
+./scripts/install-rclwebd.sh --systemd-only --systemd user --dir ~/.local/bin
+```
+
+| Kind | Unit | Env |
+|---|---|---|
+| user | `~/.config/systemd/user/rclwebd.service` | `~/.config/rclwebd/rclwebd.env` |
+| system (root) | `/etc/systemd/system/rclwebd.service` | `/etc/rclwebd.env` |
+
+`--systemd` without `user`/`system` infers user when `--dir` is under
+`$HOME`, otherwise system. `curl | bash` fetches the templates from
+`RCLWEBD_UNIT_REF` (default `main`), not from `--version`: release tags
+older than this landing do not contain `packaging/systemd`.
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now rclwebd
+```
+
+`TimeoutStopSec=30` stays above the default drain
+(`RCLWEBD_DRAIN_TIMEOUT_SECS=15`). Do not add `ExecStop` — SIGTERM
+already drains. Leave `RCLWEBD_SUPPORT_ROW` unset so the sourced prefix
+selects the row ([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md)).
+Authenticate stays **off**; do not set `RCLWEBD_AUTH_MODE=oidc`. Intranet
+WebTransport is still the one env. This unit does not start `rmw_zenohd`.
+`ProtectSystem=strict` would block `/opt/ros` dlopen; these units stay
+simple.
+
 ## Follow-ups
 
-Production PKI, remote metrics/trace export, Kubernetes or systemd units,
-and upgrade/rollback playbooks remain [open work](../tasks/plan.md).
+Production PKI, remote metrics/trace export, Kubernetes, and
+upgrade/rollback playbooks remain [open work](../tasks/plan.md).
 SROS2 is parked while auth is out of scope.
