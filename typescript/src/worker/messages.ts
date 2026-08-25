@@ -3,12 +3,12 @@
  * Application-facing only — no R2WP field knowledge on either side beyond
  * opaque binary frames the Worker already owns.
  *
- * Service/action payloads are copied out of wasm in the Worker and the lease
- * is released there. Generated service/action roots copy packed host-value
- * bytes; untyped channels stay CDR. Host-retain String / PointCloud2 /
- * generated corpus msg transfer the WS/frame `ArrayBuffer` (`sampleHostCdr`);
- * the Worker releases the host lease first. Main decodes. Service/action
- * still copy. Main never sees payload pointers.
+ * Service/action host-retained CDR transfers the WS/frame `ArrayBuffer`;
+ * the Worker releases the host lease first. Main decodes generated
+ * sections in JS CDR (`decodeOpPayload`); untyped channels stay CDR.
+ * Host-retain String / PointCloud2 / generated corpus msg transfer the
+ * same way (`sampleHostCdr`). Wasm-backed ops still copy payload bytes.
+ * Main never sees payload pointers.
  */
 
 import type { GeneratedMsg } from "../generated-value.ts";

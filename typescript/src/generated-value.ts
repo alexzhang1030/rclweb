@@ -3,6 +3,7 @@
  * Mirrors `rclweb::types::host_value`. Not CDR.
  */
 
+import { decodeGeneratedCdr } from "./cdr-le.ts";
 import {
   Collections,
   EchoNested_Request,
@@ -81,6 +82,8 @@ export function decodeOpPayload(
 ): unknown {
   const section = generatedOpTypeName(channelType, op);
   if (!section) return bytes;
+  const fromCdr = decodeGeneratedCdr(section, bytes);
+  if (fromCdr) return fromCdr;
   return decodeGeneratedHostValue(section, bytes);
 }
 

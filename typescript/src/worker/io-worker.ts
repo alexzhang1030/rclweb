@@ -3,20 +3,17 @@
  * I/O Worker: owns WebSocket + wasm poll. Main thread speaks only typed
  * application messages (ADR 0004).
  *
- * Service/action payloads are copied out of wasm here and the lease is
- * released before the message crosses to main. Generated service/action
- * roots become packed host-value bytes; untyped channels stay CDR.
- * Host-retain String / PointCloud2 / generated corpus msg transfer the
- * WS/frame buffer and release the host lease first. Wasm-backed samples
- * keep the old copy / host-value path. Service/action still copy.
+ * Service/action host-retained CDR transfers the WS/frame buffer and
+ * releases the host lease first. Main decodes generated sections in JS
+ * CDR; untyped channels stay CDR. Wasm-backed ops still copy payload
+ * bytes out of linear memory. Host-retain String / PointCloud2 /
+ * generated corpus msg transfer the same way.
  */
 
 import { IoHost } from "../host.ts";
 import {
-  generatedOpTypeName,
   isGeneratedMsgType,
   PointCloud2 as PointCloud2Msg,
-  type GeneratedOpKind,
 } from "../interfaces.ts";
 import type { GeneratedMsg } from "../generated-value.ts";
 import type { SampleAppEvent } from "../wasm/abi.ts";
@@ -179,40 +176,45 @@ function deliverSample(event: SampleAppEvent): void {
   }
 }
 
-function copyAndRelease(
-  event: {
-    payloadPtr: number;
-    payloadLen: number;
-    leaseId: number;
-    operationId: Uint8Array;
-    hostPayload?: Uint8Array;
-  },
-  channelId: number,
-  op?: GeneratedOpKind,
-): { operationId: number[]; payload: Uint8Array } {
-  const typeName = channelTypes.get(channelId);
-  const section = op && typeName ? generatedOpTypeName(typeName, op) : undefined;
-  const payload = section
-    ? (host!.copyGeneratedBytes(
-        section,
-        event.payloadPtr,
-        event.payloadLen,
-        event.hostPayload,
-      ) ??
-      host!.copyPayload(
-        event.payloadPtr,
-        event.payloadLen,
-        event.hostPayload,
-      ))
-    : host!.copyPayload(
-        event.payloadPtr,
-        event.payloadLen,
-        event.hostPayload,
-      );
+function transferOpHostCdr(event: {
+  payloadPtr: number;
+  payloadLen: number;
+  leaseId: number;
+  operationId: Uint8Array;
+  hostPayload?: Uint8Array;
+}): { operationId: number[]; payload: Uint8Array; transfer: Transferable[] } | null {
+  const payload = event.hostPayload;
+  if (!payload) return null;
+  const buffer = payload.buffer;
+  if (!(buffer instanceof ArrayBuffer)) return null;
+  const view = new Uint8Array(buffer, payload.byteOffset, payload.byteLength);
+  event.hostPayload = undefined;
+  host!.releaseLease(event.leaseId);
+  return {
+    operationId: Array.from(event.operationId),
+    payload: view,
+    transfer: [buffer],
+  };
+}
+
+function copyAndRelease(event: {
+  payloadPtr: number;
+  payloadLen: number;
+  leaseId: number;
+  operationId: Uint8Array;
+  hostPayload?: Uint8Array;
+}): { operationId: number[]; payload: Uint8Array; transfer: Transferable[] } {
+  const transferred = transferOpHostCdr(event);
+  if (transferred) return transferred;
+  const payload = host!.copyPayload(
+    event.payloadPtr,
+    event.payloadLen,
+    event.hostPayload,
+  );
   const operationId = Array.from(event.operationId);
   host!.releaseLease(event.leaseId);
   host!.flushSync();
-  return { operationId, payload };
+  return { operationId, payload, transfer: [] };
 }
 
 self.onmessage = async (ev: MessageEvent<MainToWorker>) => {
@@ -312,27 +314,33 @@ self.onmessage = async (ev: MessageEvent<MainToWorker>) => {
                 break;
               }
               case "serviceResponse": {
-                const copied = copyAndRelease(event, event.channelId, "Response");
+                const copied = copyAndRelease(event);
                 const key = opidKey(event.channelId, event.operationId);
                 const requestId = pendingCalls.get(key) ?? 0;
                 pendingCalls.delete(key);
-                post({
-                  type: "serviceResponse",
-                  requestId,
-                  channelId: event.channelId,
-                  operationId: copied.operationId,
-                  payload: copied.payload,
-                });
+                post(
+                  {
+                    type: "serviceResponse",
+                    requestId,
+                    channelId: event.channelId,
+                    operationId: copied.operationId,
+                    payload: copied.payload,
+                  },
+                  copied.transfer,
+                );
                 break;
               }
               case "serviceRequest": {
-                const copied = copyAndRelease(event, event.channelId, "Request");
-                post({
-                  type: "serviceRequest",
-                  channelId: event.channelId,
-                  operationId: copied.operationId,
-                  payload: copied.payload,
-                });
+                const copied = copyAndRelease(event);
+                post(
+                  {
+                    type: "serviceRequest",
+                    channelId: event.channelId,
+                    operationId: copied.operationId,
+                    payload: copied.payload,
+                  },
+                  copied.transfer,
+                );
                 break;
               }
               case "actionReady": {
@@ -361,47 +369,59 @@ self.onmessage = async (ev: MessageEvent<MainToWorker>) => {
                 break;
               }
               case "actionGoal": {
-                const copied = copyAndRelease(event, event.channelId, "Goal");
-                post({
-                  type: "actionGoal",
-                  channelId: event.channelId,
-                  operationId: copied.operationId,
-                  payload: copied.payload,
-                });
+                const copied = copyAndRelease(event);
+                post(
+                  {
+                    type: "actionGoal",
+                    channelId: event.channelId,
+                    operationId: copied.operationId,
+                    payload: copied.payload,
+                  },
+                  copied.transfer,
+                );
                 break;
               }
               case "actionFeedback": {
-                const copied = copyAndRelease(event, event.channelId, "Feedback");
-                post({
-                  type: "actionFeedback",
-                  channelId: event.channelId,
-                  operationId: copied.operationId,
-                  payload: copied.payload,
-                });
+                const copied = copyAndRelease(event);
+                post(
+                  {
+                    type: "actionFeedback",
+                    channelId: event.channelId,
+                    operationId: copied.operationId,
+                    payload: copied.payload,
+                  },
+                  copied.transfer,
+                );
                 break;
               }
               case "actionResult": {
-                const copied = copyAndRelease(event, event.channelId, "Result");
+                const copied = copyAndRelease(event);
                 const key = opidKey(event.channelId, event.operationId);
                 const requestId = pendingActionResults.get(key) ?? 0;
                 pendingActionResults.delete(key);
-                post({
-                  type: "actionResult",
-                  requestId,
-                  channelId: event.channelId,
-                  operationId: copied.operationId,
-                  payload: copied.payload,
-                });
+                post(
+                  {
+                    type: "actionResult",
+                    requestId,
+                    channelId: event.channelId,
+                    operationId: copied.operationId,
+                    payload: copied.payload,
+                  },
+                  copied.transfer,
+                );
                 break;
               }
               case "actionStatus": {
-                const copied = copyAndRelease(event, event.channelId);
-                post({
-                  type: "actionStatus",
-                  channelId: event.channelId,
-                  operationId: copied.operationId,
-                  payload: copied.payload,
-                });
+                const copied = copyAndRelease(event);
+                post(
+                  {
+                    type: "actionStatus",
+                    channelId: event.channelId,
+                    operationId: copied.operationId,
+                    payload: copied.payload,
+                  },
+                  copied.transfer,
+                );
                 break;
               }
               case "graphSnapshot":

@@ -19,7 +19,7 @@ ROS talker
   -> serialized rcl surface in rclwebd
   -> R2WP over binary WebSocket
   -> browser I/O Worker
-  -> host-retain JS CDR (wasm owns control / service / action)
+  -> host-retain JS CDR (wasm owns control; service/action inbound decodes in JS)
   -> typed event in a demo page or harness
 ```
 

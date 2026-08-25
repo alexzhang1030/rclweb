@@ -1,6 +1,9 @@
 import { expect, test } from "bun:test";
+import path from "node:path";
+import { decodeGeneratedCdr } from "../src/cdr-le.ts";
 import {
   decodeGeneratedHostValue,
+  decodeOpPayload,
   encodeGeneratedHostValue,
   reviveGenerated,
   sampleEchoNestedRequest,
@@ -10,6 +13,7 @@ import {
 } from "../src/generated-value.ts";
 import {
   Collections,
+  EchoNested,
   EchoNested_Request,
   EchoNested_Response,
   NestedSample,
@@ -88,6 +92,29 @@ test("host-value round-trips EchoNested request and response", () => {
   expect(resRound).toBeInstanceOf(EchoNested_Response);
   expect(resRound.accepted).toBe(true);
   expect(resRound.output.stamp.sec).toBe(11);
+});
+
+test("decodeOpPayload prefers JS CDR and still reads packed host-value", async () => {
+  const cdr = new Uint8Array(
+    await Bun.file(
+      path.join(
+        import.meta.dir,
+        "../../conformance/cdr/fixtures/J-FT/echo_nested_response.bin",
+      ),
+    ).arrayBuffer(),
+  );
+  const fromCdr = decodeOpPayload(EchoNested.typeName, "Response", cdr);
+  expect(fromCdr).toBeInstanceOf(EchoNested_Response);
+  expect((fromCdr as EchoNested_Response).accepted).toBe(true);
+  expect(decodeGeneratedCdr(EchoNested_Response.typeName, cdr)).toEqual(fromCdr);
+
+  const packed = encodeGeneratedHostValue(
+    EchoNested_Response.typeName,
+    sampleEchoNestedResponse(),
+  );
+  const fromPacked = decodeOpPayload(EchoNested.typeName, "Response", packed);
+  expect(fromPacked).toBeInstanceOf(EchoNested_Response);
+  expect((fromPacked as EchoNested_Response).accepted).toBe(true);
 });
 
 test("generatedOpTypeName maps parent service and action sections", () => {
