@@ -945,7 +945,12 @@ function attachHostPayloads(
 }
 
 const OPCODE_ROS_SAMPLE = 2;
-const HOST_LEASE_FLAG = 0x80000000;
+export const HOST_LEASE_FLAG = 0x80000000;
+
+export function isHostLeaseId(leaseId: number): boolean {
+  return (leaseId >>> 0) >= HOST_LEASE_FLAG;
+}
+
 let hostLeaseSeq = 1;
 
 type HostLease = { frame: Uint8Array; handle: number };
@@ -955,8 +960,8 @@ const hostLeases = new Map<number, HostLease>();
 const hostEngineTelemetry = new Map<number, HostEngineCounters>();
 
 /**
- * Idle-queue sample event. `onEvent` is synchronous and must not retain this
- * object; a later idle sample overwrites the same fields.
+ * Idle-queue sample event. `onEvent` / `onSample` are synchronous and must
+ * not retain this object; a later idle sample overwrites the same fields.
  */
 const idleSampleEvent: SampleAppEvent = {
   type: "sample",
@@ -1011,16 +1016,6 @@ function overlayHostTelemetry(
   };
 }
 
-function readU64BE(bytes: Uint8Array, offset: number): bigint {
-  const hi = BigInt(readU32BE(bytes, offset));
-  const lo = BigInt(readU32BE(bytes, offset + 4));
-  return (hi << 32n) + lo;
-}
-
-function readI64BE(bytes: Uint8Array, offset: number): bigint {
-  return BigInt.asIntN(64, readU64BE(bytes, offset));
-}
-
 /** Release a host-pinned ROS_SAMPLE without a poll batch. */
 export function tryReleaseHostLease(leaseId: number): boolean {
   const id = leaseId >>> 0;
@@ -1072,8 +1067,8 @@ function pinHostSample(
     type: "sample",
     channelId: readU32BE(frame, 4),
     leaseId,
-    sequence: readU64BE(frame, 8),
-    sourceTimeNs: readI64BE(frame, 16),
+    sequence: 0n,
+    sourceTimeNs: 0n,
     payloadPtr: 0,
     payloadLen: frame.length - prefixLen,
     stringData: null,
@@ -1096,8 +1091,6 @@ export function tryPinHostSample(
   const leaseId = allocHostLease(handle, bytes);
   idleSampleEvent.channelId = readU32BE(bytes, 4);
   idleSampleEvent.leaseId = leaseId;
-  idleSampleEvent.sequence = readU64BE(bytes, 8);
-  idleSampleEvent.sourceTimeNs = readI64BE(bytes, 16);
   idleSampleEvent.payloadLen = bytes.length - R2WP_HEADER_LEN;
   idleSampleEvent.stringData = null;
   idleSampleEvent.hostPayload = bytes.subarray(R2WP_HEADER_LEN);

@@ -9,7 +9,12 @@
  */
 
 import { IoHost } from "./host.ts";
-import type { AppEvent, EngineTelemetrySnapshot, SampleAppEvent } from "./wasm/abi.ts";
+import {
+  isHostLeaseId,
+  type AppEvent,
+  type EngineTelemetrySnapshot,
+  type SampleAppEvent,
+} from "./wasm/abi.ts";
 import { decodePointCloud2Cdr, decodeStdMsgsStringCdr } from "./cdr-le.ts";
 import {
   Collections,
@@ -364,9 +369,43 @@ function sampleLease(host: IoHost, leaseId: number): SampleLease {
     leaseId,
     release: () => {
       host.releaseLease(leaseId);
+      if (isHostLeaseId(leaseId)) return;
       host.flushSync();
     },
   };
+}
+
+const NOOP_LEASE: SampleLease = {
+  leaseId: 0,
+  release() {},
+};
+
+function deliverHostCdrSample(
+  kind: "string" | "pointcloud2",
+  buffer: ArrayBuffer,
+  byteOffset: number,
+  byteLength: number,
+  handler: SubscriptionHandler,
+): void {
+  const cdr = new Uint8Array(buffer, byteOffset, byteLength);
+  switch (kind) {
+    case "string": {
+      const data = decodeStdMsgsStringCdr(cdr);
+      if (data == null) return;
+      handler({ data }, NOOP_LEASE);
+      return;
+    }
+    case "pointcloud2": {
+      const message = decodePointCloud2Cdr(cdr);
+      if (!message) return;
+      handler(message, NOOP_LEASE);
+      return;
+    }
+    default: {
+      const _exhaustive: never = kind;
+      void _exhaustive;
+    }
+  }
 }
 
 /**
@@ -536,6 +575,9 @@ class InlineClient implements RclwebClient {
       onEvent(event) {
         client.#onEvent(event);
       },
+      onSample(event) {
+        client.#deliverSample(event);
+      },
       onTransportError(message) {
         for (const pending of client.#pendingSubs.values()) {
           pending.reject(new Error(message));
@@ -570,6 +612,9 @@ class InlineClient implements RclwebClient {
     const host = await IoHost.create(wasmBytes, {
       onEvent(event) {
         client.#onEvent(event);
+      },
+      onSample(event) {
+        client.#deliverSample(event);
       },
       onTransportError() {},
       onClosed() {},
@@ -709,6 +754,15 @@ class InlineClient implements RclwebClient {
     });
   }
 
+  #deliverSample(event: SampleAppEvent): void {
+    const sink = this.#sampleSinks.get(event.channelId);
+    if (!sink) {
+      this.#host.releaseLease(event.leaseId);
+      return;
+    }
+    sink(event);
+  }
+
   #onEvent(event: AppEvent): void {
     switch (event.type) {
       case "sessionReady":
@@ -810,15 +864,9 @@ class InlineClient implements RclwebClient {
         );
         break;
       }
-      case "sample": {
-        const sink = this.#sampleSinks.get(event.channelId);
-        if (!sink) {
-          this.#host.releaseLease(event.leaseId);
-          break;
-        }
-        sink(event);
+      case "sample":
+        this.#deliverSample(event);
         break;
-      }
       case "serviceReady": {
         const pending = this.#pendingServices.get(event.channelId);
         if (!pending) break;
@@ -1692,6 +1740,18 @@ class WorkerClient implements RclwebClient {
         );
         break;
       }
+      case "sampleHostCdr": {
+        const handler = this.#handlers.get(msg.channelId);
+        if (!handler) break;
+        deliverHostCdrSample(
+          msg.kind,
+          msg.buffer,
+          msg.byteOffset,
+          msg.byteLength,
+          handler,
+        );
+        break;
+      }
       case "samplePointCloud2": {
         const handler = this.#handlers.get(msg.channelId);
         if (!handler) {
@@ -2006,6 +2066,10 @@ class WorkerClient implements RclwebClient {
           void this.#autoReconnect();
         }
         break;
+      }
+      default: {
+        const _exhaustive: never = msg;
+        void _exhaustive;
       }
     }
   }

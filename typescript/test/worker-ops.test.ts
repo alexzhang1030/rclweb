@@ -1,7 +1,8 @@
 /**
  * Worker-path (default `connect`, not `inline`) coverage for subscribe,
- * graph, services, actions, PointCloud2 samples, Worker telemetry, and
- * reconnect that re-opens channels. Scripted peer bytes come from fixture-gen.
+ * graph, services, actions, PointCloud2 host-retain transfer, Worker
+ * telemetry, and reconnect that re-opens channels. Scripted peer bytes
+ * come from fixture-gen.
  */
 
 import { expect, test } from "bun:test";
@@ -368,7 +369,7 @@ function readXyz(data: Uint8Array, index: number): [number, number, number] {
   ];
 }
 
-test("Worker path: PointCloud2 sample copies data across the boundary", async () => {
+test("Worker path: PointCloud2 sample transfers the host-retained buffer", async () => {
   const fixtures = scriptedPeerFixtures();
   const wasmUrl = pathToFileUrl(wasmPath);
   let step: "hello" | "ready" | "channel" | "sample" | "done" = "hello";
@@ -419,6 +420,8 @@ test("Worker path: PointCloud2 sample copies data across the boundary", async ()
     frameId: string;
     field0: string;
     xyz1: [number, number, number];
+    dataByteOffset: number;
+    bufferLen: number;
   }>((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("pc2 timeout")), 5000);
     sub.onMessage((msg, lease) => {
@@ -430,6 +433,8 @@ test("Worker path: PointCloud2 sample copies data across the boundary", async ()
         frameId: msg.frameId,
         field0: msg.fields[0]?.name ?? "",
         xyz1: readXyz(msg.data, 1),
+        dataByteOffset: msg.data.byteOffset,
+        bufferLen: msg.data.buffer.byteLength,
       });
     });
   });
@@ -440,6 +445,10 @@ test("Worker path: PointCloud2 sample copies data across the boundary", async ()
   expect(sample.xyz1[0]).toBeCloseTo(0.01);
   expect(sample.xyz1[1]).toBeCloseTo(0.02);
   expect(sample.xyz1[2]).toBeCloseTo(0.03);
+  // Tight `data.slice()` would be offset 0 in its own buffer. A view of the
+  // transferred WS/frame keeps the R2WP + CDR prefix in the same ArrayBuffer.
+  expect(sample.dataByteOffset).toBeGreaterThan(0);
+  expect(sample.bufferLen).toBeGreaterThan(sample.dataLen);
   await client.close();
   server.stop(true);
 });
@@ -704,6 +713,51 @@ test("Worker path: telemetry() is non-null after a sample", async () => {
     () => (client.telemetry()?.leasesReleased ?? 0) >= telemetry!.samplesEmitted,
   );
   expect(client.telemetry()!.leasesReleased).toBeGreaterThan(0);
+  await client.close();
+  server.stop(true);
+});
+
+test("Worker path: host-retain sample releases the lease before postMessage", async () => {
+  const fixtures = scriptedPeerFixtures();
+  const wasmUrl = pathToFileUrl(wasmPath);
+  let step: HandshakeStep = "hello";
+
+  const server = Bun.serve({
+    port: 0,
+    fetch(req, server) {
+      if (server.upgrade(req)) return undefined;
+      return new Response("expected websocket", { status: 400 });
+    },
+    websocket: {
+      message(ws, message) {
+        const bytes = asWsBytes(message);
+        const next = advanceHandshake(ws, fixtures, bytes, step, fixtures.channelReady);
+        if (next !== step) {
+          step = next;
+          if (step === "active") {
+            setTimeout(() => {
+              ws.send(fixtures.sample);
+            }, 10);
+          }
+        }
+      },
+    },
+  });
+
+  const client = await connect(`ws://127.0.0.1:${server.port}`, { wasmUrl });
+  const sub = await client.session.subscribe("/chatter", std_msgs.msg.String);
+  const sample = await new Promise<{ data: string }>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("sample timeout")), 5000);
+    sub.onMessage((msg) => {
+      clearTimeout(timer);
+      resolve(msg);
+    });
+  });
+  expect(sample.data).toBe("hello-from-fixture");
+  await waitUntil(() => (client.telemetry()?.leasesReleased ?? 0) > 0);
+  expect(client.telemetry()!.leasesReleased).toBeGreaterThanOrEqual(
+    client.telemetry()!.samplesEmitted,
+  );
   await client.close();
   server.stop(true);
 });

@@ -102,6 +102,10 @@ describe("copy-path model", () => {
     expect(framing?.copies).toBe(0);
     const wasm = rclweb.stages.find((s) => s.stage === "Worker → wasm");
     expect(wasm?.copies).toBe(0);
+    const workerMain = rclweb.stages.find(
+      (s) => s.stage === "Worker → main (host-retain)",
+    );
+    expect(workerMain?.copies).toBe(0);
   });
 
   test("Foxglove binary spends its extra copy on gateway framing", () => {

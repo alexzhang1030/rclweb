@@ -8,6 +8,7 @@ import {
   type AppEvent,
   type EngineTelemetrySnapshot,
   type HostEventInput,
+  type SampleAppEvent,
   type PointCloud2Meta,
   type WasmExports,
   decodeGeneratedBytes,
@@ -38,6 +39,11 @@ import {
 
 export type HostCallbacks = {
   onEvent(event: AppEvent): void;
+  /**
+   * Idle-queue ROS_SAMPLE only. When set, skips the generic `onEvent` switch.
+   * The event is reused; do not retain it.
+   */
+  onSample?(event: SampleAppEvent): void;
   onTransportError(message: string): void;
   onClosed(): void;
   /** Called after each poll with the latest engine counters (Worker telemetry). */
@@ -740,7 +746,8 @@ export class IoHost {
     if (this.#pending.length === 0) {
       const event = tryPinHostSample(this.#handle, bytes);
       if (event) {
-        this.#callbacks.onEvent(event);
+        const deliver = this.#callbacks.onSample ?? this.#callbacks.onEvent;
+        deliver(event);
         this.#emitTelemetry();
         return;
       }

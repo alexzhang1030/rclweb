@@ -5,9 +5,10 @@
  *
  * Service/action payloads are copied out of wasm in the Worker and the lease
  * is released there. Generated service/action roots copy packed host-value
- * bytes; untyped channels stay CDR. PointCloud2 `data` is copied the same
- * way. Generated corpus messages are copied as host-value objects. Main never
- * sees payload pointers.
+ * bytes; untyped channels stay CDR. Host-retain String / PointCloud2 transfer
+ * the WS/frame `ArrayBuffer` (`sampleHostCdr`); the Worker releases the host
+ * lease first. Generated corpus messages are copied as host-value objects.
+ * Main never sees payload pointers.
  */
 
 import type { GeneratedMsg } from "../generated-value.ts";
@@ -186,6 +187,14 @@ export type WorkerToMain =
       channelId: number;
       leaseId: number;
       message: PointCloud2;
+    }
+  | {
+      type: "sampleHostCdr";
+      channelId: number;
+      kind: "string" | "pointcloud2";
+      buffer: ArrayBuffer;
+      byteOffset: number;
+      byteLength: number;
     }
   | {
       type: "sampleGenerated";
