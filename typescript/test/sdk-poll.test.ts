@@ -240,7 +240,6 @@ test("scripted peer: idle-queue ROS_SAMPLE delivers without flushSync", async ()
   host.ingestBytes(fixtures.sample);
   expect(saw).toBe("hello-from-fixture");
 
-  host.flushSync();
   const telemetry = client.telemetry();
   expect(telemetry!.leasesReleased).toBe(telemetry!.samplesEmitted);
 
@@ -298,10 +297,8 @@ test("scripted peer: sample with no handler still releases its lease", async () 
 
   // Deliberately no onMessage handler: the no-handler drop path must release
   // the lease (subscribed + first sample can share one poll flush).
+  // Host-retained ROS_SAMPLE release is synchronous — no second flush.
   host.ingestBytes(fixtures.sample);
-  host.flushSync();
-  // The drop-site release is enqueued (not flushSync'd); drain it.
-  host.flushSync();
 
   const telemetry = client.telemetry();
   expect(telemetry).not.toBeNull();
@@ -524,8 +521,6 @@ test("scripted peer: PointCloud2 sample with no handler still releases its lease
   await subPromise;
 
   host.ingestBytes(fixtures.pointCloud2Sample);
-  host.flushSync();
-  host.flushSync();
 
   const telemetry = client.telemetry();
   expect(telemetry).not.toBeNull();
