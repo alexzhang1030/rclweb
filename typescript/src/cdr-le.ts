@@ -77,12 +77,13 @@ export class CdrLeReader {
 
 /** `std_msgs/msg/String`. Returns null when the payload is not LE CDR string. */
 export function decodeStdMsgsStringCdr(cdr: Uint8Array): string | null {
-  try {
-    if (cdr.length < 8) return null;
-    return new CdrLeReader(cdr).str();
-  } catch {
-    return null;
-  }
+  // Encapsulation + u32 length; no CdrLeReader / try/catch on the hot path.
+  if (cdr.length < 8 || cdr[1] !== 1) return null;
+  const n =
+    (cdr[4]! | (cdr[5]! << 8) | (cdr[6]! << 16) | (cdr[7]! << 24)) >>> 0;
+  if (n === 0) return "";
+  if (8 + n > cdr.length) return null;
+  return td.decode(cdr.subarray(8, 8 + n - 1));
 }
 
 /** PointCloud2: metadata plus a view of `data` into `cdr`. */

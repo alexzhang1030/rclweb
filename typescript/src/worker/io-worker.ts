@@ -6,14 +6,20 @@
  * Service/action payloads are copied out of wasm here and the lease is
  * released before the message crosses to main. Generated service/action
  * roots become packed host-value bytes; untyped channels stay CDR.
- * PointCloud2 `data` is copied the same way; generated corpus messages are
- * copied as host-value objects. String samples keep the lease until main
- * calls release().
+ * Host-retain String / PointCloud2 transfer the WS/frame buffer and
+ * release the host lease first. Generated corpus messages are copied as
+ * host-value objects. Wasm-backed samples keep the old copy / string path.
  */
 
 import { IoHost } from "../host.ts";
-import { generatedOpTypeName, isGeneratedMsgType, type GeneratedOpKind } from "../interfaces.ts";
+import {
+  generatedOpTypeName,
+  isGeneratedMsgType,
+  PointCloud2 as PointCloud2Msg,
+  type GeneratedOpKind,
+} from "../interfaces.ts";
 import type { GeneratedMsg } from "../generated-value.ts";
+import type { SampleAppEvent } from "../wasm/abi.ts";
 import type { MainToWorker, WorkerToMain } from "./messages.ts";
 
 declare const self: DedicatedWorkerGlobalScope;
@@ -71,6 +77,102 @@ function asBytes(value: Uint8Array | number[]): Uint8Array {
   return value instanceof Uint8Array ? value : Uint8Array.from(value);
 }
 
+function isPointCloud2Type(typeName: string | undefined): boolean {
+  return (
+    typeName === PointCloud2Msg.typeName ||
+    typeName === "sensor_msgs/PointCloud2"
+  );
+}
+
+function transferHostCdr(
+  io: IoHost,
+  event: SampleAppEvent,
+  kind: "string" | "pointcloud2",
+): boolean {
+  const payload = event.hostPayload;
+  if (!payload) return false;
+  const buffer = payload.buffer;
+  if (!(buffer instanceof ArrayBuffer)) return false;
+  const byteOffset = payload.byteOffset;
+  const byteLength = payload.byteLength;
+  event.hostPayload = undefined;
+  io.releaseLease(event.leaseId);
+  post(
+    {
+      type: "sampleHostCdr",
+      channelId: event.channelId,
+      kind,
+      buffer,
+      byteOffset,
+      byteLength,
+    },
+    [buffer],
+  );
+  return true;
+}
+
+function deliverSample(event: SampleAppEvent): void {
+  if (!host) return;
+  const typeName = channelTypes.get(event.channelId);
+  if (typeName && isGeneratedMsgType(typeName)) {
+    const copied = host.decodeGenerated(
+      typeName,
+      event.payloadPtr,
+      event.payloadLen,
+      event.hostPayload,
+    );
+    host.releaseLease(event.leaseId);
+    host.flushSync();
+    if (copied) {
+      post(
+        {
+          type: "sampleGenerated",
+          channelId: event.channelId,
+          leaseId: event.leaseId,
+          typeName,
+          message: copied,
+        },
+        generatedTransferables(copied),
+      );
+    }
+    return;
+  }
+  const kind: "string" | "pointcloud2" = isPointCloud2Type(typeName)
+    ? "pointcloud2"
+    : "string";
+  if (transferHostCdr(host, event, kind)) return;
+  if (kind === "string") {
+    host.fillStringSample(event, typeName);
+    if (event.stringData != null) {
+      post({
+        type: "sample",
+        channelId: event.channelId,
+        leaseId: event.leaseId,
+        data: event.stringData,
+      });
+      return;
+    }
+  }
+  const copied = host.copyPointCloud2(
+    event.payloadPtr,
+    event.payloadLen,
+    event.hostPayload,
+  );
+  host.releaseLease(event.leaseId);
+  host.flushSync();
+  if (copied) {
+    post(
+      {
+        type: "samplePointCloud2",
+        channelId: event.channelId,
+        leaseId: event.leaseId,
+        message: copied,
+      },
+      [copied.data.buffer],
+    );
+  }
+}
+
 function copyAndRelease(
   event: {
     payloadPtr: number;
@@ -118,6 +220,9 @@ self.onmessage = async (ev: MessageEvent<MainToWorker>) => {
         }
         const bytes = await response.arrayBuffer();
         host = await IoHost.create(bytes, {
+          onSample(event) {
+            deliverSample(event);
+          },
           onEvent(event) {
             switch (event.type) {
               case "sessionReady":
@@ -172,64 +277,9 @@ self.onmessage = async (ev: MessageEvent<MainToWorker>) => {
                 pendingPublish.delete(event.channelId);
                 break;
               }
-              case "sample": {
-                host?.fillStringSample(
-                  event,
-                  channelTypes.get(event.channelId),
-                );
-                if (event.stringData != null) {
-                  post({
-                    type: "sample",
-                    channelId: event.channelId,
-                    leaseId: event.leaseId,
-                    data: event.stringData,
-                  });
-                } else {
-                  const typeName = channelTypes.get(event.channelId);
-                  if (typeName && isGeneratedMsgType(typeName)) {
-                    const copied = host?.decodeGenerated(
-                      typeName,
-                      event.payloadPtr,
-                      event.payloadLen,
-                      event.hostPayload,
-                    );
-                    host?.releaseLease(event.leaseId);
-                    host?.flushSync();
-                    if (copied) {
-                      post(
-                        {
-                          type: "sampleGenerated",
-                          channelId: event.channelId,
-                          leaseId: event.leaseId,
-                          typeName,
-                          message: copied,
-                        },
-                        generatedTransferables(copied),
-                      );
-                    }
-                  } else {
-                    const copied = host?.copyPointCloud2(
-                      event.payloadPtr,
-                      event.payloadLen,
-                      event.hostPayload,
-                    );
-                    host?.releaseLease(event.leaseId);
-                    host?.flushSync();
-                    if (copied) {
-                      post(
-                        {
-                          type: "samplePointCloud2",
-                          channelId: event.channelId,
-                          leaseId: event.leaseId,
-                          message: copied,
-                        },
-                        [copied.data.buffer],
-                      );
-                    }
-                  }
-                }
+              case "sample":
+                deliverSample(event);
                 break;
-              }
               case "serviceReady": {
                 const pending = pendingService.get(event.channelId);
                 post({

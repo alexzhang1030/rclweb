@@ -8,6 +8,7 @@ import {
   type AppEvent,
   type EngineTelemetrySnapshot,
   type HostEventInput,
+  type SampleAppEvent,
   type PointCloud2Meta,
   type WasmExports,
   decodeGeneratedBytes,
@@ -18,6 +19,7 @@ import {
   pollEngine,
   readTelemetryAt,
   tryPinHostSample,
+  tryReleaseHostLease,
 } from "./wasm/abi.ts";
 import { decodePointCloud2Cdr, decodeStdMsgsStringCdr } from "./cdr-le.ts";
 import {
@@ -37,6 +39,11 @@ import {
 
 export type HostCallbacks = {
   onEvent(event: AppEvent): void;
+  /**
+   * Idle-queue ROS_SAMPLE only. When set, skips the generic `onEvent` switch.
+   * The event is reused; do not retain it.
+   */
+  onSample?(event: SampleAppEvent): void;
   onTransportError(message: string): void;
   onClosed(): void;
   /** Called after each poll with the latest engine counters (Worker telemetry). */
@@ -243,27 +250,15 @@ export class IoHost {
   async #readWtLoop(
     reader: ReadableStreamDefaultReader<Uint8Array>,
   ): Promise<void> {
-    let pending = new Uint8Array(0);
+    const inbox = createLengthPrefixedInbox();
     try {
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
         if (!value || value.byteLength === 0) continue;
-        const merged = new Uint8Array(pending.length + value.length);
-        merged.set(pending, 0);
-        merged.set(value, pending.length);
-        pending = merged;
-        while (pending.length >= 4) {
-          const len = new DataView(
-            pending.buffer,
-            pending.byteOffset,
-            pending.byteLength,
-          ).getUint32(0, false);
-          if (pending.length < 4 + len) break;
-          const frame = pending.slice(4, 4 + len);
-          pending = pending.slice(4 + len);
+        pushLengthPrefixedChunk(inbox, value, (frame) => {
           this.#ingestWsBytes(frame);
-        }
+        });
       }
     } catch (err) {
       this.#callbacks.onTransportError(
@@ -705,6 +700,10 @@ export class IoHost {
   }
 
   releaseLease(leaseId: number): void {
+    if (tryReleaseHostLease(leaseId)) {
+      this.#emitTelemetry();
+      return;
+    }
     this.#enqueue({ type: "releaseLease", leaseId });
   }
 
@@ -747,7 +746,9 @@ export class IoHost {
     if (this.#pending.length === 0) {
       const event = tryPinHostSample(this.#handle, bytes);
       if (event) {
-        this.#callbacks.onEvent(event);
+        const deliver = this.#callbacks.onSample ?? this.#callbacks.onEvent;
+        deliver(event);
+        this.#emitTelemetry();
         return;
       }
     }
@@ -779,11 +780,7 @@ export class IoHost {
     const batch = this.#pending;
     this.#pending = [];
     const result = pollEngine(this.#wasm, this.#handle, batch);
-    const onPollEnd = this.#callbacks.onPollEnd;
-    if (onPollEnd) {
-      this.#lastTelemetry = this.#readTelemetry();
-      onPollEnd(this.#lastTelemetry);
-    }
+    this.#emitTelemetry();
     for (const msg of result.outbound) {
       const sink = this.#sink;
       if (sink) {
@@ -829,6 +826,13 @@ export class IoHost {
     return this.#lastTelemetry;
   }
 
+  #emitTelemetry(): void {
+    const onPollEnd = this.#callbacks.onPollEnd;
+    if (!onPollEnd) return;
+    this.#lastTelemetry = this.#readTelemetry();
+    onPollEnd(this.#lastTelemetry);
+  }
+
   #readTelemetry(): EngineTelemetrySnapshot {
     if (this.#telemetryPtr === 0) {
       this.#telemetryPtr = this.#wasm.rclweb_alloc(56);
@@ -837,6 +841,69 @@ export class IoHost {
       }
     }
     return readTelemetryAt(this.#wasm, this.#handle, this.#telemetryPtr);
+  }
+}
+
+const WT_INBOX_INITIAL = 4096;
+
+export type LengthPrefixedInbox = {
+  buf: Uint8Array;
+  start: number;
+  end: number;
+};
+
+export function createLengthPrefixedInbox(
+  capacity = WT_INBOX_INITIAL,
+): LengthPrefixedInbox {
+  return { buf: new Uint8Array(capacity), start: 0, end: 0 };
+}
+
+function ensureInboxCapacity(inbox: LengthPrefixedInbox, extra: number): void {
+  const live = inbox.end - inbox.start;
+  const need = live + extra;
+  if (need <= inbox.buf.length) {
+    if (inbox.end + extra > inbox.buf.length) {
+      inbox.buf.copyWithin(0, inbox.start, inbox.end);
+      inbox.end = live;
+      inbox.start = 0;
+    }
+    return;
+  }
+  let cap = Math.max(inbox.buf.length, 1);
+  while (cap < need) cap *= 2;
+  const next = new Uint8Array(cap);
+  next.set(inbox.buf.subarray(inbox.start, inbox.end));
+  inbox.buf = next;
+  inbox.start = 0;
+  inbox.end = live;
+}
+
+/**
+ * Append a length-prefixed WT chunk (u32 BE length + frame).
+ * Each complete frame is copied out — ingest pins that copy until lease.release(),
+ * and the inbox buffer is reused.
+ */
+export function pushLengthPrefixedChunk(
+  inbox: LengthPrefixedInbox,
+  chunk: Uint8Array,
+  emit: (frame: Uint8Array) => void,
+): void {
+  ensureInboxCapacity(inbox, chunk.length);
+  inbox.buf.set(chunk, inbox.end);
+  inbox.end += chunk.length;
+  while (inbox.end - inbox.start >= 4) {
+    const len = new DataView(
+      inbox.buf.buffer,
+      inbox.buf.byteOffset + inbox.start,
+      4,
+    ).getUint32(0, false);
+    if (inbox.end - inbox.start < 4 + len) break;
+    emit(inbox.buf.slice(inbox.start + 4, inbox.start + 4 + len));
+    inbox.start += 4 + len;
+  }
+  if (inbox.start === inbox.end) {
+    inbox.start = 0;
+    inbox.end = 0;
   }
 }
 

@@ -60,17 +60,23 @@ JavaScript already owned buffer lifetimes.
 ## Consequences
 
 - Controllable inbound copies drop from two to **one** (RMW serialized
-  take). Worker→wasm is 0 for sample bodies.
+  take). Worker→wasm is 0 for sample bodies. Worker→main host-retain
+  String / PointCloud2 is a transfer of the WS/frame `ArrayBuffer` (0
+  extra copies); the Worker releases the host lease before the transfer.
+  Main decodes; PointCloud2 `data` is a view of that buffer. Service/action
+  CDR and generated corpus messages still copy. Public `Node` still copies
+  PointCloud2 `data` (rclcpp-owned message).
 - `just perf-baseline` splits decode hops (header skip + CDR, paired)
   from deliver hops (framed bytes → callback). `rclweb.ingest` pairs
   with `foxglove.deliver`, not with a 13-byte MessageData skip. Idle-queue
   ROS_SAMPLE skips the host poll batch (enqueue / flush / `PollResult`);
-  a sample behind queued control stays ordered.
-- The I/O Worker still copies PointCloud2 `data` (and service/action CDR)
-  onto the main thread.
+  a sample behind queued control stays ordered. Host-lease `release()`
+  is synchronous (`tryReleaseHostLease`); wasm-backed leases still flush.
+  Idle pin does not read sequence / source time (nothing on the deliver
+  path uses them).
 - `hostRetainPrefixLen` peeks version, opcode, `payload_len`, and
   `extension_len`. It is not a second R2WP implementation. The ROS_SAMPLE
-  hot path additionally reads channel / sequence / time from that header.
+  hot path additionally reads the channel id from that header.
 
 ## Revisit triggers
 

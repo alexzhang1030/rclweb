@@ -3,8 +3,9 @@
  *
  * This is not a live e2e measurement. It names the hops each system
  * takes after the payload exists as serialized bytes. Network RX/TX
- * sits outside the budget. Optional application copies (public Node,
- * Worker `postMessage`, Studio GPU upload) are listed separately.
+ * sits outside the budget. Optional application copies (public Node
+ * PointCloud2 `data`, service/action Worker copies, Studio GPU upload)
+ * are listed separately.
  *
  * Machine-checkable copy counts for [docs/performance.md](../../docs/performance.md).
  */
@@ -82,10 +83,16 @@ export const COPY_PATHS: Record<CopySystemId, CopyPath> = {
       note: "TypedArray view of the host-retained WebSocket buffer (rcl-web/internal)",
     },
     {
-      stage: "public Node / Worker → main",
+      stage: "Worker → main (host-retain)",
+      copies: 0,
+      kind: "optional",
+      note: "transfer the host-retained WS/frame ArrayBuffer; Worker releases the host lease first",
+    },
+    {
+      stage: "public Node PointCloud2 data",
       copies: 1,
       kind: "optional",
-      note: "PointCloud2 data (and service/action CDR) copied so the app never holds a lease",
+      note: "Node copies data so the app never holds a lease (rclcpp-owned message)",
     },
   ]),
   "foxglove-bridge": path("foxglove-bridge", "Foxglove Bridge (MessageData)", [

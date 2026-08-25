@@ -945,7 +945,12 @@ function attachHostPayloads(
 }
 
 const OPCODE_ROS_SAMPLE = 2;
-const HOST_LEASE_FLAG = 0x80000000;
+export const HOST_LEASE_FLAG = 0x80000000;
+
+export function isHostLeaseId(leaseId: number): boolean {
+  return (leaseId >>> 0) >= HOST_LEASE_FLAG;
+}
+
 let hostLeaseSeq = 1;
 
 type HostLease = { frame: Uint8Array; handle: number };
@@ -953,6 +958,30 @@ type HostEngineCounters = { samplesEmitted: number; leasesReleased: number };
 
 const hostLeases = new Map<number, HostLease>();
 const hostEngineTelemetry = new Map<number, HostEngineCounters>();
+
+/**
+ * Idle-queue sample event. `onEvent` / `onSample` are synchronous and must
+ * not retain this object; a later idle sample overwrites the same fields.
+ */
+const idleSampleEvent: SampleAppEvent = {
+  type: "sample",
+  channelId: 0,
+  leaseId: 0,
+  sequence: 0n,
+  sourceTimeNs: 0n,
+  payloadPtr: 0,
+  payloadLen: 0,
+  stringData: null,
+};
+
+/** Complete no-extension ROS_SAMPLE. Not a second R2WP codec. */
+function isCompleteNoExtRosSample(bytes: Uint8Array): boolean {
+  if (bytes.length < R2WP_HEADER_LEN) return false;
+  if (bytes[0] !== 0 || bytes[1] !== OPCODE_ROS_SAMPLE) return false;
+  if (bytes[28] !== 0 || bytes[29] !== 0) return false;
+  const payloadLen = readU32BE(bytes, 24);
+  return payloadLen !== 0 && R2WP_HEADER_LEN + payloadLen === bytes.length;
+}
 
 function hostCounters(handle: number): HostEngineCounters {
   let counters = hostEngineTelemetry.get(handle);
@@ -987,14 +1016,14 @@ function overlayHostTelemetry(
   };
 }
 
-function readU64BE(bytes: Uint8Array, offset: number): bigint {
-  const hi = BigInt(readU32BE(bytes, offset));
-  const lo = BigInt(readU32BE(bytes, offset + 4));
-  return (hi << 32n) + lo;
-}
-
-function readI64BE(bytes: Uint8Array, offset: number): bigint {
-  return BigInt.asIntN(64, readU64BE(bytes, offset));
+/** Release a host-pinned ROS_SAMPLE without a poll batch. */
+export function tryReleaseHostLease(leaseId: number): boolean {
+  const id = leaseId >>> 0;
+  const lease = hostLeases.get(id);
+  if (!lease) return false;
+  hostLeases.delete(id);
+  hostCounters(lease.handle).leasesReleased += 1;
+  return true;
 }
 
 function dropHostReleases(events: HostEventInput[]): HostEventInput[] {
@@ -1008,14 +1037,8 @@ function dropHostReleases(events: HostEventInput[]): HostEventInput[] {
   if (!drop) return events;
   const rest: HostEventInput[] = [];
   for (const event of events) {
-    if (event.type === "releaseLease") {
-      const id = event.leaseId >>> 0;
-      const lease = hostLeases.get(id);
-      if (lease) {
-        hostLeases.delete(id);
-        hostCounters(lease.handle).leasesReleased += 1;
-        continue;
-      }
+    if (event.type === "releaseLease" && tryReleaseHostLease(event.leaseId)) {
+      continue;
     }
     rest.push(event);
   }
@@ -1026,21 +1049,26 @@ function emptyPollResult(): PollResult {
   return { outbound: [], events: [], released: [], nextDeadlineMs: null };
 }
 
-/** Pin a no-extension ROS_SAMPLE in the host lease table. */
+function allocHostLease(handle: number, frame: Uint8Array): number {
+  const leaseId = (HOST_LEASE_FLAG | (hostLeaseSeq++ & 0x7fffffff)) >>> 0;
+  hostLeases.set(leaseId, { frame, handle });
+  hostCounters(handle).samplesEmitted += 1;
+  return leaseId;
+}
+
+/** Pin a no-extension ROS_SAMPLE in the host lease table (queued/poll path). */
 function pinHostSample(
   handle: number,
   frame: Uint8Array,
   prefixLen: number,
 ): SampleAppEvent {
-  const leaseId = (HOST_LEASE_FLAG | (hostLeaseSeq++ & 0x7fffffff)) >>> 0;
-  hostLeases.set(leaseId, { frame, handle });
-  hostCounters(handle).samplesEmitted += 1;
+  const leaseId = allocHostLease(handle, frame);
   return {
     type: "sample",
     channelId: readU32BE(frame, 4),
     leaseId,
-    sequence: readU64BE(frame, 8),
-    sourceTimeNs: readI64BE(frame, 16),
+    sequence: 0n,
+    sourceTimeNs: 0n,
     payloadPtr: 0,
     payloadLen: frame.length - prefixLen,
     stringData: null,
@@ -1051,16 +1079,22 @@ function pinHostSample(
 /**
  * Idle-queue ROS_SAMPLE: pin the WS buffer without a poll batch.
  * Returns null when the frame is not a complete no-extension ROS_SAMPLE.
+ * The returned event is reused; callers must not retain it.
  */
 export function tryPinHostSample(
   handle: number,
   bytes: Uint8Array,
 ): SampleAppEvent | null {
-  const prefixLen = hostRetainPrefixLen(bytes);
-  if (prefixLen !== R2WP_HEADER_LEN || bytes[1] !== OPCODE_ROS_SAMPLE) {
+  if (!isCompleteNoExtRosSample(bytes)) {
     return null;
   }
-  return pinHostSample(handle, bytes, prefixLen);
+  const leaseId = allocHostLease(handle, bytes);
+  idleSampleEvent.channelId = readU32BE(bytes, 4);
+  idleSampleEvent.leaseId = leaseId;
+  idleSampleEvent.payloadLen = bytes.length - R2WP_HEADER_LEN;
+  idleSampleEvent.stringData = null;
+  idleSampleEvent.hostPayload = bytes.subarray(R2WP_HEADER_LEN);
+  return idleSampleEvent;
 }
 
 function pollSampleHostRetain(
@@ -1815,10 +1849,10 @@ function pollOneExternalWs(
   handle: number,
   event: Extract<HostEventInput, { type: "wsBytes" }>,
 ): PollResult {
-  const prefixLen = hostRetainPrefixLen(event.bytes);
-  if (prefixLen === R2WP_HEADER_LEN && event.bytes[1] === OPCODE_ROS_SAMPLE) {
-    return pollSampleHostRetain(handle, event.bytes, prefixLen);
+  if (isCompleteNoExtRosSample(event.bytes)) {
+    return pollSampleHostRetain(handle, event.bytes, R2WP_HEADER_LEN);
   }
+  const prefixLen = hostRetainPrefixLen(event.bytes);
   const copyLen = prefixLen ?? event.bytes.length;
   const ptr = copyLen === 0 ? 0 : wasm.rclweb_alloc(copyLen);
   if (copyLen !== 0 && ptr === 0) {
