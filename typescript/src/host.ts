@@ -694,7 +694,10 @@ export class IoHost {
   }
 
   releaseLease(leaseId: number): void {
-    if (tryReleaseHostLease(leaseId)) return;
+    if (tryReleaseHostLease(leaseId)) {
+      this.#emitTelemetry();
+      return;
+    }
     this.#enqueue({ type: "releaseLease", leaseId });
   }
 
@@ -738,6 +741,7 @@ export class IoHost {
       const event = tryPinHostSample(this.#handle, bytes);
       if (event) {
         this.#callbacks.onEvent(event);
+        this.#emitTelemetry();
         return;
       }
     }
@@ -769,11 +773,7 @@ export class IoHost {
     const batch = this.#pending;
     this.#pending = [];
     const result = pollEngine(this.#wasm, this.#handle, batch);
-    const onPollEnd = this.#callbacks.onPollEnd;
-    if (onPollEnd) {
-      this.#lastTelemetry = this.#readTelemetry();
-      onPollEnd(this.#lastTelemetry);
-    }
+    this.#emitTelemetry();
     for (const msg of result.outbound) {
       const sink = this.#sink;
       if (sink) {
@@ -817,6 +817,13 @@ export class IoHost {
       // keep last known
     }
     return this.#lastTelemetry;
+  }
+
+  #emitTelemetry(): void {
+    const onPollEnd = this.#callbacks.onPollEnd;
+    if (!onPollEnd) return;
+    this.#lastTelemetry = this.#readTelemetry();
+    onPollEnd(this.#lastTelemetry);
   }
 
   #readTelemetry(): EngineTelemetrySnapshot {

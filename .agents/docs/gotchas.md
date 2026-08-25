@@ -115,7 +115,7 @@ v0.1 parks SessionResume (capability 1). Reconnect means: close the transport, a
 
 ## Worker telemetry is the last poll snapshot
 
-`WorkerClient.telemetry()` used to return `null` because engine counters lived only inside the Worker. `IoHost` posts a telemetry message at the end of each poll when `onPollEnd` is set (the Worker always sets it), before sample/op events, and main caches the latest snapshot. Inline hosts skip that read unless `onPollEnd` is set; `telemetry()` still reads wasm on demand. The API stays synchronous. Do not block delivery on a telemetry round-trip, and do not read wasm counters from the main thread.
+`WorkerClient.telemetry()` used to return `null` because engine counters lived only inside the Worker. `IoHost` posts a telemetry message at the end of each poll when `onPollEnd` is set (the Worker always sets it), before sample/op events, and also after an idle-queue host pin or a synchronous host-lease release — those paths never enter a poll batch. Main caches the latest snapshot. Inline hosts skip that read unless `onPollEnd` is set; `telemetry()` still reads wasm on demand. The API stays synchronous. Do not block delivery on a telemetry round-trip, and do not read wasm counters from the main thread.
 
 ## GraphSnapshot follows SessionReady on the gateway
 
