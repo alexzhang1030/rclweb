@@ -69,6 +69,24 @@ area. The application API is [`docs/api.md`](docs/api.md); the how-to is
 [`docs/typescript.md`](docs/typescript.md). Durable decisions live under
 [`docs/adr/`](docs/adr/README.md).
 
+## Unused branches
+
+The repository setting Automatically delete head branches is on, so a
+merged PR deletes its GitHub head.
+
+[`.github/workflows/delete-unused-branches.yml`](.github/workflows/delete-unused-branches.yml)
+also deletes the same-repo head when a PR closes without merging, and
+once a day deletes leftover heads that already have a merged PR or that
+have no PR and a tip older than 14 days. `main` and protected branches
+are never deleted. A just-closed unmerged head that the close job missed
+stays until that 14-day sweep.
+
+Dry-run (needs `GH_TOKEN` or `GITHUB_TOKEN`):
+
+```bash
+bun run scripts/delete-unused-branches.ts --dry-run
+```
+
 ## License
 
 Apache-2.0 ([LICENSE](./LICENSE), [NOTICE](./NOTICE),
