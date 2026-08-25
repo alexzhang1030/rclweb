@@ -15,7 +15,11 @@ import {
   type EngineTelemetrySnapshot,
   type SampleAppEvent,
 } from "./wasm/abi.ts";
-import { decodePointCloud2Cdr, decodeStdMsgsStringCdr } from "./cdr-le.ts";
+import {
+  decodeGeneratedCdr,
+  decodePointCloud2Cdr,
+  decodeStdMsgsStringCdr,
+} from "./cdr-le.ts";
 import {
   Collections,
   NestedSample,
@@ -381,14 +385,11 @@ const NOOP_LEASE: SampleLease = {
 };
 
 function deliverHostCdrSample(
-  kind: "string" | "pointcloud2",
-  buffer: ArrayBuffer,
-  byteOffset: number,
-  byteLength: number,
+  msg: Extract<WorkerToMain, { type: "sampleHostCdr" }>,
   handler: SubscriptionHandler,
 ): void {
-  const cdr = new Uint8Array(buffer, byteOffset, byteLength);
-  switch (kind) {
+  const cdr = new Uint8Array(msg.buffer, msg.byteOffset, msg.byteLength);
+  switch (msg.kind) {
     case "string": {
       const data = decodeStdMsgsStringCdr(cdr);
       if (data == null) return;
@@ -401,8 +402,14 @@ function deliverHostCdrSample(
       handler(message, NOOP_LEASE);
       return;
     }
+    case "generated": {
+      const generated = decodeGeneratedCdr(msg.typeName, cdr);
+      if (!generated) return;
+      handler(generated, NOOP_LEASE);
+      return;
+    }
     default: {
-      const _exhaustive: never = kind;
+      const _exhaustive: never = msg;
       void _exhaustive;
     }
   }
@@ -454,12 +461,13 @@ function bindSampleSink(
   }
   if (isGeneratedMsgType(typeName)) {
     return (event) => {
-      const generated = host.decodeGenerated(
-        typeName,
-        event.payloadPtr,
-        event.payloadLen,
-        event.hostPayload,
-      );
+      const generated = event.hostPayload
+        ? decodeGeneratedCdr(typeName, event.hostPayload)
+        : host.decodeGenerated(
+            typeName,
+            event.payloadPtr,
+            event.payloadLen,
+          );
       if (!generated) {
         host.releaseLease(event.leaseId);
         return;
@@ -1743,13 +1751,7 @@ class WorkerClient implements RclwebClient {
       case "sampleHostCdr": {
         const handler = this.#handlers.get(msg.channelId);
         if (!handler) break;
-        deliverHostCdrSample(
-          msg.kind,
-          msg.buffer,
-          msg.byteOffset,
-          msg.byteLength,
-          handler,
-        );
+        deliverHostCdrSample(msg, handler);
         break;
       }
       case "samplePointCloud2": {

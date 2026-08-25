@@ -86,7 +86,7 @@ export const COPY_PATHS: Record<CopySystemId, CopyPath> = {
       stage: "Worker → main (host-retain)",
       copies: 0,
       kind: "optional",
-      note: "transfer the host-retained WS/frame ArrayBuffer; Worker releases the host lease first",
+      note: "transfer the host-retained WS/frame ArrayBuffer (String / PointCloud2 / generated corpus msg); Worker releases the host lease first",
     },
     {
       stage: "public Node PointCloud2 data",

@@ -4,7 +4,7 @@ Authoritative runtime contract for rclweb generated types and the schema-identit
 
 ## Purpose
 
-The generator turns the committed authoritative ROS corpus into production Rust models, CDR1 codecs, and a dual-scheme schema registry. The browser runtime resolves schema material by identity before channel activation, encodes and decodes sample payloads with `rclweb::cdr`, and applies the committed top-level zero-tail declaration from wire-profile resolution metadata. Dynamic type description and lazy field projection remain later work.
+The generator turns the committed authoritative ROS corpus into production Rust models, CDR1 codecs, and a dual-scheme schema registry. The browser runtime resolves schema material by identity before channel activation. Inbound generated topic samples decode from the host-retained CDR in JavaScript (`decodeGeneratedCdr`); outbound topics and service/action still use the wasm generated codecs (`rclweb::cdr`). Dynamic type description and lazy field projection remain later work.
 
 ## Authoritative inputs
 

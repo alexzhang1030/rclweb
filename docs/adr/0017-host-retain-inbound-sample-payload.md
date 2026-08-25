@@ -30,19 +30,19 @@ miss and an ADR 0004 revisit trigger (copy count / latency).
 
 - Inbound **ROS_SAMPLE** frames with no extension stay on the host. The
   host peeks the R2WP header, pins the WebSocket `Uint8Array` until
-  `lease.release()`, and decodes String / PointCloud2 from that buffer.
-  Wasm is not on that data plane (session still owns control, channels,
-  service/action, and generated codecs).
+  `lease.release()`, and decodes String / PointCloud2 / generated corpus
+  msg roots from that buffer. Wasm is not on that data plane (session
+  still owns control, channels, and service/action codecs).
 - Other application-data frames (opcodes 3–12, or samples with an
   extension) copy only the R2WP header + extension prefix into wasm. The
   CDR body stays in the host `Uint8Array` for the sample lease.
 - A poll-result sentinel `payload_ptr == 0 && payload_len > 0` means the
   body is host-backed. Wasm allocators never return a non-empty region at
   address 0.
-- `std_msgs/msg/String` and `sensor_msgs/msg/PointCloud2` decode from that
-  host buffer. PointCloud2 `data` is a view of the WebSocket bytes, matching
-  Foxglove. Generated corpus types still copy CDR into wasm for
-  `rclweb_decode_generated`.
+- `std_msgs/msg/String`, `sensor_msgs/msg/PointCloud2`, and the three
+  generated corpus msg roots decode from that host buffer. PointCloud2
+  `data` and Collections `bytes_value` are views of the WebSocket bytes.
+  Service/action still copy CDR into wasm for `rclweb_decode_generated`.
 - Control, bootstrap, and experimental opcodes still copy the full frame.
 - Public `parse_frame` stays complete-frame-only. Prefix ingest uses
   `parse_frame_declared`. The gateway is unchanged.
@@ -61,11 +61,12 @@ JavaScript already owned buffer lifetimes.
 
 - Controllable inbound copies drop from two to **one** (RMW serialized
   take). Worker→wasm is 0 for sample bodies. Worker→main host-retain
-  String / PointCloud2 is a transfer of the WS/frame `ArrayBuffer` (0
-  extra copies); the Worker releases the host lease before the transfer.
-  Main decodes; PointCloud2 `data` is a view of that buffer. Service/action
-  CDR and generated corpus messages still copy. Public `Node` still copies
-  PointCloud2 `data` (rclcpp-owned message).
+  String / PointCloud2 / generated corpus msg is a transfer of the
+  WS/frame `ArrayBuffer` (0 extra copies); the Worker releases the host
+  lease before the transfer. Main decodes; PointCloud2 `data` and
+  Collections `bytes_value` are views of that buffer. Service/action CDR
+  still copies. Public `Node` still copies PointCloud2 `data`
+  (rclcpp-owned message).
 - `just perf-baseline` splits decode hops (header skip + CDR, paired)
   from deliver hops (framed bytes → callback). `rclweb.ingest` pairs
   with `foxglove.deliver`, not with a 13-byte MessageData skip. Idle-queue

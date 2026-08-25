@@ -21,7 +21,11 @@ import {
   tryPinHostSample,
   tryReleaseHostLease,
 } from "./wasm/abi.ts";
-import { decodePointCloud2Cdr, decodeStdMsgsStringCdr } from "./cdr-le.ts";
+import {
+  decodeGeneratedCdr,
+  decodePointCloud2Cdr,
+  decodeStdMsgsStringCdr,
+} from "./cdr-le.ts";
 import {
   decodeGeneratedHostValue,
   type GeneratedMsg,
@@ -594,8 +598,8 @@ export class IoHost {
   }
 
   /**
-   * Owned generated message. These types are small; the whole host-value is
-   * copied out of wasm (no borrowed `data` view like PointCloud2).
+   * Generated corpus msg. Host-retained CDR decodes in JS (no wasm memcpy).
+   * Wasm-backed samples still go through `rclweb_decode_generated`.
    */
   decodeGenerated(
     typeName: string,
@@ -603,12 +607,14 @@ export class IoHost {
     payloadLen: number,
     hostPayload?: Uint8Array,
   ): GeneratedMsg | null {
+    if (hostPayload) {
+      return decodeGeneratedCdr(typeName, hostPayload);
+    }
     try {
       const bytes = this.#decodeGeneratedBytes(
         typeName,
         payloadPtr,
         payloadLen,
-        hostPayload,
       );
       if (!bytes) return null;
       return decodeGeneratedHostValue(typeName, bytes) as GeneratedMsg;
