@@ -4,7 +4,7 @@
  * This is not a live e2e measurement. It names the hops each system
  * takes after the payload exists as serialized bytes. Network RX/TX
  * sits outside the budget. Optional application copies (public Node
- * PointCloud2 `data`, service/action Worker copies, Studio GPU upload)
+ * PointCloud2 `data`, Studio GPU upload)
  * are listed separately.
  *
  * Machine-checkable copy counts for [docs/performance.md](../../docs/performance.md).
@@ -86,7 +86,7 @@ export const COPY_PATHS: Record<CopySystemId, CopyPath> = {
       stage: "Worker → main (host-retain)",
       copies: 0,
       kind: "optional",
-      note: "transfer the host-retained WS/frame ArrayBuffer (String / PointCloud2 / generated corpus msg); Worker releases the host lease first",
+      note: "transfer the host-retained WS/frame ArrayBuffer (String / PointCloud2 / generated corpus msg / service/action CDR); Worker releases the host lease first",
     },
     {
       stage: "public Node PointCloud2 data",

@@ -1,14 +1,19 @@
 /**
  * Little-endian CDR1 reader for host-retained sample bodies (ADR 0017).
  *
- * Wasm still owns R2WP and session. String, PointCloud2, and the three
- * generated corpus msg roots decode from the JS WebSocket buffer so
- * PointCloud2 `data` / Collections `bytes_value` are views of that
- * buffer, not a wasm memcpy. Service/action codecs stay in wasm.
+ * Wasm still owns R2WP and session. String, PointCloud2, generated corpus
+ * msg roots, and generated service/action sections decode from the JS
+ * WebSocket buffer so PointCloud2 `data` / Collections `bytes_value` are
+ * views of that buffer, not a wasm memcpy.
  */
 
 import {
   Collections,
+  EchoNested_Request,
+  EchoNested_Response,
+  MeasureSequence_Feedback,
+  MeasureSequence_Goal,
+  MeasureSequence_Result,
   NestedSample,
   PrimitiveScalars,
   Time,
@@ -16,6 +21,24 @@ import {
 import type { PointCloud2 } from "./types.ts";
 
 export type GeneratedCdrMsg = PrimitiveScalars | NestedSample | Collections;
+
+export type GeneratedCdrValue =
+  | GeneratedCdrMsg
+  | EchoNested_Request
+  | EchoNested_Response
+  | MeasureSequence_Goal
+  | MeasureSequence_Result
+  | MeasureSequence_Feedback;
+
+export function isGeneratedCdrMsg(
+  value: GeneratedCdrValue | null,
+): value is GeneratedCdrMsg {
+  return (
+    value instanceof PrimitiveScalars ||
+    value instanceof NestedSample ||
+    value instanceof Collections
+  );
+}
 
 const td = new TextDecoder();
 
@@ -239,11 +262,14 @@ export function decodePointCloud2Cdr(cdr: Uint8Array): PointCloud2 | null {
   }
 }
 
-/** Phase 1 generated msg roots. Returns null when the payload is not that type. */
+/**
+ * Phase 1 generated msg roots and service/action sections.
+ * Returns null when the payload is not that type.
+ */
 export function decodeGeneratedCdr(
   typeName: string,
   cdr: Uint8Array,
-): GeneratedCdrMsg | null {
+): GeneratedCdrValue | null {
   try {
     const r = new CdrLeReader(cdr);
     if (typeName === PrimitiveScalars.typeName) {
@@ -254,6 +280,33 @@ export function decodeGeneratedCdr(
     }
     if (typeName === NestedSample.typeName) {
       return readNestedSample(r);
+    }
+    if (typeName === EchoNested_Request.typeName) {
+      const msg = new EchoNested_Request();
+      msg.input = readNestedSample(r);
+      return msg;
+    }
+    if (typeName === EchoNested_Response.typeName) {
+      const msg = new EchoNested_Response();
+      msg.output = readNestedSample(r);
+      msg.accepted = r.bool();
+      return msg;
+    }
+    if (typeName === MeasureSequence_Goal.typeName) {
+      const msg = new MeasureSequence_Goal();
+      msg.target = readCollections(r);
+      return msg;
+    }
+    if (typeName === MeasureSequence_Result.typeName) {
+      const msg = new MeasureSequence_Result();
+      msg.result = readNestedSample(r);
+      return msg;
+    }
+    if (typeName === MeasureSequence_Feedback.typeName) {
+      const msg = new MeasureSequence_Feedback();
+      msg.progress = r.f32();
+      msg.sample = readNestedSample(r);
+      return msg;
     }
     return null;
   } catch {

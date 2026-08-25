@@ -10,7 +10,7 @@ import path from "node:path";
 import { sensor_msgs, std_msgs, rclweb_cdr_interfaces } from "../src/index.ts";
 import { connect } from "../src/internal.ts";
 import {
-  decodeGeneratedHostValue,
+  decodeOpPayload,
   encodeGeneratedHostValue,
   sampleEchoNestedRequest,
 } from "../src/generated-value.ts";
@@ -297,7 +297,7 @@ test("Worker path: action client sendGoal echoes result CDR", async () => {
   server.stop(true);
 });
 
-test("Worker path: EchoNested service call delivers host-value bytes", async () => {
+test("Worker path: EchoNested service call delivers host-retained CDR", async () => {
   const fixtures = scriptedPeerFixtures();
   const wasmUrl = pathToFileUrl(wasmPath);
   let step: "hello" | "ready" | "open" | "call" = "hello";
@@ -350,8 +350,10 @@ test("Worker path: EchoNested service call delivers host-value bytes", async () 
     sampleEchoNestedRequest(),
   );
   const response = await svc.call(request);
-  const decoded = decodeGeneratedHostValue(
-    EchoNested_Response.typeName,
+  expect(response[1]).toBe(1);
+  const decoded = decodeOpPayload(
+    rclweb_cdr_interfaces.srv.EchoNested.typeName,
+    "Response",
     response,
   ) as EchoNested_Response;
   expect(decoded.accepted).toBe(true);

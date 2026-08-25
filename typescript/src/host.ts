@@ -25,6 +25,7 @@ import {
   decodeGeneratedCdr,
   decodePointCloud2Cdr,
   decodeStdMsgsStringCdr,
+  isGeneratedCdrMsg,
 } from "./cdr-le.ts";
 import {
   decodeGeneratedHostValue,
@@ -608,10 +609,12 @@ export class IoHost {
     hostPayload?: Uint8Array,
   ): GeneratedMsg | null {
     if (hostPayload) {
-      return decodeGeneratedCdr(typeName, hostPayload);
+      const decoded = decodeGeneratedCdr(typeName, hostPayload);
+      return isGeneratedCdrMsg(decoded) ? decoded : null;
     }
     try {
-      const bytes = this.#decodeGeneratedBytes(
+      const bytes = decodeGeneratedBytes(
+        this.#wasm,
         typeName,
         payloadPtr,
         payloadLen,
@@ -620,54 +623,6 @@ export class IoHost {
       return decodeGeneratedHostValue(typeName, bytes) as GeneratedMsg;
     } catch {
       return null;
-    }
-  }
-
-  /**
-   * Packed host-value bytes for a generated CDR payload (service/action ops).
-   * Returns null when the payload is not that generated type.
-   */
-  copyGeneratedBytes(
-    typeName: string,
-    payloadPtr: number,
-    payloadLen: number,
-    hostPayload?: Uint8Array,
-  ): Uint8Array | null {
-    try {
-      return this.#decodeGeneratedBytes(
-        typeName,
-        payloadPtr,
-        payloadLen,
-        hostPayload,
-      );
-    } catch {
-      return null;
-    }
-  }
-
-  #decodeGeneratedBytes(
-    typeName: string,
-    payloadPtr: number,
-    payloadLen: number,
-    hostPayload?: Uint8Array,
-  ): Uint8Array | null {
-    if (!hostPayload) {
-      return decodeGeneratedBytes(this.#wasm, typeName, payloadPtr, payloadLen);
-    }
-    const len = hostPayload.length;
-    const ptr = this.#wasm.rclweb_alloc(len);
-    if (ptr === 0 && len !== 0) {
-      throw new Error("rclweb_alloc failed for host-retained generated CDR");
-    }
-    try {
-      if (len !== 0) {
-        new Uint8Array(this.#wasm.memory.buffer, ptr, len).set(hostPayload);
-      }
-      return decodeGeneratedBytes(this.#wasm, typeName, ptr, len);
-    } finally {
-      if (len !== 0) {
-        this.#wasm.rclweb_free(ptr, len);
-      }
     }
   }
 

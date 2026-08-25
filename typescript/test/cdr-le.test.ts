@@ -6,6 +6,11 @@ import {
 } from "../src/cdr-le.ts";
 import {
   Collections,
+  EchoNested_Request,
+  EchoNested_Response,
+  MeasureSequence_Feedback,
+  MeasureSequence_Goal,
+  MeasureSequence_Result,
   NestedSample,
   PrimitiveScalars,
 } from "../src/interfaces.ts";
@@ -125,4 +130,43 @@ test("decodeGeneratedCdr returns null for unknown types and truncated CDR", asyn
   const cdr = await readBin("J-FT", "primitive_scalars.bin");
   expect(decodeGeneratedCdr("std_msgs/msg/String", cdr)).toBeNull();
   expect(decodeGeneratedCdr(PrimitiveScalars.typeName, cdr.subarray(0, 8))).toBeNull();
+});
+
+test("decodeGeneratedCdr reads J-FT EchoNested request and response", async () => {
+  const requestCdr = await readBin("J-FT", "echo_nested_request.bin");
+  const request = decodeGeneratedCdr(EchoNested_Request.typeName, requestCdr);
+  expect(request).toBeInstanceOf(EchoNested_Request);
+  if (!(request instanceof EchoNested_Request)) throw new Error("expected request");
+  expect(request.input.scalars.string_value).toBe("rclweb CDR ✓!!");
+  expect(request.input.collections.bytes_value.buffer).toBe(requestCdr.buffer);
+
+  const responseCdr = await readBin("J-FT", "echo_nested_response.bin");
+  const response = decodeGeneratedCdr(EchoNested_Response.typeName, responseCdr);
+  expect(response).toBeInstanceOf(EchoNested_Response);
+  if (!(response instanceof EchoNested_Response)) throw new Error("expected response");
+  expect(response.accepted).toBe(true);
+  expect(response.output.scalars.string_value).toBe("rclweb CDR ✓!!");
+});
+
+test("decodeGeneratedCdr reads J-FT MeasureSequence sections", async () => {
+  const goalCdr = await readBin("J-FT", "measure_sequence_goal.bin");
+  const goal = decodeGeneratedCdr(MeasureSequence_Goal.typeName, goalCdr);
+  expect(goal).toBeInstanceOf(MeasureSequence_Goal);
+  if (!(goal instanceof MeasureSequence_Goal)) throw new Error("expected goal");
+  expect(goal.target.bytes_value.buffer).toBe(goalCdr.buffer);
+
+  const resultCdr = await readBin("J-FT", "measure_sequence_result.bin");
+  const result = decodeGeneratedCdr(MeasureSequence_Result.typeName, resultCdr);
+  expect(result).toBeInstanceOf(MeasureSequence_Result);
+  if (!(result instanceof MeasureSequence_Result)) throw new Error("expected result");
+  expect(result.result.scalars.string_value).toBe("rclweb CDR ✓!!");
+
+  const feedbackCdr = await readBin("J-FT", "measure_sequence_feedback.bin");
+  const feedback = decodeGeneratedCdr(MeasureSequence_Feedback.typeName, feedbackCdr);
+  expect(feedback).toBeInstanceOf(MeasureSequence_Feedback);
+  if (!(feedback instanceof MeasureSequence_Feedback)) {
+    throw new Error("expected feedback");
+  }
+  expect(typeof feedback.progress).toBe("number");
+  expect(feedback.sample.scalars.string_value).toBe("rclweb CDR ✓!!");
 });

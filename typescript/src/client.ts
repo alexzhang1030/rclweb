@@ -19,6 +19,7 @@ import {
   decodeGeneratedCdr,
   decodePointCloud2Cdr,
   decodeStdMsgsStringCdr,
+  isGeneratedCdrMsg,
 } from "./cdr-le.ts";
 import {
   Collections,
@@ -26,9 +27,7 @@ import {
   PointCloud2 as PointCloud2Msg,
   PrimitiveScalars,
   String as StdMsgsStringMsg,
-  generatedOpTypeName,
   isGeneratedMsgType,
-  type GeneratedOpKind,
   typeNameOf,
   type TypeNameLike,
 } from "./interfaces.ts";
@@ -404,7 +403,7 @@ function deliverHostCdrSample(
     }
     case "generated": {
       const generated = decodeGeneratedCdr(msg.typeName, cdr);
-      if (!generated) return;
+      if (!isGeneratedCdrMsg(generated)) return;
       handler(generated, NOOP_LEASE);
       return;
     }
@@ -468,7 +467,7 @@ function bindSampleSink(
             event.payloadPtr,
             event.payloadLen,
           );
-      if (!generated) {
+      if (!isGeneratedCdrMsg(generated)) {
         host.releaseLease(event.leaseId);
         return;
       }
@@ -937,9 +936,6 @@ class InlineClient implements RclwebClient {
         const pending = this.#pendingCalls.get(key);
         const bytes = copyChannelOpPayload(
           this.#host,
-          this.#channelTypes,
-          event.channelId,
-          "Response",
           event.payloadPtr,
           event.payloadLen,
           event.hostPayload,
@@ -956,9 +952,6 @@ class InlineClient implements RclwebClient {
         const handler = this.#serviceHandlers.get(event.channelId);
         const bytes = copyChannelOpPayload(
           this.#host,
-          this.#channelTypes,
-          event.channelId,
-          "Request",
           event.payloadPtr,
           event.payloadLen,
           event.hostPayload,
@@ -1058,9 +1051,6 @@ class InlineClient implements RclwebClient {
         const handlers = this.#actionServerHandlers.get(event.channelId);
         const bytes = copyChannelOpPayload(
           this.#host,
-          this.#channelTypes,
-          event.channelId,
-          "Goal",
           event.payloadPtr,
           event.payloadLen,
           event.hostPayload,
@@ -1076,9 +1066,6 @@ class InlineClient implements RclwebClient {
         const handler = this.#actionFeedback.get(event.channelId);
         const bytes = copyChannelOpPayload(
           this.#host,
-          this.#channelTypes,
-          event.channelId,
-          "Feedback",
           event.payloadPtr,
           event.payloadLen,
           event.hostPayload,
@@ -1093,9 +1080,6 @@ class InlineClient implements RclwebClient {
         const pending = this.#pendingActionResults.get(key);
         const bytes = copyChannelOpPayload(
           this.#host,
-          this.#channelTypes,
-          event.channelId,
-          "Result",
           event.payloadPtr,
           event.payloadLen,
           event.hostPayload,
@@ -1386,24 +1370,11 @@ function asPayload(value: Uint8Array | number[]): Uint8Array {
 
 function copyChannelOpPayload(
   host: IoHost,
-  channelTypes: Map<number, string>,
-  channelId: number,
-  op: GeneratedOpKind,
   payloadPtr: number,
   payloadLen: number,
   hostPayload?: Uint8Array,
 ): Uint8Array {
-  const typeName = channelTypes.get(channelId);
-  const section = typeName ? generatedOpTypeName(typeName, op) : undefined;
-  if (section) {
-    const bytes = host.copyGeneratedBytes(
-      section,
-      payloadPtr,
-      payloadLen,
-      hostPayload,
-    );
-    if (bytes) return bytes;
-  }
+  if (hostPayload) return hostPayload.slice();
   return host.copyPayload(payloadPtr, payloadLen, hostPayload);
 }
 
