@@ -6,9 +6,9 @@
  * Service/action payloads are copied out of wasm here and the lease is
  * released before the message crosses to main. Generated service/action
  * roots become packed host-value bytes; untyped channels stay CDR.
- * Host-retain String / PointCloud2 transfer the WS/frame buffer and
- * release the host lease first. Generated corpus messages are copied as
- * host-value objects. Wasm-backed samples keep the old copy / string path.
+ * Host-retain String / PointCloud2 / generated corpus msg transfer the
+ * WS/frame buffer and release the host lease first. Wasm-backed samples
+ * keep the old copy / host-value path. Service/action still copy.
  */
 
 import { IoHost } from "../host.ts";
@@ -73,6 +73,11 @@ function generatedTransferables(message: GeneratedMsg): Transferable[] {
   return [];
 }
 
+type HostCdrKind =
+  | { kind: "string" }
+  | { kind: "pointcloud2" }
+  | { kind: "generated"; typeName: string };
+
 function asBytes(value: Uint8Array | number[]): Uint8Array {
   return value instanceof Uint8Array ? value : Uint8Array.from(value);
 }
@@ -87,7 +92,7 @@ function isPointCloud2Type(typeName: string | undefined): boolean {
 function transferHostCdr(
   io: IoHost,
   event: SampleAppEvent,
-  kind: "string" | "pointcloud2",
+  spec: HostCdrKind,
 ): boolean {
   const payload = event.hostPayload;
   if (!payload) return false;
@@ -97,17 +102,18 @@ function transferHostCdr(
   const byteLength = payload.byteLength;
   event.hostPayload = undefined;
   io.releaseLease(event.leaseId);
-  post(
-    {
-      type: "sampleHostCdr",
-      channelId: event.channelId,
-      kind,
-      buffer,
-      byteOffset,
-      byteLength,
-    },
-    [buffer],
-  );
+  const base = {
+    type: "sampleHostCdr" as const,
+    channelId: event.channelId,
+    buffer,
+    byteOffset,
+    byteLength,
+  };
+  const msg =
+    spec.kind === "generated"
+      ? { ...base, kind: "generated" as const, typeName: spec.typeName }
+      : { ...base, kind: spec.kind };
+  post(msg, [buffer]);
   return true;
 }
 
@@ -115,11 +121,11 @@ function deliverSample(event: SampleAppEvent): void {
   if (!host) return;
   const typeName = channelTypes.get(event.channelId);
   if (typeName && isGeneratedMsgType(typeName)) {
+    if (transferHostCdr(host, event, { kind: "generated", typeName })) return;
     const copied = host.decodeGenerated(
       typeName,
       event.payloadPtr,
       event.payloadLen,
-      event.hostPayload,
     );
     host.releaseLease(event.leaseId);
     host.flushSync();
@@ -140,7 +146,7 @@ function deliverSample(event: SampleAppEvent): void {
   const kind: "string" | "pointcloud2" = isPointCloud2Type(typeName)
     ? "pointcloud2"
     : "string";
-  if (transferHostCdr(host, event, kind)) return;
+  if (transferHostCdr(host, event, { kind })) return;
   if (kind === "string") {
     host.fillStringSample(event, typeName);
     if (event.stringData != null) {

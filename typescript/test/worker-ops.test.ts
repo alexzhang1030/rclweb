@@ -536,7 +536,7 @@ test("Worker path: publish PointCloud2 emits a ROS_SAMPLE frame", async () => {
   server.stop(true);
 });
 
-test("Worker path: PrimitiveScalars sample copies across the boundary", async () => {
+test("Worker path: PrimitiveScalars sample transfers CDR to main", async () => {
   const fixtures = scriptedPeerFixtures();
   const wasmUrl = pathToFileUrl(wasmPath);
   let step: "hello" | "ready" | "channel" | "sample" | "done" = "hello";
@@ -600,6 +600,10 @@ test("Worker path: PrimitiveScalars sample copies across the boundary", async ()
   });
   expect(sample.string_value).toBe("hello-scalars");
   expect(sample.int64_value).toBe(-70_000n);
+  const snap = client.telemetry();
+  expect(snap).not.toBeNull();
+  expect(snap!.leasesReleased).toBeGreaterThanOrEqual(snap!.samplesEmitted);
+  expect(snap!.samplesEmitted).toBeGreaterThanOrEqual(1);
   await client.close();
   server.stop(true);
 });
