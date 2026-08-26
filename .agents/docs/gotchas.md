@@ -82,6 +82,20 @@ Spread-pushing a byte array into a `number[]` (`out.push(...bytes)`) throws a Ra
 
 The WT accept loop reads a length-prefixed bidirectional stream into a growable inbox (`pushLengthPrefixedChunk` in `typescript/src/host.ts`). Each complete frame is `slice`d out before ingest. Do not emit a view of the inbox: ROS_SAMPLE pins that `Uint8Array` until `lease.release()`, and the inbox is reused for the next chunk. Compacting leftover bytes with `copyWithin` is fine; dropping the per-frame copy is not.
 
+## Local `init()` is WebSocket; that is not a leftover copy
+
+`init()` and loopback stay on binary WebSocket. The sample is one
+`Bytes` / `ArrayBuffer` from the RMW take through `ws.send`
+(`binaryType = "arraybuffer"`, no permessage-deflate, host-retain,
+Worker transfer). Do not treat the local default as a transport we
+still owe a rewrite. The remaining WebSocket tax is one TCP stream
+(head-of-line) plus kernel/browser RX. Those are outside the
+controllable copy budget and are the same tax Foxglove pays.
+WebTransport is for a remote host or an explicit
+`{ transport: "webtransport" }`, when independent streams matter.
+`just perf-baseline` does not include the socket;
+`just perf-baseline-live` does. [performance](../../docs/performance.md#websocket).
+
 ## Intranet WebTransport is one env, not production TLS
 
 Runtime images compile `--features ros,webtransport` so

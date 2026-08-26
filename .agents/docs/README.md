@@ -13,6 +13,7 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | Product direction | [Intent](./intent.md) |
 | System boundaries and the single-core decision | [Architecture](./architecture.md) |
 | Sample path versus Foxglove / rosbridge | [Performance](../../docs/performance.md) |
+| Local WebSocket default | [Performance — WebSocket](../../docs/performance.md#websocket), [gotchas](./gotchas.md#local-init-is-websocket-that-is-not-a-leftover-copy) |
 | Languages, platforms, transport, and tooling | [Technology stack](./technology-stack.md) |
 | Rust workspace (fmt, clippy, lints, just recipes) | [Technology stack — Rust workspace infrastructure](./technology-stack.md#rust-workspace-infrastructure) |
 | Traps already paid for | [Gotchas](./gotchas.md) |
