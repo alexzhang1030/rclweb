@@ -21,10 +21,11 @@ The demo binds loopback only.
    bun run --filter rcl-web build
    ```
 
-2. Start `rclwebd` on a machine that can attach to ROS:
+2. Start the edge process on a machine that can attach to ROS:
 
    ```bash
    just gateway
+   # or, after the ament overlay: ros2 run rclwebd rclwebd
    ```
 
 3. Serve the page:

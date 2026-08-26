@@ -1,11 +1,16 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
 const repoRoot = path.resolve(import.meta.dir, "..");
 const installer = path.join(repoRoot, "scripts", "install-rclwebd.sh");
+const amentInstaller = path.join(repoRoot, "scripts", "install-rclwebd-ament.sh");
+const fromPathWrapper = path.join(repoRoot, "packaging", "ament", "rclwebd", "rclwebd-from-path.sh");
+const amentPackageXml = path.join(repoRoot, "packaging", "ament", "rclwebd", "package.xml");
+const amentLaunch = path.join(repoRoot, "packaging", "ament", "rclwebd", "launch", "rclwebd.launch.py");
+const amentCmake = path.join(repoRoot, "packaging", "ament", "rclwebd", "CMakeLists.txt");
 const wrapper = path.join(repoRoot, "scripts", "rclwebd-ros.sh");
 const systemUnit = path.join(repoRoot, "packaging", "systemd", "rclwebd.service");
 const userUnit = path.join(repoRoot, "packaging", "systemd", "rclwebd.user.service");
@@ -50,6 +55,26 @@ function timeoutStopSec(unit: string): number {
   const match = unit.match(/^TimeoutStopSec=(\d+)$/m);
   expect(match).not.toBeNull();
   return Number(match![1]);
+}
+
+function writeFakeBinary(dir: string): string {
+  mkdirSync(dir, { recursive: true });
+  const bin = path.join(dir, "rclwebd");
+  writeFileSync(bin, "#!/usr/bin/env bash\nprintf 'fake-rclwebd %s\\n' \"$*\"\n");
+  chmodSync(bin, 0o755);
+  return bin;
+}
+
+function blockedCurlPath(home: string): { path: string; log: string } {
+  const log = path.join(home, "curl.log");
+  const binDir = path.join(home, "blocked-bin");
+  mkdirSync(binDir, { recursive: true });
+  writeFileSync(
+    path.join(binDir, "curl"),
+    "#!/usr/bin/env bash\nprintf 'invoked\\n' >>\"${CURL_LOG}\"\nexit 1\n",
+  );
+  chmodSync(path.join(binDir, "curl"), 0o755);
+  return { path: `${binDir}:${process.env.PATH ?? "/usr/bin"}`, log };
 }
 
 describe("systemd unit files", () => {
@@ -178,6 +203,8 @@ describe("install-rclwebd.sh --systemd-only", () => {
     expect(readFileSync(envPath, "utf8")).toContain("not a sourced ROS prefix");
     expect(readFileSync(wrapperDest, "utf8")).toContain("Do not default RCLWEBD_SUPPORT_ROW");
     expect(() => readFileSync(curlLog, "utf8")).toThrow();
+    expect(existsSync(path.join(home, ".local", "share", "rclwebd"))).toBe(false);
+    expect(result.stdout).not.toContain("ament overlay");
   });
 
   test("does not overwrite an existing env file", () => {
@@ -237,3 +264,225 @@ describe("install-rclwebd.sh --systemd-only", () => {
     expect(result.stderr).toContain("run as root");
   });
 });
+
+describe("ament overlay sources", () => {
+  test("package.xml is named rclwebd and does not depend on launch_ros", () => {
+    const xml = read(amentPackageXml);
+    expect(xml).toContain("<name>rclwebd</name>");
+    expect(xml).toContain("<version>0.0.6</version>");
+    expect(xml).toContain("<build_type>ament_cmake</build_type>");
+    expect(xml).not.toContain("launch_ros");
+  });
+
+  test("launch uses ExecuteProcess and does not inject --ros-args", () => {
+    const launch = read(amentLaunch);
+    expect(launch).toContain("def generate_launch_description");
+    expect(launch).toContain("ExecuteProcess");
+    expect(launch).toContain('get_package_prefix("rclwebd")');
+    expect(launch).not.toContain("launch_ros");
+    expect(launch).not.toContain("Node(");
+    expect(launch).not.toContain("--ros-args");
+  });
+
+  test("CMake overlay installs the binary or the PATH-free wrapper", () => {
+    const cmake = read(amentCmake);
+    expect(cmake).toContain("project(rclwebd)");
+    expect(cmake).toContain("RCLWEBD_BIN");
+    expect(cmake).toContain("rclwebd-from-path.sh");
+    expect(cmake).toContain('install(DIRECTORY launch DESTINATION "share/${PROJECT_NAME}")');
+  });
+
+  test("from-path wrapper requires RCLWEBD_BIN and does not search PATH", () => {
+    const text = read(fromPathWrapper);
+    expect(text).not.toMatch(/command -v rclwebd/);
+    expect(text).toContain("RCLWEBD_BIN");
+
+    const missing = run("bash", [fromPathWrapper]);
+    expect(missing.status).toBe(1);
+    expect(missing.stderr).toContain("RCLWEBD_BIN");
+
+    const root = tempDir("rclwebd-from-path-");
+    const bin = writeFakeBinary(root);
+    const result = run("bash", [fromPathWrapper, "--probe"], { RCLWEBD_BIN: bin });
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("fake-rclwebd --probe");
+  });
+});
+
+describe("install-rclwebd-ament.sh", () => {
+  test("dry-run prints the overlay layout without writing or fetching", () => {
+    const home = tempDir("rclwebd-ament-dry-");
+    const prefix = path.join(home, "overlay");
+    const blocked = blockedCurlPath(home);
+    const result = run("bash", [amentInstaller, "--prefix", prefix, "--dry-run"], {
+      HOME: home,
+      CURL_LOG: blocked.log,
+      PATH: blocked.path,
+    });
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain(`would write ${path.join(prefix, "lib", "rclwebd", "rclwebd")}`);
+    expect(result.stdout).toContain(`would write ${path.join(prefix, "local_setup.bash")}`);
+    expect(existsSync(prefix)).toBe(false);
+    expect(() => readFileSync(blocked.log, "utf8")).toThrow();
+  });
+
+  test("writes the overlay, prepends AMENT_PREFIX_PATH, and links the binary", () => {
+    const home = tempDir("rclwebd-ament-write-");
+    const prefix = path.join(home, "overlay");
+    const bin = writeFakeBinary(path.join(home, "bin"));
+    const blocked = blockedCurlPath(home);
+
+    const result = run("bash", [amentInstaller, "--prefix", prefix, "--bin", bin], {
+      HOME: home,
+      CURL_LOG: blocked.log,
+      PATH: blocked.path,
+    });
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("ros2 run rclwebd rclwebd");
+
+    const destBin = path.join(prefix, "lib", "rclwebd", "rclwebd");
+    const setup = path.join(prefix, "local_setup.bash");
+    expect(readFileSync(path.join(prefix, "share", "rclwebd", "package.xml"), "utf8")).toContain(
+      "<name>rclwebd</name>",
+    );
+    expect(
+      readFileSync(path.join(prefix, "share", "rclwebd", "launch", "rclwebd.launch.py"), "utf8"),
+    ).toContain("generate_launch_description");
+    expect(existsSync(path.join(prefix, "share", "ament_index", "resource_index", "packages", "rclwebd"))).toBe(
+      true,
+    );
+    expect(realpathSync(destBin)).toBe(realpathSync(bin));
+
+    const sourced = run("bash", [
+      "-c",
+      [
+        "set -euo pipefail",
+        "export AMENT_PREFIX_PATH=/opt/ros/jazzy",
+        "export COLCON_PREFIX_PATH=/opt/ros/jazzy",
+        `source "${setup}"`,
+        'printf "ament=%s\\n" "$AMENT_PREFIX_PATH"',
+        'printf "colcon=%s\\n" "$COLCON_PREFIX_PATH"',
+      ].join("\n"),
+    ]);
+    expect(sourced.status).toBe(0);
+    expect(sourced.stdout).toContain(`ament=${prefix}:/opt/ros/jazzy`);
+    expect(sourced.stdout).toContain(`colcon=${prefix}:/opt/ros/jazzy`);
+    expect(() => readFileSync(blocked.log, "utf8")).toThrow();
+  });
+
+  test("wrapper-only does not recurse through PATH", () => {
+    const home = tempDir("rclwebd-ament-wrapper-");
+    const prefix = path.join(home, "overlay");
+    const result = run("bash", [amentInstaller, "--prefix", prefix, "--wrapper-only"]);
+    expect(result.status).toBe(0);
+    const dest = path.join(prefix, "lib", "rclwebd", "rclwebd");
+    expect(readFileSync(dest, "utf8")).not.toMatch(/command -v rclwebd/);
+
+    const missing = run("bash", [dest]);
+    expect(missing.status).toBe(1);
+    expect(missing.stderr).toContain("RCLWEBD_BIN");
+
+    const bin = writeFakeBinary(path.join(home, "real"));
+    const execd = run("bash", [dest, "hello"], { RCLWEBD_BIN: bin });
+    expect(execd.status).toBe(0);
+    expect(execd.stdout).toContain("fake-rclwebd hello");
+  });
+});
+
+describe("install-rclwebd.sh --ament-only", () => {
+  test("writes the overlay from the local tree without downloading", () => {
+    const home = tempDir("rclwebd-install-ament-");
+    const installDir = path.join(home, "bin");
+    const prefix = path.join(home, "overlay");
+    writeFakeBinary(installDir);
+    const blocked = blockedCurlPath(home);
+
+    const result = run(
+      "bash",
+      [installer, "--ament-only", "--dir", installDir, "--ament-prefix", prefix],
+      { HOME: home, CURL_LOG: blocked.log, PATH: blocked.path },
+    );
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("ament overlay");
+    expect(result.stdout).toContain("ros2 run rclwebd rclwebd");
+    expect(result.stdout).not.toContain("systemd (");
+    expect(existsSync(path.join(prefix, "lib", "rclwebd", "rclwebd"))).toBe(true);
+    expect(readFileSync(path.join(prefix, "share", "rclwebd", "package.xml"), "utf8")).toContain(
+      "<name>rclwebd</name>",
+    );
+    expect(() => readFileSync(blocked.log, "utf8")).toThrow();
+  });
+
+  test("dry-run prints the overlay and needs no binary or network", () => {
+    const home = tempDir("rclwebd-install-ament-dry-");
+    const prefix = path.join(home, "overlay");
+    const blocked = blockedCurlPath(home);
+    const result = run("bash", [installer, "--ament-only", "--dry-run", "--ament-prefix", prefix], {
+      HOME: home,
+      CURL_LOG: blocked.log,
+      PATH: blocked.path,
+    });
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain(`would write ${path.join(prefix, "lib", "rclwebd", "rclwebd")}`);
+    expect(result.stdout).toContain("ros2 run rclwebd rclwebd");
+    expect(existsSync(prefix)).toBe(false);
+    expect(() => readFileSync(blocked.log, "utf8")).toThrow();
+  });
+
+  test("fails when the binary is missing unless --wrapper-only", () => {
+    const home = tempDir("rclwebd-install-ament-missing-");
+    const prefix = path.join(home, "overlay");
+    const missing = run("bash", [
+      installer,
+      "--ament-only",
+      "--dir",
+      path.join(home, "empty"),
+      "--ament-prefix",
+      prefix,
+    ]);
+    expect(missing.status).toBe(1);
+    expect(missing.stderr).toContain("no rclwebd binary");
+
+    const wrapped = run("bash", [installer, "--ament-only", "--wrapper-only", "--ament-prefix", prefix], {
+      HOME: home,
+    });
+    expect(wrapped.status).toBe(0);
+    expect(readFileSync(path.join(prefix, "lib", "rclwebd", "rclwebd"), "utf8")).toContain("RCLWEBD_BIN");
+  });
+
+  test("refuses --no-ament with --ament-only", () => {
+    const result = run("bash", [installer, "--ament-only", "--no-ament"]);
+    expect(result.status).toBe(2);
+    expect(result.stderr).toContain("cannot be combined");
+  });
+
+  test("--systemd-only --ament writes the overlay and the user unit", () => {
+    const home = tempDir("rclwebd-systemd-ament-");
+    const installDir = path.join(home, "bin");
+    const prefix = path.join(home, "overlay");
+    writeFakeBinary(installDir);
+    const blocked = blockedCurlPath(home);
+    const result = run(
+      "bash",
+      [
+        installer,
+        "--systemd-only",
+        "--systemd",
+        "user",
+        "--dir",
+        installDir,
+        "--ament",
+        "--ament-prefix",
+        prefix,
+      ],
+      { HOME: home, CURL_LOG: blocked.log, PATH: blocked.path },
+    );
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("systemd (user)");
+    expect(result.stdout).toContain("ament overlay");
+    expect(existsSync(path.join(home, ".config", "systemd", "user", "rclwebd.service"))).toBe(true);
+    expect(existsSync(path.join(prefix, "local_setup.bash"))).toBe(true);
+    expect(() => readFileSync(blocked.log, "utf8")).toThrow();
+  });
+});
+

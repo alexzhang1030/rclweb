@@ -11,13 +11,19 @@ Prebuilt images (six support rows; `jazzy` = J-FT, `humble` = H-FT):
 docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy
 ```
 
-Prebuilt binaries for a sourced Jazzy / Humble environment:
+Prebuilt binaries for a sourced Jazzy / Humble environment. The
+installer also writes an ament overlay:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/install-rclwebd.sh | bash
+source /opt/ros/$ROS_DISTRO/setup.bash
+source ~/.local/share/rclwebd/local_setup.bash
+ros2 run rclwebd rclwebd
 ```
 
-Host systemd units: [`docs/deploy.md#systemd`](../docs/deploy.md#systemd)
+`ros2 run`: [`docs/deploy.md#ros2-run`](../docs/deploy.md#ros2-run).
+Host systemd units for unattended machines:
+[`docs/deploy.md#systemd`](../docs/deploy.md#systemd)
 (`./scripts/install-rclwebd.sh --systemd`).
 
 Building from source requires `--features ros` and a sourced ROS 2

@@ -36,7 +36,10 @@ against a sourced matching prefix:
 curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/install-rclwebd.sh | bash
 ```
 
-Optional host unit (`--systemd`, does not enable or start): [systemd](#systemd).
+The installer also writes a thin ament overlay so the process starts
+like any other ROS node (`ros2 run`). That overlay is not apt
+([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md)). Host units
+for unattended machines: [systemd](#systemd).
 
 ## Artifact
 
@@ -220,7 +223,51 @@ robot-edge shape, not a cloud overlay network.
 `RCLWEBD_OFFER_WEBTRANSPORT=1` on the `rclwebd` service (`just gateway-wt` /
 `just gateway-wt-h-ft`).
 
+## ros2 run
+
+Interactive robot-side start. `rclwebd` is still a native process
+(browsers cannot bind rcl). This overlay only makes that process look
+like a normal ROS package. It is not a bloom / apt release
+([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md)).
+
+Default `scripts/install-rclwebd.sh` writes
+`~/.local/share/rclwebd` (override with `--ament-prefix` /
+`RCLWEBD_AMENT_PREFIX`). `--no-ament` skips it. `--systemd-only`
+stays systemd-only unless you also pass `--ament`.
+
+```bash
+source /opt/ros/$ROS_DISTRO/setup.bash
+source ~/.local/share/rclwebd/local_setup.bash
+ros2 run rclwebd rclwebd
+# or
+ros2 launch rclwebd rclwebd.launch.py
+```
+
+`ros2 run` already has a sourced prefix. The overlay executable is the
+binary, not [`scripts/rclwebd-ros.sh`](../scripts/rclwebd-ros.sh).
+Do not wrap `setup.bash` again on this path. Configuration stays on the
+environment (`RCLWEBD_BIND`, `ROS_DOMAIN_ID`,
+`RCLWEBD_OFFER_WEBTRANSPORT`, …). Extra `--ros-args` from
+`launch_ros.actions.Node` would be ignored, so the launch file uses
+`ExecuteProcess`.
+
+From a clone with a built binary:
+
+```bash
+just install-rclwebd-ament
+```
+
+`--ament-only` writes the overlay against an existing
+`--dir/rclwebd` or `RCLWEBD_BIN` without downloading. `curl | bash`
+fetches `packaging/ament/rclwebd` from `RCLWEBD_UNIT_REF` (default
+`main`) when the script is not running from a clone.
+
+Docker images already source the image prefix and stay
+`docker run`. systemd stays for unattended hosts.
+
 ## systemd
+
+Unattended hosts. Interactive start is [`ros2 run`](#ros2-run).
 
 Host binaries need a sourced ROS prefix before `exec rclwebd`. systemd
 `EnvironmentFile=` only assigns variables — it cannot run `setup.bash` —

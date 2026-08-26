@@ -52,14 +52,20 @@ docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy
 ```
 
 Or install a prebuilt binary into a sourced ROS 2 environment (Jazzy or
-Humble; the support row is auto-detected from that environment):
+Humble; the support row is auto-detected from that environment). The
+installer also writes an ament overlay so the process starts like a
+normal ROS node:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/install-rclwebd.sh | bash
-rclwebd
+source /opt/ros/$ROS_DISTRO/setup.bash
+source ~/.local/share/rclwebd/local_setup.bash
+ros2 run rclwebd rclwebd
 ```
 
-Host systemd units (`--systemd`) are in [deploy](./docs/deploy.md#systemd).
+Host systemd units (`--systemd`) are for unattended machines:
+[deploy](./docs/deploy.md#systemd). `ros2 run` details:
+[deploy](./docs/deploy.md#ros2-run).
 
 Or build from source (needs Rust plus the ROS 2 development libraries):
 

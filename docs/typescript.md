@@ -14,9 +14,11 @@ Method list: [API reference](./api.md).
 npm install rcl-web
 ```
 
-On the machine that can see the ROS 2 graph, run
-[`rclwebd`](https://crates.io/crates/rclwebd). `init()` talks to
-`ws://127.0.0.1:8794/ws`. How to run that process: [deploy](./deploy.md).
+On the machine that can see the ROS 2 graph, start the edge process
+(`ros2 run rclwebd rclwebd` after the overlay, or
+`docker run … rclwebd:jazzy`). `init()` talks to
+`ws://127.0.0.1:8794/ws`. How to run that process:
+[deploy](./deploy.md#ros2-run).
 
 ```ts
 import {

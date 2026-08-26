@@ -203,6 +203,18 @@ binaries derive it). `ProtectSystem=strict` would also block `/opt/ros`.
 Units: [`packaging/systemd/`](../../packaging/systemd/),
 [deploy](../../docs/deploy.md#systemd).
 
+## ros2 run already has a sourced prefix
+
+`ros2 run rclwebd rclwebd` runs only after the caller sourced ROS (and
+the overlay). Wrapping `setup.bash` again on that executable is wrong,
+and `launch_ros.actions.Node` injects `--ros-args` that `rclwebd`
+ignores (config is env-only). The overlay binary is the process;
+[`scripts/rclwebd-ros.sh`](../../scripts/rclwebd-ros.sh) stays on
+systemd because `EnvironmentFile=` cannot source a prefix. The fallback
+wrapper must not `command -v rclwebd`: `ros2 run` puts
+`lib/rclwebd/rclwebd` first and that would recurse.
+[deploy](../../docs/deploy.md#ros2-run).
+
 ## GitHub Releases downloads need retries
 
 Foundation CI installs Bun with SHA-pinned `oven-sh/setup-bun` (`.bun-version`) and just with SHA-pinned `extractions/setup-just` (`.just-version`); a failed just step waits 15s and retries once. `dtolnay/rust-toolchain` installs the channel in `rust-toolchain.toml`. E2e images copy `/usr/local/bin/bun` from digest-pinned `oven/bun` (must match `.bun-version`); do not pipe `bun.sh/install`. Cloud-agent setup has no Actions, so it uses [`scripts/install-pinned-bun.sh`](../../scripts/install-pinned-bun.sh) and [`scripts/github-release-curl.sh`](../../scripts/github-release-curl.sh). Paid flakes were GitHub Releases 503/curl 56, not a broken setup-just. Landed in [`45cacd5`](https://github.com/alexzhang1030/rclweb/commit/45cacd5) (#19).
