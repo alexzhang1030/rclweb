@@ -35,14 +35,30 @@ function read(rel: string): string {
   return readFileSync(rel, "utf8");
 }
 
+const INSTALLER_ENV = [
+  "RCLWEBD_BIN",
+  "RCLWEBD_AMENT_PREFIX",
+  "RCLWEBD_VERSION",
+  "RCLWEBD_INSTALL_DIR",
+  "RCLWEBD_REPO",
+  "RCLWEBD_UNIT_REF",
+  "ROS_DISTRO",
+] as const;
+
 function run(
   command: string,
   args: string[],
   env: NodeJS.ProcessEnv = {},
 ): { status: number | null; stdout: string; stderr: string } {
+  const merged: NodeJS.ProcessEnv = { ...process.env, ...env };
+  for (const key of INSTALLER_ENV) {
+    if (!Object.hasOwn(env, key)) {
+      delete merged[key];
+    }
+  }
   const result = spawnSync(command, args, {
     encoding: "utf8",
-    env: { ...process.env, ...env },
+    env: merged,
   });
   return {
     status: result.status,
