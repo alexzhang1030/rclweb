@@ -22,6 +22,7 @@ Authoritative detail lives in the [open-work list](./plan.md) and the topic docu
 - [ ] Production TLS / reverse-proxy profile
 - [ ] Remote metrics/trace export
 - [x] systemd units (`packaging/systemd`, `install-rclwebd.sh --systemd`)
-- [x] ament overlay so `ros2 run rclwebd rclwebd` works (not apt)
+- [x] ament overlay so `ros2 run rclwebd rclwebd` works (not bloom)
+- [x] Own apt repo + `rclweb-apt-source` keyring (not bloom)
 - [ ] Kubernetes units beyond compose
 - [ ] Studio prototype after a release review

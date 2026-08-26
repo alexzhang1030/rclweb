@@ -31,6 +31,7 @@ license inventory, npm/crate pack members, `cargo fmt`, Clippy with
 | `just cargo-publish` / `just cargo-publish-check` | crates.io pack for `rclweb` / `rclwebd` |
 | `just e2e` / `just e2e-h-ft` | Live talker → gateway → `rcl-web` |
 | `just install-rclwebd-ament` | Write `~/.local/share/rclwebd` for `ros2 run rclwebd rclwebd` |
+| `just pack-rclwebd-deb` / `just apt-key-generate` / `just apt-repo` | Pack `rclwebd_*~$suite_*.deb`, generate the archive key, sign a local apt repo (ADR 0019) |
 | `just gateway` / `just gateway-h-ft` | Packaged gateway on the host network |
 | `just gateway-wt` / `just gateway-wt-h-ft` | Same + intranet WebTransport (`RCLWEBD_OFFER_WEBTRANSPORT=1`) |
 | `just ros-check` / `just ros-check-docker` | Compile `rclwebd --features ros --tests` (no `cargo test`) |

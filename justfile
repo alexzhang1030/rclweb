@@ -334,7 +334,8 @@ e2e-remaining-rows: (e2e-row "j-cy") (e2e-row "j-zn") (e2e-row "h-cy") (e2e-row 
 
 # Write ~/.local/share/rclwebd so `ros2 run rclwebd rclwebd` works after
 # sourcing ROS then that prefix's local_setup.bash. Needs a built binary.
-# Not apt / bloom (ADR 0018). Do not add this to `just check`.
+# Not bloom (ADR 0018). Debian packages are `just pack-rclwebd-deb`.
+# Do not add this to `just check`.
 [group('quality')]
 install-rclwebd-ament:
     #!/usr/bin/env bash
@@ -356,6 +357,33 @@ install-rclwebd-ament:
     ./scripts/install-rclwebd-ament.sh \
         --prefix "${RCLWEBD_AMENT_PREFIX:-$HOME/.local/share/rclwebd}" \
         --bin "$bin"
+
+# Pack a prebuilt binary into rclwebd_*.deb (ADR 0019). Needs dpkg-deb.
+[group('quality')]
+pack-rclwebd-deb distro="jazzy" arch="amd64":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd "{{root}}"
+    bin="${RCLWEBD_BIN:-}"
+    if [[ -z "$bin" ]]; then
+        if [[ -x "{{root}}/target/release/rclwebd" ]]; then
+            bin="{{root}}/target/release/rclwebd"
+        else
+            echo "error: set RCLWEBD_BIN or build target/release/rclwebd" >&2
+            exit 1
+        fi
+    fi
+    bun run scripts/pack-rclwebd-deb.ts --bin "$bin" --distro "{{distro}}" --arch "{{arch}}" --out-dir "${RCLWEBD_DEB_OUT:-{{root}}/dist/deb}"
+
+# Generate a local apt archive keypair. Writes the secret under DIR. Do not commit it.
+[group('quality')]
+apt-key-generate dir="/tmp/rclweb-apt-key":
+    cd "{{root}}" && bun run scripts/apt-archive-key.ts --generate --out-dir "{{dir}}" --write-secret
+
+# Pack + sign a local apt repo. Needs RCLWEB_APT_GPG_PRIVATE_KEY or --secret-file.
+[group('quality')]
+apt-repo:
+    cd "{{root}}" && bun run scripts/publish-apt-repo.ts --debs-dir "${RCLWEBD_DEB_OUT:-{{root}}/dist/deb}" --out-dir "${RCLWEBD_APT_OUT:-{{root}}/dist/apt-repo}"
 
 # J-FT runtime image for rclwebd (R4-02). Requires Docker; not a CI foundation job.
 [group('quality')]

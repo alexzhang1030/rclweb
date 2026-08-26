@@ -89,7 +89,9 @@ Staged delivery; each stage is independently shippable, in this order.
 (`apt install ros-jazzy-rclwebd`). It is the most familiar channel for
 ROS users, but it requires ament/colcon packaging of a Cargo workspace
 and buildfarm acceptance — a large, externally gated effort. Revisit
-after stages 1–4 land if users ask for apt.
+after stages 1–4 land if users ask for apt. The own apt repo in
+[ADR 0019](./0019-own-apt-repository.md) is that revisit for
+`apt install rclwebd`; it is not bloom.
 
 ## Rationale
 
@@ -131,8 +133,8 @@ after stages 1–4 land if users ask for apt.
 
 - GHCR is unreachable for target users (air-gapped robots) — raises the
   priority of the binaries and apt paths.
-- Cargo-in-colcon packaging matures, or users ask for apt — reopens the
-  deferred buildfarm release.
+- Cargo-in-colcon packaging matures — reopens the deferred buildfarm
+  release. Users asking for apt is [ADR 0019](./0019-own-apt-repository.md).
 - A new support row or a distro EOL changes the tag matrix.
 
 ## Source

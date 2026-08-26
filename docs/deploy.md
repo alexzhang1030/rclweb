@@ -30,16 +30,44 @@ router companion described under [Artifact](#artifact).
 
 Host binaries (`rclwebd-<version>-{jazzy,humble}-{amd64,arm64}` plus
 `.sha256`) are built in the same digest-pinned builder stages and run
-against a sourced matching prefix:
+against a sourced matching prefix. Ubuntu hosts can
+[`apt install rclwebd`](#apt). The curl installer writes a thin ament
+overlay so `ros2 run` works without apt
+([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md)):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/install-rclwebd.sh | bash
 ```
 
-The installer also writes a thin ament overlay so the process starts
-like any other ROS node (`ros2 run`). That overlay is not apt
-([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md)). Host units
-for unattended machines: [systemd](#systemd).
+Host units for unattended machines: [systemd](#systemd).
+
+## apt
+
+Ubuntu 24.04 (Jazzy / `noble`) and 22.04 (Humble / `jammy`). This is
+this project's repo, not bloom and not `packages.ros.org`
+([ADR 0019](./adr/0019-own-apt-repository.md)). The package name is
+`rclwebd`.
+
+First time, install the source package from the GitHub Release (it
+drops the keyring and a `Signed-By` deb822 file):
+
+```bash
+# pick the .deb from the latest Release
+sudo dpkg -i rclweb-apt-source_*_all.deb
+sudo apt update
+sudo apt install rclwebd
+source /opt/ros/$ROS_DISTRO/setup.bash
+source /opt/rclwebd/local_setup.bash
+ros2 run rclwebd rclwebd
+```
+
+Or `dpkg -i rclwebd_*~noble_amd64.deb` (Jazzy) /
+`rclwebd_*~jammy_amd64.deb` (Humble) from the same Release if you
+do not want a source. `apt` will not upgrade that path.
+
+The unit is installed and **not** enabled. `systemctl enable --now
+rclwebd` after you edit `/etc/rclwebd/rclwebd.env`. Do not
+`apt-key add`.
 
 ## Artifact
 
@@ -227,8 +255,9 @@ robot-edge shape, not a cloud overlay network.
 
 Interactive robot-side start. `rclwebd` is still a native process
 (browsers cannot bind rcl). This overlay only makes that process look
-like a normal ROS package. It is not a bloom / apt release
-([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md)).
+like a normal ROS package. It is not bloom
+([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md)). Debian
+packages are the [apt](#apt) repo ([ADR 0019](./adr/0019-own-apt-repository.md)).
 
 Default `scripts/install-rclwebd.sh` writes
 `~/.local/share/rclwebd` (override with `--ament-prefix` /

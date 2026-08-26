@@ -4,8 +4,9 @@
 #
 #   scripts/install-rclwebd-ament.sh --prefix DIR --bin PATH
 #
-# This is not apt / bloom (ADR 0018). The Cargo workspace stays outside
-# colcon. The prefix is an overlay: source ROS, then local_setup.bash.
+# This overlay is not bloom. Debian packages are ADR 0019. The Cargo
+# workspace stays outside colcon. The prefix is an overlay: source ROS,
+# then local_setup.bash.
 #
 #   --prefix DIR       overlay prefix (required)
 #   --bin PATH         executable rclwebd to symlink or copy

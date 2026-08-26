@@ -11,8 +11,9 @@
 #
 # Default also writes a thin ament overlay so `ros2 run rclwebd rclwebd`
 # works after `source $AMENT_PREFIX/local_setup.bash`. That overlay is not
-# apt / bloom (ADR 0018). --no-ament skips it. --systemd-only does not
-# write the overlay unless you also pass --ament.
+# bloom. Ubuntu apt is ADR 0019 (`docs/deploy.md#apt`). --no-ament skips
+# it. --systemd-only does not write the overlay unless you also pass
+# --ament.
 #
 #   source /opt/ros/$ROS_DISTRO/setup.bash
 #   source ~/.local/share/rclwebd/local_setup.bash

@@ -24,6 +24,7 @@ ADRs capture accepted decisions that carry significant reversal cost. Technical 
 | [0016](./0016-oidc-trusted-publish.md) | Accepted | Publish `rcl-web` and the `rclweb` / `rclwebd` crates via GitHub OIDC trusted publishing. |
 | [0017](./0017-host-retain-inbound-sample-payload.md) | Accepted | Host-retain inbound sample CDR; ROS_SAMPLE stays in JS. |
 | [0018](./0018-prebuilt-gateway-distribution.md) | Accepted | Distribute `rclwebd` as prebuilt GHCR images and release binaries; auto-detect the support row from the sourced environment. |
+| [0019](./0019-own-apt-repository.md) | Accepted | Own apt repo + Signed-By keyring for `rclwebd`. Not bloom. |
 
 ## Convention
 
@@ -37,3 +38,4 @@ ADRs capture accepted decisions that carry significant reversal cost. Technical 
 - ADR 0015 supersedes Bun as the npm ship bundler in ADR 0002. Bun workspaces, lockfile, scripts, and tests stand.
 - ADR 0016 supersedes human `npm publish` and `publish = false` on the product crates. Fixture crates stay private.
 - ADR 0017 does not supersede [ADR 0004](./0004-browser-wasm-host-boundary.md): wasm stays synchronous; JavaScript still owns buffer lifetimes. Sample bodies may live in the host buffer.
+- ADR 0019 does not supersede [ADR 0018](./0018-prebuilt-gateway-distribution.md): images, binaries, and row auto-detect stand. It is the apt revisit; bloom stays deferred.
