@@ -97,6 +97,36 @@ describe("resolveGatewayConnect", () => {
     });
   });
 
+  test("loopback stays on WebSocket even when Chromium has WebTransport", () => {
+    expect(
+      resolveGatewayConnect("ws://127.0.0.1:8794/ws", {}, browserWt),
+    ).toEqual({
+      url: "ws://127.0.0.1:8794/ws",
+      transport: "websocket",
+    });
+    expect(resolveGatewayConnect("127.0.0.1", {}, browserWt)).toEqual({
+      url: "ws://127.0.0.1:8794/ws",
+      transport: "websocket",
+    });
+    expect(resolveGatewayConnect("localhost", {}, browserWt)).toEqual({
+      url: "ws://localhost:8794/ws",
+      transport: "websocket",
+    });
+    expect(resolveGatewayConnect("::1", {}, browserWt)).toEqual({
+      url: "ws://[::1]:8794/ws",
+      transport: "websocket",
+    });
+  });
+
+  test("explicit https on loopback still requests WebTransport", () => {
+    expect(
+      resolveGatewayConnect("https://127.0.0.1:4433/", {}, browserWt),
+    ).toEqual({
+      url: "https://127.0.0.1:4433/",
+      transport: "webtransport",
+    });
+  });
+
   test("bun without WebTransport keeps the default ws URL", () => {
     const resolved = resolveGatewayConnect(
       "ws://127.0.0.1:8794/ws",
@@ -105,7 +135,7 @@ describe("resolveGatewayConnect", () => {
     );
     expect(resolved.url).toBe("ws://127.0.0.1:8794/ws");
     expect(resolved.transport).toBe("websocket");
-    expect(resolved.note).toBeDefined();
+    expect(resolved.note).toBeUndefined();
   });
 
   test("https default WT port maps back to HTTP 8794 on fallback", () => {
@@ -114,9 +144,15 @@ describe("resolveGatewayConnect", () => {
     ).toBe("ws://192.168.1.10:8794/ws");
   });
 
-  test("unbracketed IPv6 host upgrades on a secure context", () => {
-    expect(resolveGatewayConnect("::1", {}, browserWt)).toEqual({
-      url: "https://[::1]:4433/",
+  test("explicit webtransport on loopback still requests QUIC", () => {
+    expect(
+      resolveGatewayConnect(
+        "127.0.0.1",
+        { transport: "webtransport" },
+        browserWt,
+      ),
+    ).toEqual({
+      url: "https://127.0.0.1:4433/",
       transport: "webtransport",
     });
   });

@@ -1,13 +1,20 @@
 /**
  * rclweb — TypeScript host around the `rclweb` wasm core.
  *
- * Public surface follows rclcpp: `init(url)` → `new Node(name)` →
+ * Public surface follows rclcpp: `init()` → `new Node(name)` →
  * `createPublisher` / `createSubscription` with ROS message types
  * (`std_msgs.msg.String`). Wasm, the I/O Worker, and sample leases stay
  * on `rcl-web/internal`.
  */
 
-export { init, ok, shutdown, spin, type InitOptions } from "./context.ts";
+export {
+  DEFAULT_INIT_URL,
+  init,
+  ok,
+  shutdown,
+  spin,
+  type InitOptions,
+} from "./context.ts";
 export {
   Node,
   Publisher,

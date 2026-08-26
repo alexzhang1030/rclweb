@@ -1,13 +1,13 @@
 # rclweb
 
 Browser access to ROS 2. Install [`rcl-web`](https://www.npmjs.com/package/rcl-web),
-point it at an [`rclwebd`](https://crates.io/crates/rclwebd) gateway, then use
-`Node` the way you use rclcpp.
+run [`rclwebd`](https://crates.io/crates/rclwebd) on the machine that can see
+the ROS graph, then use `Node` the way you use rclcpp.
 
 ```ts
 import { init, Node, std_msgs } from "rcl-web";
 
-await init("ws://127.0.0.1:8794/ws");
+await init();
 const node = new Node("talker");
 
 const pub = node.createPublisher(std_msgs.msg.String, "chatter", 10);
@@ -43,8 +43,9 @@ const msg = new my_interfaces.msg.Status();
 [How to](./docs/typescript.md#your-own-message-types). Topic encode/decode
 still covers the types `rcl-web` ships.
 
-The page talks to ROS through a gateway on the robot (or on your laptop).
-Run the prebuilt image — no clone, no toolchain (`:humble` for Humble):
+`init()` talks to `ws://127.0.0.1:8794/ws`. On the robot (or your laptop)
+run `rclwebd` so that process can join the ROS domain. Prebuilt image,
+no clone, no toolchain (`:humble` for Humble):
 
 ```bash
 docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy
@@ -67,8 +68,8 @@ cargo install rclwebd --features ros
 rclwebd
 ```
 
-Default WebSocket URL is `ws://127.0.0.1:8794/ws`. Rows, images, and
-operations: [deploy](./docs/deploy.md).
+Another host: `init("192.168.1.10")`. Rows, images, and operations:
+[deploy](./docs/deploy.md).
 
 ## License
 

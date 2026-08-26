@@ -14,9 +14,9 @@ Method list: [API reference](./api.md).
 npm install rcl-web
 ```
 
-You need a running [`rclwebd`](https://crates.io/crates/rclwebd) that
-can see the ROS 2 graph you care about. Default URL:
-`ws://127.0.0.1:8794/ws`. How to run the gateway: [deploy](./deploy.md).
+On the machine that can see the ROS 2 graph, run
+[`rclwebd`](https://crates.io/crates/rclwebd). `init()` talks to
+`ws://127.0.0.1:8794/ws`. How to run that process: [deploy](./deploy.md).
 
 ```ts
 import {
@@ -32,18 +32,18 @@ import {
 ## Connect
 
 ```ts
-await init("ws://127.0.0.1:8794/ws");
+await init();
 ```
 
-Intranet WebTransport after `just gateway-wt` on the robot — page on
-`http://127.0.0.1`, Chromium. No CA and no second argument:
+That is the local default. Another host after `just gateway-wt` on the
+robot, page on `http://127.0.0.1`, Chromium. No CA:
 
 ```ts
 await init("192.168.1.10");
 ```
 
 That is WebTransport (QUIC). A tab opened via a LAN IP is not a secure
-context — `init` throws instead of silently using WebSocket. Pass
+context. `init` throws instead of silently using WebSocket. Pass
 `{ transport: "websocket" }` only to skip QUIC. Recipe:
 [Intranet WebTransport](./deploy.md#intranet-webtransport).
 
@@ -51,7 +51,7 @@ Call `init` once. A second call throws until `shutdown()`.
 
 | Function | What it does |
 |---|---|
-| `init(url)` | Connect to the gateway. Required before `new Node`. |
+| `init()` | Connect. Local default is `ws://127.0.0.1:8794/ws`. Required before `new Node`. |
 | `ok()` | `true` after `init`, `false` after `shutdown`. |
 | `shutdown()` | Close the session. Existing nodes stop. |
 | `spin()` | Wait until `shutdown()`. The browser already delivers callbacks; you do not need this for messages to arrive. |
@@ -259,7 +259,7 @@ only. A directory writes one file per package.
 import { init, Node } from "rcl-web";
 import { my_interfaces } from "./generated/my_interfaces.ts";
 
-await init("ws://127.0.0.1:8794/ws");
+await init();
 const node = new Node("ui");
 
 const status = new my_interfaces.msg.Status();

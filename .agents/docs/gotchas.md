@@ -94,10 +94,12 @@ was built `ros`-only logs “WT accept deferred”.
 
 The hash fetch is HTTP, not UDP: `httpOriginFromWebTransportUrl` maps
 default WT `4433` to HTTP `8794`. Custom ports need `localDevTlsOrigin`.
-`init("192.168.1.10")` (or the default `:8794` WS URL) uses WebTransport
-(QUIC) when the page is a secure context and `WebTransport` exists. A
-LAN-IP page is not a secure context — `init` throws
-`IntranetQuicRequiresSecureContextError` instead of quietly using TCP.
+`init()` and loopback (`127.0.0.1`, `localhost`, `::1`, the default
+`:8794` WS URL) stay on WebSocket. Default `rclwebd` does not offer
+QUIC. `init("192.168.1.10")` uses WebTransport (QUIC) when the page is
+a secure context and `WebTransport` exists. A LAN-IP page is not a
+secure context. `init` throws `IntranetQuicRequiresSecureContextError`
+instead of quietly using TCP.
 Pass `{ transport: "websocket" }` only to skip QUIC. Runtimes without
 the `WebTransport` API still fall back to WebSocket. Do not put the
 page on self-signed HTTPS and do not ask operators to install mkcert —

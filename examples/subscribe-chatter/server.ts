@@ -1,15 +1,16 @@
 /**
- * Demo server: serves the built `rclweb` bundle and a page that connects to rclwebd.
- * Build first (`just build` or `bun run --filter rcl-web build`), then:
- * `RCLWEB_GATEWAY_URL=192.168.1.10 bun run start`
- * Open the page at http://127.0.0.1:4173 (WebTransport / QUIC, no CA).
- * The demo binds loopback only — a LAN-IP origin cannot speak QUIC.
+ * Demo server: serves the built `rclweb` bundle and a page that connects
+ * to rclwebd. Build first (`just build` or `bun run --filter rcl-web
+ * build`), then `bun run start`. Open http://127.0.0.1:4173. Leave the
+ * host empty for this machine. Type a robot IP for QUIC
+ * (`RCLWEB_GATEWAY_URL=192.168.1.10`). The demo binds loopback only.
+ * A LAN-IP origin cannot speak QUIC.
  */
 import { serve } from "bun";
 import path from "node:path";
 
 const port = Number(process.env.PORT ?? "4173");
-const configuredGateway = process.env.RCLWEB_GATEWAY_URL ?? "127.0.0.1";
+const configuredGateway = process.env.RCLWEB_GATEWAY_URL ?? "";
 const root = import.meta.dir;
 const sdkWasm = path.resolve(root, "../../typescript/wasm/rclweb.wasm");
 const sdkDist = path.resolve(root, "../../typescript/dist");
@@ -132,14 +133,14 @@ const html = `<!doctype html>
 <body>
   <main>
     <h1>rclweb</h1>
-    <p class="lede">Live <code>/chatter</code>. This page stays on <code>http://127.0.0.1</code> so Connect uses WebTransport (QUIC) — no certificate. A LAN-IP tab cannot do that.</p>
-    <input id="gw" type="text" spellcheck="false" value="${configuredGateway.replace(/"/g, "&quot;")}" placeholder="Robot host, e.g. 192.168.1.10" />
+    <p class="lede">Live <code>/chatter</code>. Leave the host empty for this machine. Type a robot IP for WebTransport (QUIC). Keep this page on <code>http://127.0.0.1</code>. A LAN-IP tab cannot use QUIC.</p>
+    <input id="gw" type="text" spellcheck="false" value="${configuredGateway.replace(/"/g, "&quot;")}" placeholder="This machine, or a robot host such as 192.168.1.10" />
     <button id="go" type="button">Connect</button>
     <form id="compose" hidden>
       <input id="out" type="text" maxlength="200" placeholder="Publish to /chatter" autocomplete="off" />
       <button id="send" type="submit">Send</button>
     </form>
-    <p id="status">Idle · type the robot host and connect</p>
+    <p id="status">Idle · connect to this machine, or type a robot host</p>
     <ul id="log" aria-live="polite"></ul>
   </main>
   <script type="module">
@@ -152,13 +153,18 @@ const html = `<!doctype html>
     const out = document.getElementById("out");
     go.addEventListener("click", async () => {
       go.disabled = true;
-      const target = gw.value.trim() || "127.0.0.1";
-      const planned = resolveGatewayConnect(target);
-      status.textContent = planned.note
-        ? ("Connecting via " + planned.transport + " — " + planned.note)
-        : ("Connecting via " + planned.transport + " · " + planned.url);
+      const target = gw.value.trim();
       try {
-        await init(target);
+        if (!target) {
+          status.textContent = "Connecting · this machine";
+          await init();
+        } else {
+          const planned = resolveGatewayConnect(target);
+          status.textContent = planned.note
+            ? ("Connecting via " + planned.transport + " · " + planned.note)
+            : ("Connecting via " + planned.transport + " · " + planned.url);
+          await init(target);
+        }
         const node = new Node("subscribe_chatter");
         const publisher = node.createPublisher(std_msgs.msg.String, "/chatter", 10);
         node.createSubscription(std_msgs.msg.String, "/chatter", 10, (msg) => {

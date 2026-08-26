@@ -9,6 +9,7 @@ import {
   ok,
   shutdown,
   spin,
+  DEFAULT_INIT_URL,
   Node,
   Publisher,
   Subscription,
@@ -29,15 +30,19 @@ import {
 ## Context
 
 ```ts
+await init(): Promise<void>
+await init(options: InitOptions): Promise<void>
 await init(url: string, options?: InitOptions): Promise<void>
 ok(): boolean
 await shutdown(): Promise<void>
 await spin(node?: unknown): Promise<void>
 ```
 
-`init` throws if a context already exists. `Node` throws if `init` has
-not run. `spin` waits until `shutdown()`; the browser event loop already
-runs subscription and service callbacks.
+`init()` talks to `DEFAULT_INIT_URL` (`ws://127.0.0.1:8794/ws`), the
+same bind as host `rclwebd`. Pass a host only when ROS is on another
+machine. `init` throws if a context already exists. `Node` throws if
+`init` has not run. `spin` waits until `shutdown()`; the browser event
+loop already runs subscription and service callbacks.
 
 ## InitOptions
 
@@ -47,7 +52,7 @@ All fields optional. Leave the object off unless you need one of these.
 |---|---|---|
 | `reconnect` | `false` | On transport close, start a new session and re-open channels. In-flight calls reject with `"session reconnected"`. |
 | `reconnectAttempts` | `3` | Cap for `reconnect`. |
-| `transport` | auto | Unset: WebTransport (QUIC) on a secure context when the URL looks like the intranet default. A LAN-IP page throws. Set `websocket` to skip QUIC. |
+| `transport` | auto | Unset: WebSocket for loopback / `init()`. WebTransport (QUIC) for a remote host on the default ports. A LAN-IP page throws. Set `websocket` to skip QUIC. |
 | `serverCertificateHashes` | — | Local-dev WebTransport hashes (`algorithm: "sha-256"`). |
 | `fetchLocalDevTls` | — | Fetch `{origin}/local-dev/tls` when hashes are omitted. |
 | `localDevTlsOrigin` | WT `:4433` → HTTP `:8794` | HTTP origin for that fetch. Custom WT ports need this. |

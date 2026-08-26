@@ -1,11 +1,13 @@
 /**
- * Pick a gateway URL and transport so intranet `init` uses QUIC.
+ * Pick a URL and transport so remote `init("192.168.1.10")` uses QUIC,
+ * while `init()` / loopback stays on the local WebSocket default.
  *
  * Chromium + `http://127.0.0.1` can use WebTransport (hash-pinned local-dev
- * cert). A page opened via a LAN IP is not a secure context, so the same
- * `init("192.168.1.10")` throws — pass `{ transport: "websocket" }` only to
- * skip QUIC. Do not serve the page over a self-signed HTTPS URL; that
- * interstitial is more trouble than opening localhost.
+ * cert) for a *remote* host. A page opened via a LAN IP is not a secure
+ * context, so the same `init("192.168.1.10")` throws. Pass
+ * `{ transport: "websocket" }` only to skip QUIC. Do not serve the page
+ * over a self-signed HTTPS URL. That interstitial is more trouble than
+ * opening localhost.
  */
 
 import {
@@ -70,7 +72,7 @@ export function detectGatewayRuntime(
 function parseGatewayInput(raw: string): URL {
   const trimmed = raw.trim();
   if (!trimmed) {
-    throw new Error("gateway URL is empty");
+    throw new Error("rclweb.init() URL is empty");
   }
   if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) {
     return new URL(trimmed);
@@ -123,10 +125,21 @@ function defaultHttpOrWtPort(port: string): boolean {
   );
 }
 
-/** Intranet-shaped hint: bare host, HTTP/WS on 8794, or HTTPS on 4433. */
+/** Loopback talks to the process on this machine. That stays WebSocket. */
+function isLoopbackHost(hostname: string): boolean {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  return host === "localhost" || host === "127.0.0.1" || host === "::1";
+}
+
+/**
+ * Remote intranet hint: bare LAN host, HTTP/WS on 8794, or HTTPS on 4433.
+ * Loopback never implies QUIC — default `rclwebd` does not offer it.
+ * Explicit `https://` (including loopback:4433) still requests WebTransport.
+ */
 function impliesIntranetWebTransport(u: URL): boolean {
   if (u.protocol === "wss:") return false;
   if (u.protocol === "https:") return true;
+  if (isLoopbackHost(u.hostname)) return false;
   if (u.protocol === "ws:" || u.protocol === "http:") {
     return defaultHttpOrWtPort(u.port);
   }
@@ -147,8 +160,9 @@ function refuseUnlessWebTransport(runtime: GatewayRuntime): never {
 /**
  * Resolve `init` / `connect` input to a concrete URL and transport.
  *
- * Intranet defaults use WebTransport (QUIC). A LAN-IP page is not a
- * secure context — this throws unless `{ transport: "websocket" }`.
+ * A remote host on the default ports uses WebTransport (QUIC). Loopback
+ * and `init()` stay on WebSocket. A LAN-IP page is not a secure context
+ * — this throws unless `{ transport: "websocket" }`.
  *
  * Pass `runtime` in tests. Applications leave it unset.
  */
