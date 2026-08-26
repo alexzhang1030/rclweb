@@ -25,3 +25,31 @@ Foxglove views PointCloud2 `data` on the WS buffer. rclweb does the same: ROS_SA
 | `just perf-baseline` | p50/p99/mean, CPU µs/sample, RSS at 1 KiB, 32 KiB, PointCloud2 ~1 MiB |
 | `just perf-baseline-live` | Docker stamp latency + CPU/RSS vs foxglove_bridge and rosbridge |
 | `just poll-latency` | Empty timer-poll (wasm size reopen input) |
+
+## WebSocket
+
+`init()` is local binary WebSocket. That is the happy path, not a
+fallback we still owe a rewrite.
+
+The sample already sits in one `Bytes` / `ArrayBuffer` from the RMW
+take through `ws.send`. Framing is in-place. `binaryType` is
+`arraybuffer`. Data channels do not enable permessage-deflate. The
+I/O Worker transfers that buffer to main. None of those steps is a
+second payload copy.
+
+What WebSocket still costs, and what we leave alone:
+
+- One TCP stream. A stalled reliable channel head-of-line blocks
+  every other channel on the connection. That is the reason
+  WebTransport exists (`init("192.168.1.10")` or
+  `{ transport: "webtransport" }`), not because WebSocket memcpy's
+  more.
+- Kernel and browser RX buffers. They sit outside the controllable
+  copy budget. Foxglove pays the same tax on the same hop.
+- `just perf-baseline` starts after the bytes are already in JS. Use
+  `just perf-baseline-live` when the socket is part of the claim.
+
+Do not put ROS_SAMPLE back into wasm to "parse the socket faster".
+Do not turn on permessage-deflate to "win" a large PointCloud2.
+Do not make local `init()` imply QUIC. Default `rclwebd` does not
+offer it.

@@ -40,7 +40,7 @@ GitHub documents this under
 
 ## Pixi ros-test must pin ROS_PREFIX over a host /opt/ros
 
-`just ros-test-pixi` exists for machines without apt ROS, but a host `/opt/ros/jazzy` on `PATH` / `LD_LIBRARY_PATH` makes link, dlopen, and `ros2 topic pub` silently use the apt prefix — mixed apt + RoboStack FastDDS then hangs the live talker e2e (GraphSnapshot / discovery) instead of failing cleanly. `scripts/pixi-ros-activate.sh` pins `ROS_PREFIX` / `AMENT_PREFIX_PATH` to `$CONDA_PREFIX`, sets `LD_LIBRARY_PATH` to that `lib` only, and forces `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` (RoboStack's activate.d defaults to `SUBNET`). The pixi env includes `ros2cli` / `ros2topic` so the talker is the same prefix. `docs-check` skips `.pixi/` so a local install does not poison `just check`. RoboStack Jazzy is still not a substitute for digest-pinned Docker e2e (`just e2e` / `just e2e-h-ft`). Landed in [`25fb42f`](https://github.com/alexzhang1030/rclweb/commit/25fb42f) (#20); reproduce with `just ros-test-pixi`.
+`just ros-test-pixi` exists for machines without apt ROS, but a host `/opt/ros/jazzy` on `PATH` / `LD_LIBRARY_PATH` makes link, dlopen, and `ros2 topic pub` silently use the apt prefix — mixed apt + RoboStack FastDDS then hangs the live talker e2e (GraphSnapshot / discovery) instead of failing cleanly. `scripts/pixi-ros-activate.sh` pins `ROS_PREFIX` / `AMENT_PREFIX_PATH` to `$CONDA_PREFIX`, sets `LD_LIBRARY_PATH` to that `lib` only, and forces `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` (RoboStack's activate.d defaults to `SUBNET`). The pixi env includes `ros2cli` / `ros2topic` so the talker is the same prefix. `docs-check` skips `.pixi/` so a local install does not poison `just check`. RoboStack Jazzy is still not a substitute for digest-pinned Docker e2e (`just e2e` / `just e2e-h-ft`). Landed in [`25fb42f`](https://github.com/alexzhang1030/rclweb/commit/25fb42f) (#20); reproduce with `just ros-test-pixi`. `ros2 run` is `ros-jazzy-ros2run`, not `ros-jazzy-ros2pkg` (`ros2 pkg` only). Pixi activation overwrites `AMENT_PREFIX_PATH` to `$CONDA_PREFIX`; source the rclwebd overlay after that, not before.
 
 ## Typesupport is dlopen, not link-time
 
@@ -82,6 +82,20 @@ Spread-pushing a byte array into a `number[]` (`out.push(...bytes)`) throws a Ra
 
 The WT accept loop reads a length-prefixed bidirectional stream into a growable inbox (`pushLengthPrefixedChunk` in `typescript/src/host.ts`). Each complete frame is `slice`d out before ingest. Do not emit a view of the inbox: ROS_SAMPLE pins that `Uint8Array` until `lease.release()`, and the inbox is reused for the next chunk. Compacting leftover bytes with `copyWithin` is fine; dropping the per-frame copy is not.
 
+## Local `init()` is WebSocket; that is not a leftover copy
+
+`init()` and loopback stay on binary WebSocket. The sample is one
+`Bytes` / `ArrayBuffer` from the RMW take through `ws.send`
+(`binaryType = "arraybuffer"`, no permessage-deflate, host-retain,
+Worker transfer). Do not treat the local default as a transport we
+still owe a rewrite. The remaining WebSocket tax is one TCP stream
+(head-of-line) plus kernel/browser RX. Those are outside the
+controllable copy budget and are the same tax Foxglove pays.
+WebTransport is for a remote host or an explicit
+`{ transport: "webtransport" }`, when independent streams matter.
+`just perf-baseline` does not include the socket;
+`just perf-baseline-live` does. [performance](../../docs/performance.md#websocket).
+
 ## Intranet WebTransport is one env, not production TLS
 
 Runtime images compile `--features ros,webtransport` so
@@ -94,10 +108,12 @@ was built `ros`-only logs “WT accept deferred”.
 
 The hash fetch is HTTP, not UDP: `httpOriginFromWebTransportUrl` maps
 default WT `4433` to HTTP `8794`. Custom ports need `localDevTlsOrigin`.
-`init("192.168.1.10")` (or the default `:8794` WS URL) uses WebTransport
-(QUIC) when the page is a secure context and `WebTransport` exists. A
-LAN-IP page is not a secure context — `init` throws
-`IntranetQuicRequiresSecureContextError` instead of quietly using TCP.
+`init()` and loopback (`127.0.0.1`, `localhost`, `::1`, the default
+`:8794` WS URL) stay on WebSocket. Default `rclwebd` does not offer
+QUIC. `init("192.168.1.10")` uses WebTransport (QUIC) when the page is
+a secure context and `WebTransport` exists. A LAN-IP page is not a
+secure context. `init` throws `IntranetQuicRequiresSecureContextError`
+instead of quietly using TCP.
 Pass `{ transport: "websocket" }` only to skip QUIC. Runtimes without
 the `WebTransport` API still fall back to WebSocket. Do not put the
 page on self-signed HTTPS and do not ask operators to install mkcert —
@@ -186,6 +202,18 @@ Do not `ExecStart=` the binary directly, and do not default
 binaries derive it). `ProtectSystem=strict` would also block `/opt/ros`.
 Units: [`packaging/systemd/`](../../packaging/systemd/),
 [deploy](../../docs/deploy.md#systemd).
+
+## ros2 run already has a sourced prefix
+
+`ros2 run rclwebd rclwebd` runs only after the caller sourced ROS (and
+the overlay). Wrapping `setup.bash` again on that executable is wrong,
+and `launch_ros.actions.Node` injects `--ros-args` that `rclwebd`
+ignores (config is env-only). The overlay binary is the process;
+[`scripts/rclwebd-ros.sh`](../../scripts/rclwebd-ros.sh) stays on
+systemd because `EnvironmentFile=` cannot source a prefix. The fallback
+wrapper must not `command -v rclwebd`: `ros2 run` puts
+`lib/rclwebd/rclwebd` first and that would recurse.
+[deploy](../../docs/deploy.md#ros2-run).
 
 ## GitHub Releases downloads need retries
 

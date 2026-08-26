@@ -5,7 +5,7 @@ Runnable consumers of `rcl-web`.
 
 | Path | Role |
 |---|---|
-| [`subscribe-chatter`](./subscribe-chatter/) | Browser demo: type the robot host, `init` uses WebTransport (QUIC) from localhost. |
+| [`subscribe-chatter`](./subscribe-chatter/) | Browser demo: leave the host empty for this machine, or type a robot IP for QUIC. |
 | [`e2e-harness`](./e2e-harness/) | Headless inline-host subscribe. Gate for `just e2e` and `just e2e-h-ft`; not a human demo |
 
 Both packages depend on `"rcl-web": "workspace:*"`. That specifier

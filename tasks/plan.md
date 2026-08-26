@@ -36,9 +36,9 @@ None. The 2026-08-14 replies are in Settled. Reopen a row only if the human name
 | SROS2 enclave | Parked: auth is out of scope until the human names a tenant / keystore |
 | Production TLS | Runtime images speak plaintext HTTP/WS by default; PKI stays a follow-up. Intranet / lab WebTransport is the ADR 0011 opt-in (`RCLWEBD_OFFER_WEBTRANSPORT`), not this row ([deploy](../docs/deploy.md#intranet-webtransport)) |
 | Remote telemetry | `/metrics` is scrape-only; no OTLP export yet |
-| Orchestrators | systemd units: [`packaging/systemd/`](../packaging/systemd/), `install-rclwebd.sh --systemd` ([deploy](../docs/deploy.md#systemd)). Kubernetes still open |
+| Orchestrators | Interactive: `ros2 run rclwebd rclwebd` via the ament overlay ([deploy](../docs/deploy.md#ros2-run)). Unattended: systemd units ([`packaging/systemd/`](../packaging/systemd/), `install-rclwebd.sh --systemd`, [deploy](../docs/deploy.md#systemd)). Kubernetes still open |
 | Soak / upgrade | Rollback, soak, and fault evidence |
-| apt / buildfarm | Deferred in [ADR 0018](../docs/adr/0018-prebuilt-gateway-distribution.md); reopens if cargo-in-colcon matures or users ask for apt |
+| apt / buildfarm | Deferred in [ADR 0018](../docs/adr/0018-prebuilt-gateway-distribution.md). The thin ament overlay is not that work; reopens if cargo-in-colcon matures or users ask for apt |
 | Studio | Post-release UI prototype ([studio-ui](../docs/prototypes/studio-ui.md)) |
 
 ## Definition of done

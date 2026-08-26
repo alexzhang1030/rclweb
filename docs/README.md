@@ -11,7 +11,7 @@ Start here if you are writing a browser app against ROS 2:
 | Send or host an action | [Actions](./typescript.md#actions) |
 | Look up every method | [API reference](./api.md) |
 | Generate types from `.msg` / `.action` | [Your own message types](./typescript.md#your-own-message-types) |
-| Run the gateway | [Deploy `rclwebd`](./deploy.md) |
+| Run `rclwebd` | [`ros2 run`](./deploy.md#ros2-run), [Deploy `rclwebd`](./deploy.md) |
 
 Runnable demo: [`examples/subscribe-chatter`](../examples/subscribe-chatter/).
 

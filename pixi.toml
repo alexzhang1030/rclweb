@@ -21,6 +21,9 @@ ros-jazzy-example-interfaces = "*"
 # Live talker e2e (`ros2 topic pub`) must be this prefix, not a host /opt/ros.
 ros-jazzy-ros2cli = "*"
 ros-jazzy-ros2topic = "*"
+# Overlay check: `ros2 run` is its own verb package, not ros2pkg.
+ros-jazzy-ros2run = "*"
+ros-jazzy-ros2launch = "*"
 
 [activation]
 scripts = ["scripts/pixi-ros-activate.sh"]

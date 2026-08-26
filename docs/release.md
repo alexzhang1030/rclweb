@@ -62,7 +62,8 @@ as soon as this workflow is on the default branch.
 ## Publish a version
 
 Bump the version in the tree (`typescript/package.json` and/or
-`[workspace.package].version` plus the `rclweb` workspace dep version),
+`[workspace.package].version` plus the `rclweb` workspace dep version,
+and `packaging/ament/rclwebd/package.xml`),
 merge to `main`, then either:
 
 ```bash

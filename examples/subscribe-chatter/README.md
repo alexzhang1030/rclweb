@@ -3,8 +3,9 @@
 Browser page that connects to `rclwebd`, subscribes to `/chatter`, and
 can publish `std_msgs/msg/String` samples. This is the public `rcl-web`
 demo ([how to](../../docs/typescript.md), [API](../../docs/api.md)).
-`init` uses WebTransport (QUIC) from `http://127.0.0.1` — no
-certificate to install. The demo binds loopback only.
+Leave the host empty for this machine (`init()`). Type a robot IP for
+WebTransport (QUIC) from `http://127.0.0.1`. No certificate to install.
+The demo binds loopback only.
 
 ## Run
 
@@ -20,11 +21,11 @@ certificate to install. The demo binds loopback only.
    bun run --filter rcl-web build
    ```
 
-2. Start a gateway that can attach to ROS (or the mock-free live image):
+2. Start the edge process on a machine that can attach to ROS:
 
    ```bash
-   # example: packaged J-FT gateway on the host network
    just gateway
+   # or, after the ament overlay: ros2 run rclwebd rclwebd
    ```
 
 3. Serve the page:
@@ -33,9 +34,9 @@ certificate to install. The demo binds loopback only.
    bun run --filter @rclweb/subscribe-chatter start
    ```
 
-   Open http://127.0.0.1:4173, type the robot host (or leave
-   `127.0.0.1`), click **Connect**, then send from the page or from a
-   ROS talker on `/chatter`.
+   Open http://127.0.0.1:4173, click **Connect** for this machine, or
+   type a robot host first. Send from the page or from a ROS talker on
+   `/chatter`.
 
    Intranet WebTransport: `just gateway-wt` on the robot, keep this page
    on `http://127.0.0.1:4173`, type the robot IP. Chromium. That is the
@@ -44,7 +45,7 @@ certificate to install. The demo binds loopback only.
 | Variable | Default | Role |
 |---|---|---|
 | `PORT` | `4173` | HTTP port for the demo page |
-| `RCLWEB_GATEWAY_URL` | `127.0.0.1` | Prefills the host field (`192.168.1.10` is enough) |
+| `RCLWEB_GATEWAY_URL` | empty | Prefills the host field (`192.168.1.10` for QUIC) |
 
 The page loads `typescript/dist/index.js` (Worker path, not
 `inline: true`). `just build` must have produced `dist/` first; the

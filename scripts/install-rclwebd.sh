@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install a prebuilt rclwebd gateway binary from GitHub Releases (ADR 0018).
+# Install a prebuilt rclwebd binary from GitHub Releases (ADR 0018).
 #
 #   curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/install-rclwebd.sh | bash
 #
@@ -9,19 +9,34 @@
 # systemd units therefore ExecStart a wrapper that sources setup.bash first
 # (EnvironmentFile cannot source a ROS prefix).
 #
+# Default also writes a thin ament overlay so `ros2 run rclwebd rclwebd`
+# works after `source $AMENT_PREFIX/local_setup.bash`. That overlay is not
+# apt / bloom (ADR 0018). --no-ament skips it. --systemd-only does not
+# write the overlay unless you also pass --ament.
+#
+#   source /opt/ros/$ROS_DISTRO/setup.bash
+#   source ~/.local/share/rclwebd/local_setup.bash
+#   ros2 run rclwebd rclwebd
+#
 # Options (also as env vars):
 #   --distro jazzy|humble   ROS distro (default: $ROS_DISTRO from the sourced env)
 #   --version vX.Y.Z        release tag (default: latest release)
 #   --dir PATH              install directory (default: $RCLWEBD_INSTALL_DIR or ~/.local/bin)
 #   --systemd [user|system] install a systemd unit + env example (never auto-enable)
 #   --systemd-only          install units/wrapper only; skip the binary download
+#   --no-ament              skip the ament overlay
+#   --ament                 write the overlay even with --systemd-only
+#   --ament-only            overlay only; skip the binary download
+#   --ament-prefix DIR      overlay prefix (default: $RCLWEBD_AMENT_PREFIX or ~/.local/share/rclwebd)
+#   --wrapper-only          overlay lib/rclwebd/rclwebd is a RCLWEBD_BIN wrapper
 #   --dry-run               print what would be downloaded/installed and exit
 set -euo pipefail
 
 REPO="${RCLWEBD_REPO:-alexzhang1030/rclweb}"
-# Units landed after v0.0.6. Fetch them from this ref unless overridden.
-# Do not default this to --version: a tag that predates packaging/systemd
-# would 404. Operators who pin units to a later tag set RCLWEBD_UNIT_REF.
+# Units and the ament overlay landed after v0.0.6. Fetch them from this
+# ref unless overridden. Do not default this to --version: a tag that
+# predates those paths would 404. Operators who pin the fetch to a later
+# tag set RCLWEBD_UNIT_REF.
 UNIT_REF="${RCLWEBD_UNIT_REF:-main}"
 DISTRO="${ROS_DISTRO:-}"
 VERSION=""
@@ -29,6 +44,11 @@ INSTALL_DIR="${RCLWEBD_INSTALL_DIR:-${HOME}/.local/bin}"
 DRY_RUN=0
 SYSTEMD=""
 SYSTEMD_ONLY=0
+NO_AMENT=0
+FORCE_AMENT=0
+AMENT_ONLY=0
+WRAPPER_ONLY=0
+AMENT_PREFIX="${RCLWEBD_AMENT_PREFIX:-${HOME}/.local/share/rclwebd}"
 
 usage() {
   grep '^#' "$0" | sed 's/^# \{0,1\}//'
@@ -49,11 +69,29 @@ while [[ $# -gt 0 ]]; do
       fi
       ;;
     --systemd-only) SYSTEMD_ONLY=1; shift ;;
+    --no-ament) NO_AMENT=1; shift ;;
+    --ament) FORCE_AMENT=1; shift ;;
+    --ament-only) AMENT_ONLY=1; shift ;;
+    --ament-prefix) AMENT_PREFIX="$2"; shift 2 ;;
+    --wrapper-only) WRAPPER_ONLY=1; shift ;;
     --dry-run) DRY_RUN=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "error: unknown argument: $1 (see --help)" >&2; exit 2 ;;
   esac
 done
+
+if [[ $NO_AMENT -eq 1 && $FORCE_AMENT -eq 1 ]]; then
+  echo "error: --no-ament and --ament cannot be combined" >&2
+  exit 2
+fi
+if [[ $NO_AMENT -eq 1 && $AMENT_ONLY -eq 1 ]]; then
+  echo "error: --no-ament and --ament-only cannot be combined" >&2
+  exit 2
+fi
+if [[ -z "$AMENT_PREFIX" ]]; then
+  echo "error: --ament-prefix is empty" >&2
+  exit 2
+fi
 
 if [[ $SYSTEMD_ONLY -eq 1 && -z "$SYSTEMD" ]]; then
   SYSTEMD="infer"
@@ -79,9 +117,15 @@ fi
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 LOCAL_SYSTEMD_DIR=""
 LOCAL_WRAPPER=""
+LOCAL_AMENT_DIR=""
+LOCAL_AMENT_INSTALLER=""
 if [[ -f "${SCRIPT_DIR}/rclwebd-ros.sh" && -f "${SCRIPT_DIR}/../packaging/systemd/rclwebd.service" ]]; then
   LOCAL_SYSTEMD_DIR="$(CDPATH= cd -- "${SCRIPT_DIR}/../packaging/systemd" && pwd)"
   LOCAL_WRAPPER="${SCRIPT_DIR}/rclwebd-ros.sh"
+fi
+if [[ -f "${SCRIPT_DIR}/install-rclwebd-ament.sh" && -f "${SCRIPT_DIR}/../packaging/ament/rclwebd/package.xml" ]]; then
+  LOCAL_AMENT_DIR="$(CDPATH= cd -- "${SCRIPT_DIR}/../packaging/ament/rclwebd" && pwd)"
+  LOCAL_AMENT_INSTALLER="${SCRIPT_DIR}/install-rclwebd-ament.sh"
 fi
 
 raw_url() {
@@ -239,10 +283,71 @@ install_systemd() {
   fi
 }
 
-if [[ $SYSTEMD_ONLY -eq 0 ]]; then
+install_ament() {
+  local bin ament_script pkg launch tmpdir args
+  bin="${RCLWEBD_BIN:-${INSTALL_DIR}/rclwebd}"
+
+  echo "ament overlay"
+  echo "  prefix  ${AMENT_PREFIX}"
+  echo "  binary  ${bin}"
+  echo "  ros2 run rclwebd rclwebd"
+
+  if [[ $DRY_RUN -eq 1 ]]; then
+    if [[ -z "$LOCAL_AMENT_INSTALLER" ]]; then
+      echo "  would fetch $(raw_url packaging/ament/rclwebd/package.xml)"
+      echo "  would fetch $(raw_url packaging/ament/rclwebd/launch/rclwebd.launch.py)"
+      echo "  would fetch $(raw_url scripts/install-rclwebd-ament.sh)"
+    fi
+    echo "  would write ${AMENT_PREFIX}/lib/rclwebd/rclwebd"
+    echo "  would write ${AMENT_PREFIX}/share/rclwebd/package.xml"
+    echo "  would write ${AMENT_PREFIX}/share/rclwebd/launch/rclwebd.launch.py"
+    echo "  would write ${AMENT_PREFIX}/share/ament_index/resource_index/packages/rclwebd"
+    echo "  would write ${AMENT_PREFIX}/local_setup.bash"
+    return 0
+  fi
+
+  if [[ $WRAPPER_ONLY -eq 0 && ( -z "$bin" || ! -x "$bin" ) ]]; then
+    echo "error: no rclwebd binary at ${bin}" >&2
+    echo "  pass --dir DIR (expects DIR/rclwebd), set RCLWEBD_BIN, or --wrapper-only" >&2
+    exit 1
+  fi
+
+  tmpdir=""
+  if [[ -n "$LOCAL_AMENT_INSTALLER" ]]; then
+    ament_script="$LOCAL_AMENT_INSTALLER"
+    pkg="${LOCAL_AMENT_DIR}/package.xml"
+    launch="${LOCAL_AMENT_DIR}/launch/rclwebd.launch.py"
+  else
+    tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/rclwebd-ament.XXXXXX")"
+    ament_script="${tmpdir}/install-rclwebd-ament.sh"
+    pkg="${tmpdir}/package.xml"
+    launch="${tmpdir}/rclwebd.launch.py"
+    copy_or_fetch "$ament_script" "" "scripts/install-rclwebd-ament.sh"
+    copy_or_fetch "$pkg" "" "packaging/ament/rclwebd/package.xml"
+    copy_or_fetch "$launch" "" "packaging/ament/rclwebd/launch/rclwebd.launch.py"
+    chmod 755 "$ament_script"
+  fi
+
+  args=(--prefix "$AMENT_PREFIX" --package-xml "$pkg" --launch "$launch")
+  if [[ $WRAPPER_ONLY -eq 1 ]]; then
+    args+=(--wrapper-only)
+  else
+    args+=(--bin "$bin")
+  fi
+  bash "$ament_script" "${args[@]}"
+  if [[ -n "$tmpdir" ]]; then
+    rm -rf "$tmpdir"
+  fi
+}
+
+if [[ $SYSTEMD_ONLY -eq 0 && $AMENT_ONLY -eq 0 ]]; then
   install_binary
 fi
 
 if [[ -n "$SYSTEMD" ]]; then
   install_systemd
+fi
+
+if [[ $NO_AMENT -eq 0 && ( $SYSTEMD_ONLY -eq 0 || $FORCE_AMENT -eq 1 || $AMENT_ONLY -eq 1 ) ]]; then
+  install_ament
 fi

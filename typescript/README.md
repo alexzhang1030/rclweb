@@ -1,13 +1,14 @@
 # rcl-web
 
-TypeScript client for ROS 2 in the browser. Connect to an
-[`rclwebd`](https://crates.io/crates/rclwebd) gateway, then use `Node`
-like rclcpp.
+TypeScript client for ROS 2 in the browser. On the machine that can
+see the ROS graph, start the edge process (`ros2 run rclwebd rclwebd`
+or the [image](https://github.com/alexzhang1030/rclweb/pkgs/container/rclwebd)),
+then use `Node` like rclcpp.
 
 ```ts
 import { init, Node, std_msgs } from "rcl-web";
 
-await init("ws://127.0.0.1:8794/ws");
+await init();
 const node = new Node("listener");
 
 node.createSubscription(std_msgs.msg.String, "chatter", 10, (msg) => {

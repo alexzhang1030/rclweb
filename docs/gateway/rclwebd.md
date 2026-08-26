@@ -89,7 +89,7 @@ Resume validates identity, wire version, capabilities, gateway instance, support
 
 The gateway is the trust boundary for OIDC identity, SROS2, operation ACLs, resource policy, and audit. Compatibility endpoints such as Foxglove and rosbridge have independent sessions, policy, and telemetry.
 
-Operations expose liveness (`/livez`, `/healthz`), readiness (`/readyz`), configuration validation (`/configz`), metrics (`/telemetryz` JSON and `/metrics` Prometheus text), logs, audit output, drain (`POST /drain` then SIGTERM), and bounded recovery. Audit default is stderr JSON lines; `RCLWEBD_AUDIT_SINK=file` adds a hash-chained JSONL with size rotation and copy/verify export ([security](../security.md#audit), [deploy](../deploy.md)). Deployment artifacts cover the six-row runtime images, host-network compose, and systemd units ([deploy](../deploy.md#systemd)); proxy and TLS configuration, identity, SROS2, and Kubernetes remain follow-ups.
+Operations expose liveness (`/livez`, `/healthz`), readiness (`/readyz`), configuration validation (`/configz`), metrics (`/telemetryz` JSON and `/metrics` Prometheus text), logs, audit output, drain (`POST /drain` then SIGTERM), and bounded recovery. Audit default is stderr JSON lines; `RCLWEBD_AUDIT_SINK=file` adds a hash-chained JSONL with size rotation and copy/verify export ([security](../security.md#audit), [deploy](../deploy.md)). Deployment artifacts cover the six-row runtime images, host-network compose, the thin ament overlay for `ros2 run` ([deploy](../deploy.md#ros2-run)), and systemd units ([deploy](../deploy.md#systemd)); proxy and TLS configuration, identity, SROS2, and Kubernetes remain follow-ups.
 
 ## Validation
 

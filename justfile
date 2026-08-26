@@ -332,6 +332,31 @@ e2e-row row: toolchain-check
 [group('quality')]
 e2e-remaining-rows: (e2e-row "j-cy") (e2e-row "j-zn") (e2e-row "h-cy") (e2e-row "h-zn")
 
+# Write ~/.local/share/rclwebd so `ros2 run rclwebd rclwebd` works after
+# sourcing ROS then that prefix's local_setup.bash. Needs a built binary.
+# Not apt / bloom (ADR 0018). Do not add this to `just check`.
+[group('quality')]
+install-rclwebd-ament:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd "{{root}}"
+    bin="${RCLWEBD_BIN:-}"
+    if [[ -z "$bin" ]]; then
+        if [[ -x "{{root}}/target/release/rclwebd" ]]; then
+            bin="{{root}}/target/release/rclwebd"
+        elif [[ -x "{{root}}/target/debug/rclwebd" ]]; then
+            bin="{{root}}/target/debug/rclwebd"
+        elif command -v rclwebd >/dev/null 2>&1; then
+            bin="$(command -v rclwebd)"
+        else
+            echo "error: no rclwebd binary. Build one or set RCLWEBD_BIN." >&2
+            exit 1
+        fi
+    fi
+    ./scripts/install-rclwebd-ament.sh \
+        --prefix "${RCLWEBD_AMENT_PREFIX:-$HOME/.local/share/rclwebd}" \
+        --bin "$bin"
+
 # J-FT runtime image for rclwebd (R4-02). Requires Docker; not a CI foundation job.
 [group('quality')]
 image-rclwebd: toolchain-check

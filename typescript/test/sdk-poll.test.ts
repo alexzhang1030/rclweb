@@ -52,6 +52,7 @@ test("public runtime exports stay application-facing", async () => {
     "ActionServer",
     "Client",
     "Collections",
+    "DEFAULT_INIT_URL",
     "Header",
     "IntranetQuicRequiresSecureContextError",
     "KeepLast",
