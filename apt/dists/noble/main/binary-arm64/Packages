@@ -1,0 +1,38 @@
+Package: rclweb-apt-source
+Version: 0.0.6-1
+Architecture: all
+Maintainer: rclweb maintainers <maintainers@localhost>
+Installed-Size: 2
+Filename: pool/noble/main/r/rclweb-apt-source/rclweb-apt-source_0.0.6-1_all.deb
+Size: 2526
+MD5sum: f6b4257998d639187bacf4ea6b557308
+SHA1: 47b5c54ecfd4fa6f8c3408d86976d584f44e543b
+SHA256: 0fed39a79e58e354dc827f7c08e5f786a68b9703880ad79445b364579f3f3b20
+Section: admin
+Priority: optional
+Homepage: https://github.com/alexzhang1030/rclweb
+Description: APT source and archive keyring for rclwebd
+ Adds a Signed-By keyring and a deb822 source. Not bloom.
+ Package name is rclwebd, never ros-jazzy-rclwebd.
+
+Package: rclwebd
+Version: 0.0.6-1~noble
+Architecture: arm64
+Maintainer: rclweb maintainers <maintainers@localhost>
+Installed-Size: 4367
+Depends: libc6, libgcc-s1, libssl3, ros-jazzy-rcl, ros-jazzy-rcl-action, ros-jazzy-rmw, ros-jazzy-rcutils, ros-jazzy-rosidl-runtime-c
+Recommends: ros-jazzy-rmw-fastrtps-cpp
+Filename: pool/noble/main/r/rclwebd/rclwebd_0.0.6-1~noble_arm64.deb
+Size: 1753644
+MD5sum: 806647f8f699fd9f232621ccaa253654
+SHA1: ea75fcf0ccfea8ec867c8b496701eca1bb165feb
+SHA256: be2d27d6cc9e35eb7cb08ac9602b836e6691847df4a8565eb5af18b6e5513589
+Section: misc
+Priority: optional
+Homepage: https://github.com/alexzhang1030/rclweb
+Description: Browser gateway for ROS 2 (R2WP)
+ rclwebd attaches browser R2WP sessions to one ROS 2 support row.
+ This jazzy build is not ros-jazzy-rclwebd and is
+ not a bloom / ROS buildfarm package.
+X-Ros-Distro: jazzy
+

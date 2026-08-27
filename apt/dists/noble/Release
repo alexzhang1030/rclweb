@@ -1,0 +1,18 @@
+Origin: rclweb
+Label: rclweb
+Suite: noble
+Codename: noble
+Architectures: amd64 arm64
+Components: main
+Description: rclwebd packages (not a ROS buildfarm release)
+Date: Thu, 27 Aug 2026 02:58:24 GMT
+MD5Sum:
+ b48ca9df9ea0093eaec4a9788c52224b     1493 main/binary-amd64/Packages
+ a2358af0eb21a684a71c47caaf1fb98f      765 main/binary-amd64/Packages.gz
+ b74f33a066c7a583b8f3a4ba0f508580     1493 main/binary-arm64/Packages
+ 0971aed3e2d93995fa7a64f4aa0300a7      767 main/binary-arm64/Packages.gz
+SHA256:
+ d9a433cd2e23bc6c36f7b69cd974f592ed3b2e8b6c934e4b5413821da3121e9f     1493 main/binary-amd64/Packages
+ 8b754b15d66837af03cb01c3d0b90af4d9c8642a929a6da919afd73f8018e314      765 main/binary-amd64/Packages.gz
+ e23c69eec04eaf863b4dae00f582f80b558850f6848dd7b41438fc9e7493ba3f     1493 main/binary-arm64/Packages
+ 344e8455cd744f1f4b856cf90121fc54779c0a5477912547c431104da996ab1c      767 main/binary-arm64/Packages.gz

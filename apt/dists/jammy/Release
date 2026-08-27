@@ -1,0 +1,18 @@
+Origin: rclweb
+Label: rclweb
+Suite: jammy
+Codename: jammy
+Architectures: amd64 arm64
+Components: main
+Description: rclwebd packages (not a ROS buildfarm release)
+Date: Thu, 27 Aug 2026 02:58:25 GMT
+MD5Sum:
+ 1ca11a20103fd0848da22e90b0142bcf     1502 main/binary-amd64/Packages
+ 98c86f906f3dce6d8c84c91575302dab      778 main/binary-amd64/Packages.gz
+ 82d9a0e63ae997eec3d3b289c5c86c50     1502 main/binary-arm64/Packages
+ d975098d42bb8b9e72143ec38a5b3283      776 main/binary-arm64/Packages.gz
+SHA256:
+ 28c30946af55d13ce39a0e87b75a04cb491fce3b5b75d16a6c3d2bfef6a8fdc3     1502 main/binary-amd64/Packages
+ 1e6e94eadcaa192480c8dc71a2d9b6a6ac6eba364fd3044afa1f19e0694b63c9      778 main/binary-amd64/Packages.gz
+ 879f716ae5664826aa6a2cf2cad48150a484457ced45d7ad4122d6ad29f75512     1502 main/binary-arm64/Packages
+ 1d8c4dadbb522693fd6a78da1ec9841dd73ddb7a0f320fa30ee51e6053f57ad9      776 main/binary-arm64/Packages.gz

@@ -1,0 +1,37 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+Origin: rclweb
+Label: rclweb
+Suite: jammy
+Codename: jammy
+Architectures: amd64 arm64
+Components: main
+Description: rclwebd packages (not a ROS buildfarm release)
+Date: Thu, 27 Aug 2026 02:58:25 GMT
+MD5Sum:
+ 1ca11a20103fd0848da22e90b0142bcf     1502 main/binary-amd64/Packages
+ 98c86f906f3dce6d8c84c91575302dab      778 main/binary-amd64/Packages.gz
+ 82d9a0e63ae997eec3d3b289c5c86c50     1502 main/binary-arm64/Packages
+ d975098d42bb8b9e72143ec38a5b3283      776 main/binary-arm64/Packages.gz
+SHA256:
+ 28c30946af55d13ce39a0e87b75a04cb491fce3b5b75d16a6c3d2bfef6a8fdc3     1502 main/binary-amd64/Packages
+ 1e6e94eadcaa192480c8dc71a2d9b6a6ac6eba364fd3044afa1f19e0694b63c9      778 main/binary-amd64/Packages.gz
+ 879f716ae5664826aa6a2cf2cad48150a484457ced45d7ad4122d6ad29f75512     1502 main/binary-arm64/Packages
+ 1d8c4dadbb522693fd6a78da1ec9841dd73ddb7a0f320fa30ee51e6053f57ad9      776 main/binary-arm64/Packages.gz
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEEMvwut1fWpAxwReIb3fV9iW+rT4FAmqPp9EACgkQb3fV9iW+
+rT6Vkw//essRocDv6jnPNA/RppxZzUyCyZLYqxHeboBFZzhNtQcgmPt/uWv77lYZ
+stwXpOQ+tx4bPbHTSr9ntyvnxJv+we2rvtSbRu2sO0c1ibQnbGfV10JGKapdQqsT
++vj7gj4AfCzsDYUUtj84poJAoX4yZP7f7L33fFNmP9GAM5zfEeyxhe0v7WsP6a6j
+5bn5N1WYB/SwFI/kOFZnQGMOJJeER7Ej2q0Na355qAtcJ86xCDsMqmL07P45nzP8
+20xzyxywLliZ0rJshOGIYdNxO5Yibe9ZwY0/IzAG2VPYoqjsfcrXayusTSiKri69
+xxiX/cKCoTDnXmqLEG5TDvueamKemNdDflU06aHj3wb3iEICZjkhUmUDsKMvpJdW
+PCWAxN2KAK80idrENKwtOYJ+I+PEEpf8DS5vdpJt4pebzmHqMCLeZLxiML8G+9CR
+haciICwhWhvjdQIT9DlFI6GnD8rLxLDEikK28lZa7tbhwrNOO1qvv4qGsmGO375g
+AhH1cM+dW8OrPo0/+/hfj+pbEJ73lyPXFkFsv88G8jxAgIgT1AzMbzaRPGBCjUx2
+9xOj/TH+ElKLUkYnKt0ogcqJb/IfYmBgNf3H3Rva0brmKXYxfNKSXyTalLStXixh
+onGUyyIMp+7KrgKb+4nz49YaYfmSc9grJpT1rgb5TLTa0q64qsE=
+=MF7f
+-----END PGP SIGNATURE-----
