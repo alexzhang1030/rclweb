@@ -47,3 +47,7 @@ TanStack stack. No further rationale.
 - **Pages coexistence** is still open. Do not teach the apt
   force-push to delete a future site tree, or the other way around.
 - **DESIGN.md is Studio**, not the docs chrome.
+- **Landing is chrome.** The homepage is a two-column hero, the how-to
+  snippet, and the Browser → R2WP → rclwebd → ROS 2 path from
+  [architecture](../../docs/architecture.md). It does not take Studio
+  tokens.
