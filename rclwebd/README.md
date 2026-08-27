@@ -11,6 +11,13 @@ Prebuilt images (six support rows; `jazzy` = J-FT, `humble` = H-FT):
 docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy
 ```
 
+Ubuntu apt ([`docs/deploy.md#apt`](../docs/deploy.md#apt)):
+
+```bash
+sudo dpkg -i rclweb-apt-source_*_all.deb
+sudo apt update && sudo apt install rclwebd
+```
+
 Prebuilt binaries for a sourced Jazzy / Humble environment. The
 installer also writes an ament overlay:
 

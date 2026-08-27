@@ -59,6 +59,19 @@ as soon as this workflow is on the default branch.
    - Workflow filename: `release.yml`
    - Environment: *leave blank*
 
+5. Apt archive key ([ADR 0019](./adr/0019-own-apt-repository.md)). Generate
+   on a machine you trust. Do not commit the secret.
+
+   ```bash
+   bun run scripts/apt-archive-key.ts --generate --out-dir /tmp/rclweb-apt-key --write-secret
+   ```
+
+   Add `/tmp/rclweb-apt-key/rclweb-archive-key.secret.asc` as the
+   repository secret `RCLWEB_APT_GPG_PRIVATE_KEY`. Optional:
+   `RCLWEB_APT_GPG_PASSPHRASE` if you protected the key. Enable GitHub
+   Pages on branch `gh-pages` (site root). Until the secret exists,
+   release still uploads `rclwebd_*.deb` for `dpkg -i`.
+
 ## Publish a version
 
 Bump the version in the tree (`typescript/package.json` and/or
@@ -72,14 +85,15 @@ git push origin v0.0.6
 ```
 
 or run **Actions → release → Run workflow** (`npm` / `crates` / `images`
-/ `binaries` checkboxes; dispatched image and binary jobs resolve the
+/ `binaries` / `apt` checkboxes; dispatched image and binary jobs resolve the
 version from `Cargo.toml`, and the binary upload requires the matching
-`v<version>` tag to exist).
+`v<version>` tag to exist). The apt job packs from those binaries and
+signs the Pages repo only when `RCLWEB_APT_GPG_PRIVATE_KEY` is set.
 
-To republish only the images and binaries of an existing version (for
-example after a workflow fix), push `rebuild-v<version>`; the npm and
-crates jobs skip (the registries refuse duplicates anyway; GHCR tags
-and release assets are replaced):
+To republish only the images, binaries, and apt repo of an existing
+version (for example after a workflow fix), push `rebuild-v<version>`;
+the npm and crates jobs skip (the registries refuse duplicates anyway;
+GHCR tags and release assets are replaced):
 
 ```bash
 git tag rebuild-v0.0.6 && git push origin rebuild-v0.0.6
@@ -102,7 +116,13 @@ job then combines them into the user-facing multi-arch tags (table in
 tag, creating the release with generated notes when it does not exist
 yet — so the GitHub Release page is no longer a separate human step,
 though editing its notes still is. `scripts/install-rclwebd.sh` is the
-consumer of those assets.
+consumer of those assets. The same job packs `rclwebd_*~$suite_*.deb` (`~noble` = Jazzy,
+`~jammy` = Humble) so the four assets do not share a filename. When
+`RCLWEB_APT_GPG_PRIVATE_KEY` is set, `publish-apt` signs the GitHub
+Pages repo (`noble` / `jammy`) and uploads `rclweb-apt-source`
+([ADR 0019](./adr/0019-own-apt-repository.md), [deploy](./deploy.md#apt)).
+That secret is the apt exception to OIDC. Leave it unset and the
+Release still gets the `.deb` files.
 
 This cut: `0.0.6` everywhere — npm and crate versions stay aligned so
 the tag-named images and binaries
@@ -123,6 +143,7 @@ Do not retag a version already on the registry.
 ```bash
 just npm-pack-check
 just cargo-publish-check
+bun test scripts/apt-pack.test.ts
 ```
 
 `just check` runs both. Do not commit the staged `typescript/LICENSE` /

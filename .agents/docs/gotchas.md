@@ -215,6 +215,24 @@ wrapper must not `command -v rclwebd`: `ros2 run` puts
 `lib/rclwebd/rclwebd` first and that would recurse.
 [deploy](../../docs/deploy.md#ros2-run).
 
+## Own apt is Signed-By, not bloom
+
+`apt install rclwebd` comes from this project's GitHub Pages repo
+(`noble` = Jazzy, `jammy` = Humble), not `packages.ros.org`. The
+package name is `rclwebd`. Do not name it `ros-jazzy-rclwebd`. The
+source package `rclweb-apt-source` writes a deb822 file with
+`Signed-By: /usr/share/keyrings/rclweb-archive-keyring.gpg`. Do not
+`apt-key add` and do not drop the key in `trusted.gpg.d` — that key
+would then be valid for every other source. First install of the
+source package is `dpkg -i` from the GitHub Release; there is no
+chicken-and-egg apt source until that package is on the machine.
+`RCLWEB_APT_GPG_PRIVATE_KEY` is the one long-lived publish secret
+(apt cannot use OIDC). Leave it unset and the Release still gets
+`.deb` files for `dpkg -i`. Debian version is
+`$upstream-1~$suite` so jazzy and humble `amd64` assets are not the
+same filename on the Release. [ADR 0019](../../docs/adr/0019-own-apt-repository.md),
+[deploy](../../docs/deploy.md#apt).
+
 ## GitHub Releases downloads need retries
 
 Foundation CI installs Bun with SHA-pinned `oven-sh/setup-bun` (`.bun-version`) and just with SHA-pinned `extractions/setup-just` (`.just-version`); a failed just step waits 15s and retries once. `dtolnay/rust-toolchain` installs the channel in `rust-toolchain.toml`. E2e images copy `/usr/local/bin/bun` from digest-pinned `oven/bun` (must match `.bun-version`); do not pipe `bun.sh/install`. Cloud-agent setup has no Actions, so it uses [`scripts/install-pinned-bun.sh`](../../scripts/install-pinned-bun.sh) and [`scripts/github-release-curl.sh`](../../scripts/github-release-curl.sh). Paid flakes were GitHub Releases 503/curl 56, not a broken setup-just. Landed in [`45cacd5`](https://github.com/alexzhang1030/rclweb/commit/45cacd5) (#19).

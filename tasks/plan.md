@@ -38,7 +38,7 @@ None. The 2026-08-14 replies are in Settled. Reopen a row only if the human name
 | Remote telemetry | `/metrics` is scrape-only; no OTLP export yet |
 | Orchestrators | Interactive: `ros2 run rclwebd rclwebd` via the ament overlay ([deploy](../docs/deploy.md#ros2-run)). Unattended: systemd units ([`packaging/systemd/`](../packaging/systemd/), `install-rclwebd.sh --systemd`, [deploy](../docs/deploy.md#systemd)). Kubernetes still open |
 | Soak / upgrade | Rollback, soak, and fault evidence |
-| apt / buildfarm | Deferred in [ADR 0018](../docs/adr/0018-prebuilt-gateway-distribution.md). The thin ament overlay is not that work; reopens if cargo-in-colcon matures or users ask for apt |
+| apt / buildfarm | Own apt repo + Signed-By keyring ([ADR 0019](../docs/adr/0019-own-apt-repository.md), [deploy](../docs/deploy.md#apt)). Bloom / `packages.ros.org` stays deferred until cargo-in-colcon lands on the farm |
 | Studio | Post-release UI prototype ([studio-ui](../docs/prototypes/studio-ui.md)) |
 
 ## Definition of done

@@ -12,6 +12,7 @@
 secrets/
 *.key
 *.pem
+*.secret.asc
 
 # JavaScript and Bun
 node_modules/
