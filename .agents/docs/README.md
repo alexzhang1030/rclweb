@@ -22,6 +22,7 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | TypeScript package | [How to](../../docs/typescript.md), [API reference](../../docs/api.md), [ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md), [ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md) |
 | Publish | [Release](../../docs/release.md), [ADR 0016](../../docs/adr/0016-oidc-trusted-publish.md) |
 | License | [Licensing](../../docs/licensing.md) |
+| Rendered docs site (not chosen) | [Docs site renderer](./docs-site.md) — default VitePress if a site starts |
 | Studio visual system | [DESIGN.md](./DESIGN.md) |
 
 ## Project records
@@ -29,6 +30,7 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | Need | Read |
 |---|---|
 | Formal documentation | [Documentation index](../../docs/README.md) (customer API first, internals second) |
+| Docs site framework | [Docs site renderer](./docs-site.md) (analysis only; no ADR yet) |
 | Architecture decisions | [ADR register](../../docs/adr/README.md) |
 | Humble scheme / corpus / ROS package names | [ADR 0012](../../docs/adr/0012-rclweb-schema-identifiers.md), [gotchas](./gotchas.md#bundle-files-are-named-by-type) |
 | Local WebTransport TLS | [ADR 0011](../../docs/adr/0011-local-dev-webtransport-tls.md) |
