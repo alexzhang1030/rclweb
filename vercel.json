@@ -1,5 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "bun install",
-  "buildCommand": "bun run --filter @rclweb/website build && mkdir -p .vercel && rm -rf .vercel/output && cp -a website/.vercel/output .vercel/output"
-}

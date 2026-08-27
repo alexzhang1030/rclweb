@@ -352,10 +352,10 @@ was pinned to `node-server`, which writes `.output/server/index.mjs`.
 Vercel does not run that process; it looks for `.vercel/output` (Build
 Output API) or a static `dist/`. `nitroPreset()` uses `vercel` when
 `VERCEL` is set, else `node-server` for `just website` /
-`just website-check`. Repo-root `vercel.json` builds
-`@rclweb/website` and copies `website/.vercel/output` to
-`.vercel/output` so a project whose Root Directory is the repo still
-finds the function. [docs-site](./docs-site.md).
+`just website-check`. The Vercel project Root Directory is `website`
+(Vercel-for-GitHub payload). A repo-root `buildCommand` that copies
+`website/.vercel/output` runs with cwd already `website/` and exits 1.
+Keep `vercel.json` in `website/` and `bun run build`. [docs-site](./docs-site.md).
 
 ## Docs landing SVG must min-width 0 in the flex column
 
