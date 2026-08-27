@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { generateAptArchiveKey } from "./apt-archive-key.ts";
@@ -242,6 +242,7 @@ describe("apt repo", () => {
       secretArmor: key.secretArmor,
     });
     expect(published.suites).toEqual(["noble"]);
+    expect(readdirSync(path.join(dir, "repo")).filter((name) => name.includes("gnupg"))).toEqual([]);
     expect(existsSync(path.join(published.aptRoot, "dists", "noble", "InRelease"))).toBe(true);
     expect(existsSync(path.join(published.aptRoot, "dists", "noble", "main", "binary-amd64", "Packages.gz"))).toBe(
       true,

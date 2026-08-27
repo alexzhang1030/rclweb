@@ -29,10 +29,16 @@ fi
 work="$(mktemp -d)"
 git -C "${work}" init
 git -C "${work}" checkout --orphan gh-pages
-cp -a "${REPO_DIR}/." "${work}/"
+# Only the public index. Never copy GNUPGHOME / secret.asc from --repo-dir.
+mkdir -p "${work}/apt"
+cp -a "${REPO_DIR}/apt/." "${work}/apt/"
+cp "${REPO_DIR}/index.html" "${work}/index.html"
 git -C "${work}" config user.name "github-actions[bot]"
 git -C "${work}" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git -C "${work}" add -A
 git -C "${work}" commit -m "apt repository ${VERSION}"
-git -C "${work}" -c "http.https://github.com/.extraheader=AUTHORIZATION: bearer ${GH_TOKEN}" \
+# checkout's persist-credentials:false unsets the URL-scoped extraheader.
+# git HTTPS wants basic x-access-token, not a bearer header.
+auth="$(printf 'x-access-token:%s' "${GH_TOKEN}" | base64 -w0)"
+git -C "${work}" -c "http.extraheader=AUTHORIZATION: basic ${auth}" \
   push --force "https://github.com/${GITHUB_REPOSITORY}.git" HEAD:gh-pages

@@ -186,7 +186,9 @@ export function publishAptRepo(args: PublishAptRepoArgs): PublishedAptRepo {
     writeFileSync(path.join(aptRoot, "dists", suite, "Release"), release);
   }
 
-  const gnupgHome = createGnupgHome(args.outDir);
+  // Always use a temp GNUPGHOME. outDir is copied to gh-pages; a keyring
+  // left there would publish the archive secret.
+  const gnupgHome = createGnupgHome();
   const passphrase = args.passphrase ?? "";
   importSecretKey(gnupgHome, args.secretArmor, passphrase);
   const signPrefix = passphrase

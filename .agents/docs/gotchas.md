@@ -232,7 +232,10 @@ chicken-and-egg apt source until that package is on the machine.
 `$upstream-1~$suite` so jazzy and humble `amd64` assets are not the
 same filename on the Release. Retry apt without moving GHCR tags with
 `apt-v<version>` (`publish-apt.yml`), not `rebuild-v<version>`.
-[ADR 0019](../../docs/adr/0019-own-apt-repository.md),
+GNUPGHOME for signing must stay in a temp dir — `publish-apt-repo`
+used to create it under the Pages output, and a `cp -a repo/.` would
+have published `secret.asc`. The public tarball only packs `apt/` +
+`index.html`; Pages copies those two as well. [ADR 0019](../../docs/adr/0019-own-apt-repository.md),
 [deploy](../../docs/deploy.md#apt).
 
 ## GitHub Releases downloads need retries
