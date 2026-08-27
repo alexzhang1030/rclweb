@@ -326,6 +326,20 @@ service/action loopbacks additionally need `example_interfaces`
 installed, as the [gateway doc](../../docs/gateway/rclwebd.md#environment-contract)
 says.
 
+## Fumadocs defineDocs dir is a string literal
+
+`defineDocs` in fumadocs-mdx is a Vite macro: `dir` must be the string
+literal `"../docs"`. A computed `path.resolve` fails the transform.
+Heading `id`s share [`scripts/github-slug.ts`](../../scripts/github-slug.ts)
+with `docs-check`. Do not import [`scripts/docs-check.ts`](../../scripts/docs-check.ts)
+into the client — it pulls `node:fs/promises`.
+`export { githubHeadingSlug } from "./github-slug.ts"` does not bind the
+name in the same file; import, then re-export. In fumadocs-core 16.15,
+import `Root` / `Item` / `Node` from `fumadocs-core/page-tree` (`PageTree`
+is not a namespace). Commit `website/src/routeTree.gen.ts` so `tsc` sees
+`createFileRoute` paths; do not commit `website/.output/` or `.tanstack/`.
+[docs-site](./docs-site.md), [ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md).
+
 ## Do not wrap cargo tests in a Docker mock lane
 
 `docker/compose.r3-03-h-ft.yml` once existed whose image only re-ran `cargo test` inside `rust:1.97.1`. Foundation already runs those tests via `just test`. The CI job was `workflow_dispatch`-only, so it never gated. Live Humble remains [`docker/compose.r3-03-h-ft-e2e.yml`](../../docker/compose.r3-03-h-ft-e2e.yml). Do not add a compose file whose only command is cargo tests the workspace already runs. The ros-feature compile image ([`docker/compose.ros-feature-check.yml`](../../docker/compose.ros-feature-check.yml)) is not that anti-pattern: it runs `cargo check --tests`, not `cargo test`.

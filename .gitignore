@@ -17,6 +17,11 @@ rclweb-apt-gnupg-*/
 
 # JavaScript and Bun
 node_modules/
+website/.output/
+website/.nitro/
+website/.tanstack/
+website/.source/
+website/.vercel/
 .bun/
 dist/
 coverage/
