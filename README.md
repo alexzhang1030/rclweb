@@ -51,13 +51,11 @@ no clone, no toolchain (`:humble` for Humble):
 docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy
 ```
 
-On Ubuntu 24.04 (Jazzy) or 22.04 (Humble), after the Release has
-`rclweb-apt-source` ([deploy](./docs/deploy.md#apt)):
+On Ubuntu 24.04 (Jazzy) or 22.04 (Humble)
+([deploy](./docs/deploy.md#apt)):
 
 ```bash
-sudo dpkg -i rclweb-apt-source_*_all.deb
-sudo apt update
-sudo apt install rclwebd
+curl -fsSL https://alexzhang1030.github.io/rclweb/enable-apt.sh | sudo bash
 source /opt/ros/$ROS_DISTRO/setup.bash
 source /opt/rclwebd/local_setup.bash
 ros2 run rclwebd rclwebd

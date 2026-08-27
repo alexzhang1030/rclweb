@@ -12,7 +12,12 @@ import {
   writeFileSync,
 } from "node:fs";
 import path from "node:path";
-import { createGnupgHome, importSecretKey } from "./apt-archive-key.ts";
+import {
+  KEYRING_BASENAME,
+  createGnupgHome,
+  exportPublicKeyring,
+  importSecretKey,
+} from "./apt-archive-key.ts";
 import {
   APT_SOURCE_PACKAGE,
   GATEWAY_PACKAGE,
@@ -217,9 +222,7 @@ export function publishAptRepo(args: PublishAptRepoArgs): PublishedAptRepo {
     "<meta charset=utf-8>",
     "<title>rclweb apt</title>",
     "<pre>",
-    "sudo apt install ./rclweb-apt-source_*.deb",
-    "sudo apt update",
-    "sudo apt install rclwebd",
+    "curl -fsSL https://alexzhang1030.github.io/rclweb/enable-apt.sh | sudo bash",
     "</pre>",
     "<p>Not bloom. Package name is <code>rclwebd</code>.</p>",
     "",
@@ -230,6 +233,11 @@ export function publishAptRepo(args: PublishAptRepoArgs): PublishedAptRepo {
   // InRelease / Packages can 404 without it. The /apt/ directory also
   // 404s in a browser without index.html (apt itself does not care).
   writeFileSync(path.join(args.outDir, ".nojekyll"), "");
+  exportPublicKeyring(gnupgHome, path.join(args.outDir, KEYRING_BASENAME));
+  copyFileSync(
+    path.join(import.meta.dir, "enable-rclweb-apt.sh"),
+    path.join(args.outDir, "enable-apt.sh"),
+  );
 
   return { aptRoot, suites, inRelease };
 }

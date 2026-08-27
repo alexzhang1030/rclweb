@@ -1,7 +1,8 @@
 /**
  * Pack `rclweb-apt-source`: archive keyring + deb822 source (ADR 0019).
  *
- * First install is `dpkg -i` from the GitHub Release. After that,
+ * Offline / key-upgrade package. First enable is enable-rclweb-apt.sh
+ * (public keyring on Pages). After the source is on the machine,
  * `apt update` can upgrade this package.
  */
 import { chmodSync, copyFileSync, mkdirSync, writeFileSync } from "node:fs";

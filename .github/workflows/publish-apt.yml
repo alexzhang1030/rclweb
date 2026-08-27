@@ -115,7 +115,9 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
-          tar -C repo -czf "rclweb-apt-repo-${VERSION}.tar.gz" apt index.html
+          tar -C repo -czf "rclweb-apt-repo-${VERSION}.tar.gz" \
+            apt index.html .nojekyll \
+            rclweb-archive-keyring.gpg enable-apt.sh
           sha256sum "rclweb-apt-repo-${VERSION}.tar.gz" debs/rclweb-apt-source_*.deb > apt-extra.sha256
           gh release upload "${TAG}" \
             debs/rclweb-apt-source_*.deb \
