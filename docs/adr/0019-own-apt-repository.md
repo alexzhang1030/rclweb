@@ -67,6 +67,9 @@ command without farm acceptance.
   `$upstream-1~$suite` filenames), packs `rclweb-apt-source` when the
   signing secret is present, signs `InRelease`, uploads assets, and
   force-pushes `gh-pages`.
+- `publish-apt.yml` wraps binaries already on the GitHub Release
+  (`apt-v<version>` or workflow_dispatch). Use that to retry apt
+  without rebuilding images.
 - Operators enable GitHub Pages once (branch `gh-pages`, site root).
   Until the secret exists, the Release still gets unsigned `.deb`
   files for `dpkg -i`.

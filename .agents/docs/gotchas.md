@@ -230,7 +230,9 @@ chicken-and-egg apt source until that package is on the machine.
 (apt cannot use OIDC). Leave it unset and the Release still gets
 `.deb` files for `dpkg -i`. Debian version is
 `$upstream-1~$suite` so jazzy and humble `amd64` assets are not the
-same filename on the Release. [ADR 0019](../../docs/adr/0019-own-apt-repository.md),
+same filename on the Release. Retry apt without moving GHCR tags with
+`apt-v<version>` (`publish-apt.yml`), not `rebuild-v<version>`.
+[ADR 0019](../../docs/adr/0019-own-apt-repository.md),
 [deploy](../../docs/deploy.md#apt).
 
 ## GitHub Releases downloads need retries

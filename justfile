@@ -380,6 +380,19 @@ pack-rclwebd-deb distro="jazzy" arch="amd64":
 apt-key-generate dir="/tmp/rclweb-apt-key":
     cd "{{root}}" && bun run scripts/apt-archive-key.ts --generate --out-dir "{{dir}}" --write-secret
 
+# Pack the four GitHub Release binaries into rclwebd_*~$suite_*.deb (ADR 0019).
+[group('quality')]
+pack-release-debs version="0.0.6" bin_dir="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd "{{root}}"
+    bin_dir="{{bin_dir}}"
+    if [[ -z "$bin_dir" ]]; then
+        echo "error: pass bin_dir=/path/to/rclwebd-<version>-<distro>-<arch> files" >&2
+        exit 1
+    fi
+    bun run scripts/pack-release-debs.ts --bin-dir "$bin_dir" --out-dir "${RCLWEBD_DEB_OUT:-{{root}}/dist/deb}" --version "{{version}}"
+
 # Pack + sign a local apt repo. Needs RCLWEB_APT_GPG_PRIVATE_KEY or --secret-file.
 [group('quality')]
 apt-repo:

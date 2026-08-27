@@ -8,17 +8,20 @@ import {
   APT_URI_DEFAULT,
   GATEWAY_PACKAGE,
   KEYRING_INSTALL_PATH,
+  GATEWAY_TARGETS,
   debianVersion,
   distroForSuite,
   gatewayDebName,
   gatewayDepends,
   parseRosDistro,
+  releaseBinaryName,
   suiteForDistro,
   writeDeb822Sources,
 } from "./apt-distro.ts";
 import { runCommand } from "./apt-run.ts";
 import { packRclwebAptSource } from "./pack-rclweb-apt-source.ts";
 import { packRclwebdDeb } from "./pack-rclwebd-deb.ts";
+import { packReleaseDebs } from "./pack-release-debs.ts";
 import { publishAptRepo, readDebIdentity } from "./publish-apt-repo.ts";
 import { readWorkspaceVersion } from "./workspace-version.ts";
 
@@ -88,6 +91,8 @@ describe("apt distro mapping", () => {
     expect(gatewayDebName({ version: "0.0.6", distro: "jazzy", arch: "amd64" })).not.toBe(
       gatewayDebName({ version: "0.0.6", distro: "humble", arch: "amd64" }),
     );
+    expect(GATEWAY_TARGETS).toHaveLength(4);
+    expect(releaseBinaryName("0.0.6", "jazzy", "amd64")).toBe("rclwebd-0.0.6-jazzy-amd64");
   });
 });
 
@@ -181,6 +186,30 @@ describe("pack rclwebd deb", () => {
     expect(path.basename(jazzy.deb)).not.toBe(path.basename(humble.deb));
     expect(existsSync(jazzy.deb)).toBe(true);
     expect(existsSync(humble.deb)).toBe(true);
+  });
+
+  test("pack-release-debs wraps all four release binary names", () => {
+    requireTool("dpkg-deb");
+    const dir = tempDir("rclwebd-release-debs-");
+    const binDir = path.join(dir, "bins");
+    mkdirSync(binDir, { recursive: true });
+    for (const target of GATEWAY_TARGETS) {
+      const bin = path.join(binDir, releaseBinaryName("0.0.6", target.distro, target.arch));
+      writeFileSync(bin, "#!/bin/sh\necho rclwebd-stub\n");
+      chmodSync(bin, 0o755);
+    }
+    const packed = packReleaseDebs({
+      root: repoRoot,
+      binDir,
+      outDir: path.join(dir, "debs"),
+      version: "0.0.6",
+    });
+    expect(packed.map((item) => path.basename(item.deb)).sort()).toEqual([
+      "rclwebd_0.0.6-1~jammy_amd64.deb",
+      "rclwebd_0.0.6-1~jammy_arm64.deb",
+      "rclwebd_0.0.6-1~noble_amd64.deb",
+      "rclwebd_0.0.6-1~noble_arm64.deb",
+    ]);
   });
 });
 

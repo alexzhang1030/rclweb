@@ -11,6 +11,21 @@ export const ROS_DISTROS = ["jazzy", "humble"] as const;
 export const UBUNTU_SUITES = ["noble", "jammy"] as const;
 export const DEB_ARCHES = ["amd64", "arm64"] as const;
 
+export const GATEWAY_TARGETS = [
+  { distro: "jazzy", arch: "amd64" },
+  { distro: "jazzy", arch: "arm64" },
+  { distro: "humble", arch: "amd64" },
+  { distro: "humble", arch: "arm64" },
+] as const satisfies ReadonlyArray<{ distro: RosDistro; arch: DebArch }>;
+
+export function releaseBinaryName(
+  version: string,
+  distro: RosDistro,
+  arch: DebArch,
+): string {
+  return `rclwebd-${version}-${distro}-${arch}`;
+}
+
 export const GATEWAY_PACKAGE = "rclwebd";
 export const APT_SOURCE_PACKAGE = "rclweb-apt-source";
 export const GATEWAY_PREFIX = "/opt/rclwebd";
