@@ -24,6 +24,13 @@ export const Route = createFileRoute("/docs/$")({
     await docs.getPage(data.path)?.preload();
     return data;
   },
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: loaderData?.title ? `${loaderData.title} · rclweb` : "rclweb",
+      },
+    ],
+  }),
 });
 
 const serverLoader = createServerFn({
