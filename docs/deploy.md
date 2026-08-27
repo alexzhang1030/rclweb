@@ -46,7 +46,10 @@ Host units for unattended machines: [systemd](#systemd).
 Ubuntu 24.04 (Jazzy / `noble`) and 22.04 (Humble / `jammy`). This is
 this project's repo, not bloom and not `packages.ros.org`
 ([ADR 0019](./adr/0019-own-apt-repository.md)). The package name is
-`rclwebd`.
+`rclwebd`. The browser page is
+[alexzhang1030.github.io/rclweb](https://alexzhang1030.github.io/rclweb/).
+`apt` uses `…/rclweb/apt` (files under `dists/`). Opening that
+directory in a browser is not the check — `apt update` is.
 
 First time, install the source package from the GitHub Release (it
 drops the keyring and a `Signed-By` deb822 file):

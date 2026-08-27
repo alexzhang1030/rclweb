@@ -33,6 +33,9 @@ git -C "${work}" checkout --orphan gh-pages
 mkdir -p "${work}/apt"
 cp -a "${REPO_DIR}/apt/." "${work}/apt/"
 cp "${REPO_DIR}/index.html" "${work}/index.html"
+if [[ -f "${REPO_DIR}/.nojekyll" ]]; then
+  cp "${REPO_DIR}/.nojekyll" "${work}/.nojekyll"
+fi
 git -C "${work}" config user.name "github-actions[bot]"
 git -C "${work}" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git -C "${work}" add -A

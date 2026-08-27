@@ -212,21 +212,24 @@ export function publishAptRepo(args: PublishAptRepoArgs): PublishedAptRepo {
     inRelease.push(inReleasePath);
   }
 
-  writeFileSync(
-    path.join(args.outDir, "index.html"),
-    [
-      "<!doctype html>",
-      "<meta charset=utf-8>",
-      "<title>rclweb apt</title>",
-      "<pre>",
-      "sudo apt install ./rclweb-apt-source_*.deb",
-      "sudo apt update",
-      "sudo apt install rclwebd",
-      "</pre>",
-      "<p>Not bloom. Package name is <code>rclwebd</code>.</p>",
-      "",
-    ].join("\n"),
-  );
+  const index = [
+    "<!doctype html>",
+    "<meta charset=utf-8>",
+    "<title>rclweb apt</title>",
+    "<pre>",
+    "sudo apt install ./rclweb-apt-source_*.deb",
+    "sudo apt update",
+    "sudo apt install rclwebd",
+    "</pre>",
+    "<p>Not bloom. Package name is <code>rclwebd</code>.</p>",
+    "",
+  ].join("\n");
+  writeFileSync(path.join(args.outDir, "index.html"), index);
+  writeFileSync(path.join(aptRoot, "index.html"), index);
+  // GitHub Pages runs Jekyll unless this file exists. Extensionless
+  // InRelease / Packages can 404 without it. The /apt/ directory also
+  // 404s in a browser without index.html (apt itself does not care).
+  writeFileSync(path.join(args.outDir, ".nojekyll"), "");
 
   return { aptRoot, suites, inRelease };
 }

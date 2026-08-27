@@ -242,6 +242,8 @@ describe("apt repo", () => {
       secretArmor: key.secretArmor,
     });
     expect(published.suites).toEqual(["noble"]);
+    expect(existsSync(path.join(dir, "repo", ".nojekyll"))).toBe(true);
+    expect(existsSync(path.join(published.aptRoot, "index.html"))).toBe(true);
     expect(readdirSync(path.join(dir, "repo")).filter((name) => name.includes("gnupg"))).toEqual([]);
     expect(existsSync(path.join(published.aptRoot, "dists", "noble", "InRelease"))).toBe(true);
     expect(existsSync(path.join(published.aptRoot, "dists", "noble", "main", "binary-amd64", "Packages.gz"))).toBe(
