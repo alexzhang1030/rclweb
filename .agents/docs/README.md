@@ -83,7 +83,7 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | `scripts/build-wasm.ts` | Fat-LTO wasm ship ([gotchas](./gotchas.md#release-wasm-inherits-native-release-settings)) |
 | Support matrix | Human matrix edit; no committed measurement JSON ([gotchas](./gotchas.md#do-not-commit-measurement-json)) |
 | `scripts/perf-baseline/**`, `scripts/measure-perf-baseline.ts` | [Performance](../../docs/performance.md); primary metrics are latency / CPU / RSS; stdout only, no committed JSON ([gotchas](./gotchas.md#do-not-commit-measurement-json)). Hops must pair by work ([gotchas](./gotchas.md#perf-baseline-hops-must-pair-by-work)). RSS snapshots retry EINTR ([gotchas](./gotchas.md#processmemoryusage-can-return-eintr)) |
-| `website/` | Fumadocs UI on TanStack Start over `docs/` ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md), [docs-site](./docs-site.md)). `just website` / `just website-check`. Macro/`dir` and slug import traps: [gotchas](./gotchas.md#fumadocs-definedocs-dir-is-a-string-literal) |
+| `website/` | Fumadocs UI on TanStack Start over `docs/` ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md), [docs-site](./docs-site.md)). `just website` / `just website-check`. Macro/`dir` and slug import traps: [gotchas](./gotchas.md#fumadocs-definedocs-dir-is-a-string-literal). Landing SVG shrink: [gotchas](./gotchas.md#docs-landing-svg-must-min-width-0-in-the-flex-column) |
 | `studio/` (not in the tree) | [Studio](../../docs/prototypes/studio-ui.md), [DESIGN.md](./DESIGN.md) |
 
 ## Design record check
