@@ -51,3 +51,6 @@ TanStack stack. No further rationale.
   snippet, and the Browser → R2WP → rclwebd → ROS 2 path from
   [architecture](../../docs/architecture.md). It does not take Studio
   tokens.
+- **Mark.** The site mark is a viewport, a node inside it, and a wire
+  to a smaller edge node. Not the ROS turtle. SVG in
+  [`website/src/components/logo.tsx`](../../website/src/components/logo.tsx).

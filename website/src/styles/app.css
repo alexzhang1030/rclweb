@@ -2,6 +2,7 @@
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
 @import './home.css';
+@import './logo.css';
 
 html {
   scrollbar-gutter: stable;

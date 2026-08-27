@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, BookOpen, Code2, Server } from "lucide-react";
+import { RclwebMark } from "@/components/logo";
 
 const snippet = (
   <code>
@@ -61,6 +62,9 @@ export function HomePage() {
     <div className="home">
       <section className="home-hero">
         <div>
+          <div className="home-brand">
+            <RclwebMark size="hero" />
+          </div>
           <p className="home-kicker">rclweb docs</p>
           <h1 className="home-title">
             Browser access
