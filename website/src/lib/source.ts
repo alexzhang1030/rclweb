@@ -1,9 +1,10 @@
 import { pageSchema } from "fumadocs-core/source/schema";
-import { loader } from "fumadocs-core/source";
+import { loader, type LoaderPlugin } from "fumadocs-core/source";
 import { defineDocs } from "fumadocs-mdx/macro";
 import { lucideIconsPlugin } from "fumadocs-core/source/lucide-icons";
 import { z } from "zod";
 import { docsRoute } from "./shared";
+import { isRootReadmeFile } from "./omit-root-readme";
 import { titleFromMarkdown } from "./title-from-markdown";
 
 export const docs = defineDocs({
@@ -21,10 +22,21 @@ export const docs = defineDocs({
   },
 });
 
+function omitRootReadme(): LoaderPlugin {
+  return {
+    name: "omit-root-readme",
+    transformStorage({ storage }) {
+      for (const filePath of storage.getFiles()) {
+        if (isRootReadmeFile(filePath)) storage.delete(filePath);
+      }
+    },
+  };
+}
+
 export const source = loader({
   source: docs.toFumadocsSource(),
   baseUrl: docsRoute,
-  plugins: [lucideIconsPlugin()],
+  plugins: [lucideIconsPlugin(), omitRootReadme()],
 });
 
 export async function getLLMText(page: (typeof source)["$inferPage"]) {

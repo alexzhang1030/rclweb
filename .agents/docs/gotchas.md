@@ -338,6 +338,10 @@ name in the same file; import, then re-export. In fumadocs-core 16.15,
 import `Root` / `Item` / `Node` from `fumadocs-core/page-tree` (`PageTree`
 is not a namespace). Commit `website/src/routeTree.gen.ts` so `tsc` sees
 `createFileRoute` paths; do not commit `website/.output/` or `.tanstack/`.
+Search indexes every collection page: drop the GitHub
+`docs/README.md` from storage (and filter `/docs/README` hits) or a
+Node query opens that map and the `/docs/README` redirect lands on
+how-to.
 [docs-site](./docs-site.md), [ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md).
 
 ## Do not wrap cargo tests in a Docker mock lane
