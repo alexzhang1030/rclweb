@@ -344,6 +344,14 @@ Node query opens that map and the `/docs/README` redirect lands on
 how-to.
 [docs-site](./docs-site.md), [ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md).
 
+## Docs landing SVG must min-width 0 in the flex column
+
+`body` is `flex flex-col`. The homepage graph SVG uses a 1000-wide
+viewBox, so its min-content size is 1000px. A flex item will not shrink
+below that, and a phone viewport clips `rclwebd` / `ROS 2`. `.home` /
+`.home-graph` set `min-width: 0` and the SVG is `max-width: 100%`.
+[docs-site](./docs-site.md).
+
 ## Do not wrap cargo tests in a Docker mock lane
 
 `docker/compose.r3-03-h-ft.yml` once existed whose image only re-ran `cargo test` inside `rust:1.97.1`. Foundation already runs those tests via `just test`. The CI job was `workflow_dispatch`-only, so it never gated. Live Humble remains [`docker/compose.r3-03-h-ft-e2e.yml`](../../docker/compose.r3-03-h-ft-e2e.yml). Do not add a compose file whose only command is cargo tests the workspace already runs. The ros-feature compile image ([`docker/compose.ros-feature-check.yml`](../../docker/compose.ros-feature-check.yml)) is not that anti-pattern: it runs `cargo check --tests`, not `cargo test`.

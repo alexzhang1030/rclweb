@@ -81,7 +81,9 @@ export function GraphField() {
       >
         <svg
           className="home-graph-svg"
+          width="100%"
           viewBox={`0 0 ${GRAPH_WIDTH} ${GRAPH_HEIGHT}`}
+          preserveAspectRatio="xMidYMid meet"
           role="img"
           aria-label="rcl-web to rclwebd to ROS 2. Click a node."
         >

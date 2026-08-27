@@ -51,6 +51,8 @@ TanStack stack. No further rationale.
   dots, five live nodes on the Browser → R2WP → rclwebd → ROS 2
   path from [architecture](../../docs/architecture.md), and a hover
   chip. It is not a docs index and does not take Studio tokens.
+  The field SVG must shrink in the `body` flex column
+  ([gotchas](./gotchas.md#docs-landing-svg-must-min-width-0-in-the-flex-column)).
 - **Mark.** The site mark is a viewport, a node inside it, and a wire
   to a smaller edge node. Not the ROS turtle. SVG in
   [`website/src/components/logo.tsx`](../../website/src/components/logo.tsx).
