@@ -90,7 +90,15 @@ version from `Cargo.toml`, and the binary upload requires the matching
 `v<version>` tag to exist). The apt job packs from those binaries and
 signs the Pages repo only when `RCLWEB_APT_GPG_PRIVATE_KEY` is set.
 
-To republish only the images, binaries, and apt repo of an existing
+To republish **only apt** from binaries already on the GitHub Release
+(no image or binary rebuild), push `apt-v<version>` or run
+**Actions → publish-apt → Run workflow**:
+
+```bash
+git tag apt-v0.0.6 && git push origin apt-v0.0.6
+```
+
+To republish the images, binaries, **and** apt repo of an existing
 version (for example after a workflow fix), push `rebuild-v<version>`;
 the npm and crates jobs skip (the registries refuse duplicates anyway;
 GHCR tags and release assets are replaced):

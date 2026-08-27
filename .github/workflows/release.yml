@@ -557,33 +557,16 @@ jobs:
             exit 1
           fi
           cp "${packed[@]}" debs/
-          if [[ -z "${RCLWEB_APT_GPG_PRIVATE_KEY}" ]]; then
-            echo "RCLWEB_APT_GPG_PRIVATE_KEY is empty; rclwebd debs are on the Release, signed apt repo skipped"
-            echo "signed=0" >> "${GITHUB_OUTPUT}"
-            exit 0
+          scripts/publish-signed-apt.sh --debs-dir debs --out-dir repo
+          if [[ -f repo/index.html ]]; then
+            tar -C repo -czf "rclweb-apt-repo-${VERSION}.tar.gz" apt index.html
+            sha256sum "rclweb-apt-repo-${VERSION}.tar.gz" debs/rclweb-apt-source_*.deb > apt-extra.sha256
+            gh release upload "${TAG}" \
+              debs/rclweb-apt-source_*.deb \
+              "rclweb-apt-repo-${VERSION}.tar.gz" \
+              apt-extra.sha256 \
+              --repo "${GITHUB_REPOSITORY}" --clobber
           fi
-          gnupg="$(mktemp -d)"
-          chmod 700 "${gnupg}"
-          export GNUPGHOME="${gnupg}"
-          printf '%s\n' "${RCLWEB_APT_GPG_PRIVATE_KEY}" > "${gnupg}/secret.asc"
-          if [[ -n "${RCLWEB_APT_GPG_PASSPHRASE}" ]]; then
-            gpg --batch --pinentry-mode loopback --passphrase "${RCLWEB_APT_GPG_PASSPHRASE}" --import "${gnupg}/secret.asc"
-          else
-            gpg --batch --import "${gnupg}/secret.asc"
-          fi
-          gpg --batch --output "${gnupg}/rclweb-archive-keyring.gpg" --export
-          bun run scripts/pack-rclweb-apt-source.ts \
-            --keyring "${gnupg}/rclweb-archive-keyring.gpg" \
-            --out-dir debs
-          bun run scripts/publish-apt-repo.ts --debs-dir debs --out-dir repo
-          tar -C repo -czf "rclweb-apt-repo-${VERSION}.tar.gz" apt index.html
-          sha256sum "rclweb-apt-repo-${VERSION}.tar.gz" debs/rclweb-apt-source_*.deb > apt-extra.sha256
-          gh release upload "${TAG}" \
-            debs/rclweb-apt-source_*.deb \
-            "rclweb-apt-repo-${VERSION}.tar.gz" \
-            apt-extra.sha256 \
-            --repo "${GITHUB_REPOSITORY}" --clobber
-          echo "signed=1" >> "${GITHUB_OUTPUT}"
 
       - name: Publish GitHub Pages
         if: steps.apt.outputs.signed == '1'
@@ -591,15 +574,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.version.outputs.version }}
-        run: |
-          set -euo pipefail
-          work="$(mktemp -d)"
-          git -C "${work}" init
-          git -C "${work}" checkout --orphan gh-pages
-          cp -a repo/. "${work}/"
-          git -C "${work}" config user.name "github-actions[bot]"
-          git -C "${work}" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C "${work}" add -A
-          git -C "${work}" commit -m "apt repository ${VERSION}"
-          git -C "${work}" -c "http.https://github.com/.extraheader=AUTHORIZATION: bearer ${GH_TOKEN}" \
-            push --force "https://github.com/${GITHUB_REPOSITORY}.git" HEAD:gh-pages
+        run: scripts/push-apt-gh-pages.sh --repo-dir repo
