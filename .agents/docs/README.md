@@ -22,7 +22,7 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | TypeScript package | [How to](../../docs/typescript.md), [API reference](../../docs/api.md), [ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md), [ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md) |
 | Publish | [Release](../../docs/release.md), [ADR 0016](../../docs/adr/0016-oidc-trusted-publish.md) |
 | License | [Licensing](../../docs/licensing.md) |
-| Rendered docs site (not chosen) | [Docs site renderer](./docs-site.md) — default VitePress if a site starts |
+| Rendered docs site (not chosen) | [Docs site renderer](./docs-site.md) — default Fumadocs if a site starts |
 | Studio visual system | [DESIGN.md](./DESIGN.md) |
 
 ## Project records

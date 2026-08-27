@@ -97,4 +97,4 @@ is part of `just check`.
 - Mainline architecture decisions gain authority through ADR review and validation gates.
 - Platform changes update the support matrix and conformance evidence.
 - Studio technology choices receive their own review when that prototype starts.
-- A rendered docs site is not a stack pin. If one starts, the default renderer is VitePress over the existing `docs/` tree; analysis and rejected alternatives live in [docs-site](./docs-site.md). GitHub Pages today is the apt origin ([ADR 0019](../../docs/adr/0019-own-apt-repository.md)), not a docs host.
+- A rendered docs site is not a stack pin. If one starts, the default renderer is Fumadocs over the existing `docs/` tree (human: VitePress looks worse than Fumadocs); analysis and rejected alternatives live in [docs-site](./docs-site.md). GitHub Pages today is the apt origin ([ADR 0019](../../docs/adr/0019-own-apt-repository.md)), not a docs host.
