@@ -47,10 +47,10 @@ TanStack stack. No further rationale.
 - **Pages coexistence** is still open. Do not teach the apt
   force-push to delete a future site tree, or the other way around.
 - **DESIGN.md is Studio**, not the docs chrome.
-- **Landing is chrome.** The homepage is a two-column hero, the how-to
-  snippet, and the Browser → R2WP → rclwebd → ROS 2 path from
-  [architecture](../../docs/architecture.md). It does not take Studio
-  tokens.
+- **Landing is chrome.** The homepage is a node field: decorative
+  dots, five live nodes on the Browser → R2WP → rclwebd → ROS 2
+  path from [architecture](../../docs/architecture.md), and a hover
+  chip. It is not a docs index and does not take Studio tokens.
 - **Mark.** The site mark is a viewport, a node inside it, and a wire
   to a smaller edge node. Not the ROS turtle. SVG in
   [`website/src/components/logo.tsx`](../../website/src/components/logo.tsx).
