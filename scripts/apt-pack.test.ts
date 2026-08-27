@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { generateAptArchiveKey } from "./apt-archive-key.ts";
+import { KEYRING_BASENAME, generateAptArchiveKey } from "./apt-archive-key.ts";
 import {
   APT_SOURCE_PACKAGE,
   APT_URI_DEFAULT,
@@ -244,6 +244,16 @@ describe("apt repo", () => {
     expect(published.suites).toEqual(["noble"]);
     expect(existsSync(path.join(dir, "repo", ".nojekyll"))).toBe(true);
     expect(existsSync(path.join(published.aptRoot, "index.html"))).toBe(true);
+    expect(existsSync(path.join(dir, "repo", KEYRING_BASENAME))).toBe(true);
+    expect(existsSync(path.join(dir, "repo", "enable-apt.sh"))).toBe(true);
+    const secrets = runCommand("gpg", [
+      "--batch",
+      "--no-default-keyring",
+      "--keyring",
+      path.join(dir, "repo", KEYRING_BASENAME),
+      "--list-secret-keys",
+    ]);
+    expect(secrets.stdout.trim()).toBe("");
     expect(readdirSync(path.join(dir, "repo")).filter((name) => name.includes("gnupg"))).toEqual([]);
     expect(existsSync(path.join(published.aptRoot, "dists", "noble", "InRelease"))).toBe(true);
     expect(existsSync(path.join(published.aptRoot, "dists", "noble", "main", "binary-amd64", "Packages.gz"))).toBe(
@@ -323,5 +333,41 @@ describe("apt repo", () => {
     expect(existsSync(path.join(published.aptRoot, "pool", "jammy", "main", "r", "rclwebd", path.basename(humble.deb)))).toBe(
       true,
     );
+  });
+});
+
+describe("enable-rclweb-apt.sh", () => {
+  const enable = path.join(repoRoot, "scripts", "enable-rclweb-apt.sh");
+
+  test("dry-run prints the Pages URI and does not write", () => {
+    const listed = runCommand("bash", [enable, "--dry-run"], {
+      env: { RCLWEB_APT_SUITE: "noble" },
+    });
+    expect(listed.status).toBe(0);
+    expect(listed.stdout).toContain("https://alexzhang1030.github.io/rclweb/apt");
+    expect(listed.stdout).toContain("would fetch");
+  });
+
+  test("writes Signed-By sources from a local public keyring", () => {
+    requireTool("gpg");
+    const dir = tempDir("enable-apt-");
+    const key = generateAptArchiveKey(path.join(dir, "key"));
+    const destKey = path.join(dir, "rclweb-archive-keyring.gpg");
+    const destSrc = path.join(dir, "rclweb.sources");
+    const result = runCommand("bash", [enable, "--source-only"], {
+      env: {
+        RCLWEB_APT_SUITE: "noble",
+        RCLWEB_APT_KEYRING: key.publicKeyring,
+        RCLWEB_APT_KEYRING_DEST: destKey,
+        RCLWEB_APT_SOURCES_DEST: destSrc,
+      },
+    });
+    expect(result.status).toBe(0);
+    expect(existsSync(destKey)).toBe(true);
+    const body = readFileSync(destSrc, "utf8");
+    expect(body).toContain("Signed-By:");
+    expect(body).toContain("Suites: noble");
+    expect(body).not.toContain("trusted.gpg");
+    expect(readFileSync(destKey).includes("BEGIN PGP PRIVATE KEY")).toBe(false);
   });
 });

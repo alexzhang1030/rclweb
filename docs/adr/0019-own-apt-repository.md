@@ -32,12 +32,12 @@ command without farm acceptance.
 - Suites: `noble` = Jazzy, `jammy` = Humble. One glibc floor per suite.
 - Control includes `X-ROS-Distro:` so the repo publisher does not
   guess the suite from Depends text.
-- `rclweb-apt-source` (`Architecture: all`) installs
-  `/usr/share/keyrings/rclweb-archive-keyring.gpg` and writes a deb822
-  source with `Signed-By`. Do not use `apt-key` or
-  `/etc/apt/trusted.gpg.d`.
-- First install of the source package is `dpkg -i` from the GitHub
-  Release. After that, `apt update` can upgrade it.
+- First enable downloads the **public** keyring from Pages and writes
+  a Signed-By deb822 file (`enable-rclweb-apt.sh`). Do not use
+  `apt-key` or `/etc/apt/trusted.gpg.d`.
+- `rclweb-apt-source` stays in the repo so `apt` can upgrade the
+  keyring later. `dpkg -i` of that package is the offline fallback,
+  not the default.
 - Repo URL: `https://alexzhang1030.github.io/rclweb/apt` (GitHub Pages
   from `gh-pages`). Release assets also carry the `.deb` files and a
   signed repo tarball.
