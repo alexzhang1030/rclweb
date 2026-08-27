@@ -15,6 +15,7 @@ rclweb keeps the language count at the minimum the platform forces: Rust for eve
 | JavaScript tooling | Bun ([ADR 0002](../../docs/adr/0002-use-bun-for-javascript-tooling.md)) | Workspaces, installation, scripts, tests, lockfile |
 | TypeScript npm bundle | tsdown ([ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md)) | Owner ruling: do not publish `.ts` source; ship ESM + `.d.ts`. `dist/cli.js` is the Node `npx rcl-web gen` bin |
 | Repository commands | just | One root command surface |
+| Docs site | Fumadocs UI + TanStack Start (`website/`) | Owner named the look (Fumadocs over VitePress) and the host ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md)). Markdown stays in `docs/` |
 
 A second language for the browser runtime would duplicate every shared contract. The single-core choice reopens only if wasm artifact size or poll latency is unacceptable for a required profile ([ADR 0010](../../docs/adr/0010-restructure-single-rust-core.md)). `just build` prints staged wasm size; `just poll-latency` prints p50/p99.
 
@@ -63,6 +64,7 @@ Committed rustfmt/clippy knobs, workspace lints, shared crate versions, and name
 | `rclweb/` | Cargo crate: the core (native + wasm32); `cdylib` exports the hand-written poll ABI. crates.io publish unit |
 | `rclwebd/` | Cargo crate: the gateway. crates.io publish unit (`--features ros` for the binary) |
 | `typescript/` | Bun workspace package `rcl-web` (public). tsdown ship bundle + `npx rcl-web gen`. Customer docs: [how to](../../docs/typescript.md), [API](../../docs/api.md). `rcl-web/internal` is host/ABI/test helpers ([ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md), [ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md)). Publish is GitHub OIDC ([release](../../docs/release.md), [ADR 0016](../../docs/adr/0016-oidc-trusted-publish.md)) |
+| `website/` | Private Bun workspace `@rclweb/website`. Fumadocs UI + TanStack Start over `docs/` ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md), [docs-site](./docs-site.md)). Not on the published `rcl-web` graph |
 | `typescript/wasm/` | Staged `rclweb.wasm` from `scripts/build-wasm.ts` (fat LTO) |
 | `protocol/` | Normative contracts, registries, schemas, and frozen fixtures |
 | `conformance/` | CDR corpus and qualification workloads |
@@ -97,4 +99,4 @@ is part of `just check`.
 - Mainline architecture decisions gain authority through ADR review and validation gates.
 - Platform changes update the support matrix and conformance evidence.
 - Studio technology choices receive their own review when that prototype starts.
-- A rendered docs site is not a stack pin. If one starts, the default renderer is Fumadocs over the existing `docs/` tree (human: VitePress looks worse than Fumadocs); analysis and rejected alternatives live in [docs-site](./docs-site.md). GitHub Pages today is the apt origin ([ADR 0019](../../docs/adr/0019-own-apt-repository.md)), not a docs host.
+- The docs site is Fumadocs on TanStack Start ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md), [docs-site](./docs-site.md)). GitHub Pages today is the apt origin ([ADR 0019](../../docs/adr/0019-own-apt-repository.md)), not a docs host.
