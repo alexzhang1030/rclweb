@@ -25,6 +25,10 @@ if [[ ! -d "${REPO_DIR}/apt" || ! -f "${REPO_DIR}/index.html" ]]; then
   echo "error: ${REPO_DIR} must contain apt/ and index.html" >&2
   exit 1
 fi
+if [[ ! -f "${REPO_DIR}/rclweb-archive-keyring.gpg" || ! -f "${REPO_DIR}/enable-apt.sh" ]]; then
+  echo "error: ${REPO_DIR} must contain rclweb-archive-keyring.gpg and enable-apt.sh" >&2
+  exit 1
+fi
 
 work="$(mktemp -d)"
 git -C "${work}" init
@@ -36,12 +40,8 @@ cp "${REPO_DIR}/index.html" "${work}/index.html"
 if [[ -f "${REPO_DIR}/.nojekyll" ]]; then
   cp "${REPO_DIR}/.nojekyll" "${work}/.nojekyll"
 fi
-if [[ -f "${REPO_DIR}/rclweb-archive-keyring.gpg" ]]; then
-  cp "${REPO_DIR}/rclweb-archive-keyring.gpg" "${work}/rclweb-archive-keyring.gpg"
-fi
-if [[ -f "${REPO_DIR}/enable-apt.sh" ]]; then
-  cp "${REPO_DIR}/enable-apt.sh" "${work}/enable-apt.sh"
-fi
+cp "${REPO_DIR}/rclweb-archive-keyring.gpg" "${work}/rclweb-archive-keyring.gpg"
+cp "${REPO_DIR}/enable-apt.sh" "${work}/enable-apt.sh"
 git -C "${work}" config user.name "github-actions[bot]"
 git -C "${work}" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git -C "${work}" add -A

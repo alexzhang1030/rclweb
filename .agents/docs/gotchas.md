@@ -234,8 +234,9 @@ same filename on the Release. Retry apt without moving GHCR tags with
 `apt-v<version>` (`publish-apt.yml`), not `rebuild-v<version>`.
 GNUPGHOME for signing must stay in a temp dir — `publish-apt-repo`
 used to create it under the Pages output, and a `cp -a repo/.` would
-have published `secret.asc`. The public tarball only packs `apt/` +
-`index.html`; Pages copies those two as well. The apt URI
+have published `secret.asc`. The public tarball and Pages copy pack
+`apt/`, `index.html`, `.nojekyll`, the public keyring, and
+`enable-apt.sh`. Never `GNUPGHOME`. The apt URI
 `…/rclweb/apt` is a repo, not a directory listing: without
 `apt/index.html` a browser shows GitHub's 404 even while
 `…/apt/dists/noble/InRelease` and `apt-get update` succeed. Drop
