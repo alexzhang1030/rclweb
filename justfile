@@ -164,7 +164,22 @@ cargo-publish: toolchain-check
 cargo-publish-check: toolchain-check
     cd "{{root}}" && bun run scripts/cargo-publish.ts --check
 
-# Docs, protocol, corpus, generated-types, rosidl-dts, and license inventory; npm/crate pack members; Rust fmt/clippy; tsdown ship bundle.
+# Fumadocs + TanStack Start site over the existing docs/ tree (ADR 0020).
+[group('docs')]
+website:
+    cd "{{root}}" && bun run --filter @rclweb/website dev
+
+# Typecheck and production build of the docs site.
+# Build first so Vite can refresh `src/routeTree.gen.ts` for tsc.
+[group('docs')]
+website-check: toolchain-check
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd "{{root}}"
+    bun run --filter @rclweb/website build
+    bun run --filter @rclweb/website types:check
+
+# Docs, protocol, corpus, generated-types, rosidl-dts, and license inventory; npm/crate pack members; Rust fmt/clippy; tsdown ship bundle; docs site.
 [group('quality')]
 check: toolchain-check
     #!/usr/bin/env bash
@@ -179,6 +194,7 @@ check: toolchain-check
     just clippy
     just clippy-webtransport
     bun run --filter rcl-web check
+    just website-check
 
 # Bun tests (root scripts and TypeScript package) and Cargo workspace tests.
 [group('quality')]

@@ -37,4 +37,5 @@ These pages are for people changing this repository, not for calling `Node`.
 | Studio (not in tree) | [Studio prototype](./prototypes/studio-ui.md), [design system](../.agents/docs/DESIGN.md) |
 
 Workspace routes for contributors: [CONTRIBUTING.md](../CONTRIBUTING.md),
-[PCR map](../.agents/docs/README.md).
+[PCR map](../.agents/docs/README.md). The rendered site is
+[`website/`](../website/README.md) ([ADR 0020](./adr/0020-fumadocs-tanstack-docs-site.md)).

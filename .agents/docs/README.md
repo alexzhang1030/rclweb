@@ -22,6 +22,7 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | TypeScript package | [How to](../../docs/typescript.md), [API reference](../../docs/api.md), [ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md), [ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md) |
 | Publish | [Release](../../docs/release.md), [ADR 0016](../../docs/adr/0016-oidc-trusted-publish.md) |
 | License | [Licensing](../../docs/licensing.md) |
+| Rendered docs site | [Docs site renderer](./docs-site.md), [ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md) — Fumadocs + TanStack Start at `website/` |
 | Studio visual system | [DESIGN.md](./DESIGN.md) |
 
 ## Project records
@@ -29,6 +30,7 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | Need | Read |
 |---|---|
 | Formal documentation | [Documentation index](../../docs/README.md) (customer API first, internals second) |
+| Docs site | [Docs site renderer](./docs-site.md), [ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md) |
 | Architecture decisions | [ADR register](../../docs/adr/README.md) |
 | Humble scheme / corpus / ROS package names | [ADR 0012](../../docs/adr/0012-rclweb-schema-identifiers.md), [gotchas](./gotchas.md#bundle-files-are-named-by-type) |
 | Local WebTransport TLS | [ADR 0011](../../docs/adr/0011-local-dev-webtransport-tls.md) |
@@ -81,6 +83,7 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | `scripts/build-wasm.ts` | Fat-LTO wasm ship ([gotchas](./gotchas.md#release-wasm-inherits-native-release-settings)) |
 | Support matrix | Human matrix edit; no committed measurement JSON ([gotchas](./gotchas.md#do-not-commit-measurement-json)) |
 | `scripts/perf-baseline/**`, `scripts/measure-perf-baseline.ts` | [Performance](../../docs/performance.md); primary metrics are latency / CPU / RSS; stdout only, no committed JSON ([gotchas](./gotchas.md#do-not-commit-measurement-json)). Hops must pair by work ([gotchas](./gotchas.md#perf-baseline-hops-must-pair-by-work)). RSS snapshots retry EINTR ([gotchas](./gotchas.md#processmemoryusage-can-return-eintr)) |
+| `website/` | Fumadocs UI on TanStack Start over `docs/` ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md), [docs-site](./docs-site.md)). `just website` / `just website-check`. Macro/`dir` and slug import traps: [gotchas](./gotchas.md#fumadocs-definedocs-dir-is-a-string-literal). Landing SVG shrink: [gotchas](./gotchas.md#docs-landing-svg-must-min-width-0-in-the-flex-column) |
 | `studio/` (not in the tree) | [Studio](../../docs/prototypes/studio-ui.md), [DESIGN.md](./DESIGN.md) |
 
 ## Design record check
