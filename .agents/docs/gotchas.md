@@ -359,11 +359,12 @@ Keep `vercel.json` in `website/` and `bun run build`. [docs-site](./docs-site.md
 
 ## Docs landing SVG must min-width 0 in the flex column
 
-`body` is `flex flex-col`. The homepage graph SVG uses a 1000-wide
-viewBox, so its min-content size is 1000px. A flex item will not shrink
-below that, and a phone viewport clips `rclwebd` / `ROS 2`. `.home` /
-`.home-graph` set `min-width: 0` and the SVG is `max-width: 100%`.
-[docs-site](./docs-site.md).
+`body` and `#nd-home-layout` are `flex flex-col`. The homepage graph
+SVG uses a 1000-wide viewBox, so min-content is 1000px unless that
+chain can shrink — a phone then clips `rclwebd` / `ROS 2`. Bind
+`min-width: 0` on `body` / `#nd-home-layout` / `.home`,
+`contain: inline-size` on `.home-stage`, and `max-width: 100%` on the
+SVG. [docs-site](./docs-site.md).
 
 ## Do not wrap cargo tests in a Docker mock lane
 
