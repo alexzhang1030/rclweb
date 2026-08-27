@@ -220,12 +220,12 @@ wrapper must not `command -v rclwebd`: `ros2 run` puts
 `apt install rclwebd` comes from this project's GitHub Pages repo
 (`noble` = Jazzy, `jammy` = Humble), not `packages.ros.org`. The
 package name is `rclwebd`. Do not name it `ros-jazzy-rclwebd`. The
-source package `rclweb-apt-source` writes a deb822 file with
-`Signed-By: /usr/share/keyrings/rclweb-archive-keyring.gpg`. Do not
+First enable is `enable-rclweb-apt.sh`: it downloads the **public**
+keyring from Pages and writes a `Signed-By` deb822 file. Do not
 `apt-key add` and do not drop the key in `trusted.gpg.d` — that key
-would then be valid for every other source. First install of the
-source package is `dpkg -i` from the GitHub Release; there is no
-chicken-and-egg apt source until that package is on the machine.
+would then be valid for every other source. `dpkg -i
+rclweb-apt-source_*.deb` is the offline fallback; once the source is
+on the machine, `apt` can upgrade that package to rotate the key.
 `RCLWEB_APT_GPG_PRIVATE_KEY` is the one long-lived publish secret
 (apt cannot use OIDC). Leave it unset and the Release still gets
 `.deb` files for `dpkg -i`. Debian version is

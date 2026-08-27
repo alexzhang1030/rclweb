@@ -48,25 +48,19 @@ this project's repo, not bloom and not `packages.ros.org`
 ([ADR 0019](./adr/0019-own-apt-repository.md)). The package name is
 `rclwebd`. The browser page is
 [alexzhang1030.github.io/rclweb](https://alexzhang1030.github.io/rclweb/).
-`apt` uses `…/rclweb/apt` (files under `dists/`). Opening that
-directory in a browser is not the check — `apt update` is.
-
-First time, install the source package from the GitHub Release (it
-drops the keyring and a `Signed-By` deb822 file):
+`apt` uses `…/rclweb/apt` (files under `dists/`).
 
 ```bash
-# pick the .deb from the latest Release
-sudo dpkg -i rclweb-apt-source_*_all.deb
-sudo apt update
-sudo apt install rclwebd
+curl -fsSL https://alexzhang1030.github.io/rclweb/enable-apt.sh | sudo bash
 source /opt/ros/$ROS_DISTRO/setup.bash
 source /opt/rclwebd/local_setup.bash
 ros2 run rclwebd rclwebd
 ```
 
-Or `dpkg -i rclwebd_*~noble_amd64.deb` (Jazzy) /
-`rclwebd_*~jammy_amd64.deb` (Humble) from the same Release if you
-do not want a source. `apt` will not upgrade that path.
+That script fetches the public keyring (not the signing secret) and
+writes a `Signed-By` source, then `apt install rclwebd`. Offline:
+`dpkg -i rclweb-apt-source_*_all.deb` from the Release, or
+`dpkg -i rclwebd_*~noble_amd64.deb` / `~jammy` without a source.
 
 The unit is installed and **not** enabled. `systemctl enable --now
 rclwebd` after you edit `/etc/rclwebd/rclwebd.env`. Do not

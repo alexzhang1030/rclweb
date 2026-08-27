@@ -14,8 +14,7 @@ docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy
 Ubuntu apt ([`docs/deploy.md#apt`](../docs/deploy.md#apt)):
 
 ```bash
-sudo dpkg -i rclweb-apt-source_*_all.deb
-sudo apt update && sudo apt install rclwebd
+curl -fsSL https://alexzhang1030.github.io/rclweb/enable-apt.sh | sudo bash
 ```
 
 Prebuilt binaries for a sourced Jazzy / Humble environment. The
