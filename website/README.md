@@ -8,3 +8,9 @@ just website
 ```
 
 Build check: `just website-check`.
+
+Vercel Root Directory is `website`. `website/vercel.json` installs
+from the repo root and runs `bun run build`. `VERCEL=1` selects
+Nitro's `vercel` preset. Do not pin `node-server`, and do not copy
+`website/.vercel/output` from a repo-root command — cwd is already
+`website/`.

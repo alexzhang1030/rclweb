@@ -5,6 +5,7 @@ import { defineConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 import { fumadocsMdx } from "fumadocs-mdx/vite";
 import { nitro } from "nitro/vite";
+import { nitroPreset } from "./src/lib/nitro-preset.ts";
 
 const websiteRoot = import.meta.dirname;
 const repoRoot = path.resolve(websiteRoot, "..");
@@ -26,7 +27,7 @@ export default defineConfig({
     }),
     react(),
     nitro({
-      preset: "node-server",
+      preset: nitroPreset(),
     }),
   ],
   resolve: {

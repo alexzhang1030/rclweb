@@ -22,6 +22,7 @@ website/.nitro/
 website/.tanstack/
 website/.source/
 website/.vercel/
+.vercel/
 .bun/
 dist/
 coverage/

@@ -344,6 +344,19 @@ Node query opens that map and the `/docs/README` redirect lands on
 how-to.
 [docs-site](./docs-site.md), [ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md).
 
+## Vercel will not start the node-server preset
+
+`https://rclweb-website.vercel.app/` returned Vercel's platform
+`NOT_FOUND` on `/` and `/docs/typescript` after a green deploy. Nitro
+was pinned to `node-server`, which writes `.output/server/index.mjs`.
+Vercel does not run that process; it looks for `.vercel/output` (Build
+Output API) or a static `dist/`. `nitroPreset()` uses `vercel` when
+`VERCEL` is set, else `node-server` for `just website` /
+`just website-check`. The Vercel project Root Directory is `website`
+(Vercel-for-GitHub payload). A repo-root `buildCommand` that copies
+`website/.vercel/output` runs with cwd already `website/` and exits 1.
+Keep `vercel.json` in `website/` and `bun run build`. [docs-site](./docs-site.md).
+
 ## Docs landing SVG must min-width 0 in the flex column
 
 `body` and `#nd-home-layout` are `flex flex-col`. The homepage graph

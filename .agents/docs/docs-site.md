@@ -46,6 +46,11 @@ TanStack stack. No further rationale.
   stay on the OSI-permissive allowlist.
 - **Pages coexistence** is still open. Do not teach the apt
   force-push to delete a future site tree, or the other way around.
+  A Vercel project (`https://rclweb-website.vercel.app`) is not that
+  apt host. Nitro must emit the `vercel` preset there, and
+  `vercel.json` lives in `website/` because Root Directory is
+  `website`
+  ([gotchas](./gotchas.md#vercel-will-not-start-the-node-server-preset)).
 - **DESIGN.md is Studio**, not the docs chrome.
 - **Landing is chrome.** The homepage is a node field: decorative
   dots, five live nodes on the Browser → R2WP → rclwebd → ROS 2
