@@ -39,7 +39,8 @@ overlay so `ros2 run` works without apt
 curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/install-rclwebd.sh | bash
 ```
 
-Host units for unattended machines: [systemd](#systemd).
+Host units for unattended machines: [systemd](#systemd). Cluster
+units: [Kubernetes](#kubernetes).
 
 ## apt
 
@@ -243,7 +244,8 @@ headers.
 (H-FT), and [`docker/compose.r4-02-gateway-rmw.yml`](../docker/compose.r4-02-gateway-rmw.yml)
 (J-CY / J-ZN / H-CY / H-ZN plus zenoh router companions) use
 `network_mode: host` so the RMW can see the robot domain. That is a local /
-robot-edge shape, not a cloud overlay network.
+robot-edge shape, not a cloud overlay network. The [Kubernetes](#kubernetes)
+units keep the same host-network bind.
 [`docker/compose.webtransport.yml`](../docker/compose.webtransport.yml) overlays
 `RCLWEBD_OFFER_WEBTRANSPORT=1` on the `rclwebd` service (`just gateway-wt` /
 `just gateway-wt-h-ft`).
@@ -289,7 +291,8 @@ fetches `packaging/ament/rclwebd` from `RCLWEBD_UNIT_REF` (default
 `main`) when the script is not running from a clone.
 
 Docker images already source the image prefix and stay
-`docker run`. systemd stays for unattended hosts.
+`docker run`. systemd stays for unattended hosts. Kubernetes is the
+cluster unit.
 
 ## systemd
 
@@ -335,8 +338,42 @@ WebTransport is still the one env. This unit does not start `rmw_zenohd`.
 `ProtectSystem=strict` would block `/opt/ros` dlopen; these units stay
 simple.
 
+## Kubernetes
+
+Cluster units for the same host-network robot-edge shape as
+[compose](#compose-shape). systemd stays for unattended hosts without a
+cluster. This is not a cloud overlay network.
+
+Templates live in [`packaging/kubernetes/`](../packaging/kubernetes/).
+
+```bash
+kubectl apply -k packaging/kubernetes
+```
+
+`hostNetwork: true` so the RMW sees the robot domain. `replicas: 1` —
+one process, one row, one node bind of 8794 ([ADR 0008](./adr/0008-one-adapter-row-per-gateway-process.md)).
+`strategy: Recreate`: a RollingUpdate surge would collide on that bind.
+The image default is `ghcr.io/alexzhang1030/rclwebd:jazzy` (J-FT). Change
+the image tag for another row (`:humble`, `:j-zn`, …). Do not set
+`RCLWEBD_SUPPORT_ROW` on the pod — the image bakes the row, and a
+disagreement fails the adapter probe. This unit does not start
+`rmw_zenohd`.
+
+Probes: liveness [`/healthz`](#operations-endpoints), readiness
+[`/readyz`](#operations-endpoints). `preStop` POSTs `/drain`.
+`terminationGracePeriodSeconds` is 30 (above the default drain of 15s).
+Do not probe `/healthz` for admission.
+
+Authenticate stays **off**; do not set `RCLWEBD_AUTH_MODE=oidc`. Intranet
+WebTransport is still the one env. Production WSS / HTTPS stays a reverse
+proxy or Ingress in front of 8794 — this unit does not terminate TLS.
+
+A ClusterIP Service is for in-cluster scrape of `/metrics` and in-cluster
+`/readyz`. Browsers on the robot LAN use the node address the same way
+they use compose host network.
+
 ## Follow-ups
 
-Production PKI, remote metrics/trace export, Kubernetes, and
-upgrade/rollback playbooks remain [open work](../tasks/plan.md).
+Production PKI, remote metrics/trace export, and upgrade/rollback
+playbooks remain [open work](../tasks/plan.md).
 SROS2 is parked while auth is out of scope.
