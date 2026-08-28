@@ -30,7 +30,8 @@ ros2 run rclwebd rclwebd
 `ros2 run`: [`docs/deploy.md#ros2-run`](../docs/deploy.md#ros2-run).
 Host systemd units for unattended machines:
 [`docs/deploy.md#systemd`](../docs/deploy.md#systemd)
-(`./scripts/install-rclwebd.sh --systemd`).
+(`./scripts/install-rclwebd.sh --systemd`). Kubernetes host-network
+units: [`docs/deploy.md#kubernetes`](../docs/deploy.md#kubernetes).
 
 Building from source requires `--features ros` and a sourced ROS 2
 prefix (`ROS_PREFIX` / `AMENT_PREFIX_PATH`). Add `webtransport` for the

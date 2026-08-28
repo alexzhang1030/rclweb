@@ -1,0 +1,100 @@
+# J-FT gateway on a cluster node (robot-edge).
+# hostNetwork so rclwebd attaches to the robot's ROS domain — same shape
+# as docker/compose.r4-02-gateway.yml, not a cloud overlay network.
+# replicas stay 1 (ADR 0008: one process, one row; 8794 is a host bind).
+# Recreate: a RollingUpdate surge would collide on that bind.
+# The image bakes the support row; do not set RCLWEBD_SUPPORT_ROW here.
+# This unit does not start rmw_zenohd. Auth stays off. Production TLS
+# is a reverse proxy / Ingress in front of 8794, not this file.
+# Apply: kubectl apply -k packaging/kubernetes
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rclwebd
+  labels:
+    app.kubernetes.io/name: rclwebd
+    app.kubernetes.io/part-of: rclweb
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rclwebd
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rclwebd
+        app.kubernetes.io/part-of: rclweb
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: rclwebd
+          image: ghcr.io/alexzhang1030/rclwebd:jazzy
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: http
+              containerPort: 8794
+              protocol: TCP
+          env:
+            - name: RCLWEBD_BIND
+              value: "0.0.0.0:8794"
+            - name: RCLWEBD_GATEWAY_INSTANCE_ID
+              value: rclwebd
+            - name: ROS_DOMAIN_ID
+              value: "0"
+          startupProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - curl
+                  - -fsS
+                  - -X
+                  - POST
+                  - http://127.0.0.1:8794/drain
+---
+# ClusterIP is for in-cluster /metrics and /readyz. Browsers on the
+# robot LAN use the node address the same way they use compose host
+# network. This is not a LoadBalancer and not TLS.
+apiVersion: v1
+kind: Service
+metadata:
+  name: rclwebd
+  labels:
+    app.kubernetes.io/name: rclwebd
+    app.kubernetes.io/part-of: rclweb
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: rclwebd
+  ports:
+    - name: http
+      port: 8794
+      targetPort: http
+      protocol: TCP

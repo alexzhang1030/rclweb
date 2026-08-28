@@ -74,8 +74,9 @@ ros2 run rclwebd rclwebd
 ```
 
 Host systemd units (`--systemd`) are for unattended machines:
-[deploy](./docs/deploy.md#systemd). `ros2 run` details:
-[deploy](./docs/deploy.md#ros2-run).
+[deploy](./docs/deploy.md#systemd). Cluster units (host-network, same
+shape as compose): [deploy](./docs/deploy.md#kubernetes). `ros2 run`
+details: [deploy](./docs/deploy.md#ros2-run).
 
 Or build from source (needs Rust plus the ROS 2 development libraries):
 

@@ -36,7 +36,7 @@ None. The 2026-08-14 replies are in Settled. Reopen a row only if the human name
 | SROS2 enclave | Parked: auth is out of scope until the human names a tenant / keystore |
 | Production TLS | Runtime images speak plaintext HTTP/WS by default; PKI stays a follow-up. Intranet / lab WebTransport is the ADR 0011 opt-in (`RCLWEBD_OFFER_WEBTRANSPORT`), not this row ([deploy](../docs/deploy.md#intranet-webtransport)) |
 | Remote telemetry | `/metrics` is scrape-only; no OTLP export yet |
-| Orchestrators | Interactive: `ros2 run rclwebd rclwebd` via the ament overlay ([deploy](../docs/deploy.md#ros2-run)). Unattended: systemd units ([`packaging/systemd/`](../packaging/systemd/), `install-rclwebd.sh --systemd`, [deploy](../docs/deploy.md#systemd)). Kubernetes still open |
+| Orchestrators | Interactive: `ros2 run rclwebd rclwebd` via the ament overlay ([deploy](../docs/deploy.md#ros2-run)). Unattended: systemd units ([`packaging/systemd/`](../packaging/systemd/), `install-rclwebd.sh --systemd`, [deploy](../docs/deploy.md#systemd)). Cluster: host-network Kubernetes units ([`packaging/kubernetes/`](../packaging/kubernetes/), [deploy](../docs/deploy.md#kubernetes)) |
 | Soak / upgrade | Rollback, soak, and fault evidence |
 | apt / buildfarm | Own apt repo + Signed-By keyring ([ADR 0019](../docs/adr/0019-own-apt-repository.md), [deploy](../docs/deploy.md#apt)). Bloom / `packages.ros.org` stays deferred until cargo-in-colcon lands on the farm |
 | Studio | Post-release UI prototype ([studio-ui](../docs/prototypes/studio-ui.md)) |

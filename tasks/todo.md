@@ -24,5 +24,5 @@ Authoritative detail lives in the [open-work list](./plan.md) and the topic docu
 - [x] systemd units (`packaging/systemd`, `install-rclwebd.sh --systemd`)
 - [x] ament overlay so `ros2 run rclwebd rclwebd` works (not bloom)
 - [x] Own apt repo + `rclweb-apt-source` keyring (not bloom)
-- [ ] Kubernetes units beyond compose
+- [x] Kubernetes units beyond compose (`packaging/kubernetes`, host-network)
 - [ ] Studio prototype after a release review
