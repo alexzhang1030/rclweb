@@ -3,6 +3,319 @@
  * Do not edit by hand. Regenerate with `bun run rosidl-dts:write`.
  */
 
+export class Vector3 {
+  static readonly typeName = "geometry_msgs/msg/Vector3" as const;
+  x = 0;
+  y = 0;
+  z = 0;
+}
+
+export class Accel {
+  static readonly typeName = "geometry_msgs/msg/Accel" as const;
+  linear = new Vector3();
+  angular = new Vector3();
+}
+
+export class Time {
+  static readonly typeName = "builtin_interfaces/msg/Time" as const;
+  sec = 0;
+  nanosec = 0;
+}
+
+export class Header {
+  static readonly typeName = "std_msgs/msg/Header" as const;
+  stamp = new Time();
+  frame_id = "";
+}
+
+export class AccelStamped {
+  static readonly typeName = "geometry_msgs/msg/AccelStamped" as const;
+  header = new Header();
+  accel = new Accel();
+}
+
+export class AccelWithCovariance {
+  static readonly typeName = "geometry_msgs/msg/AccelWithCovariance" as const;
+  accel = new Accel();
+  covariance: number[] = [];
+}
+
+export class AccelWithCovarianceStamped {
+  static readonly typeName = "geometry_msgs/msg/AccelWithCovarianceStamped" as const;
+  header = new Header();
+  accel = new AccelWithCovariance();
+}
+
+export class TypeHash {
+  static readonly typeName = "rosgraph_msgs/msg/TypeHash" as const;
+  version = 0;
+  value = new Uint8Array();
+}
+
+export class InterfaceType {
+  static readonly typeName = "rosgraph_msgs/msg/InterfaceType" as const;
+  name = "";
+  hash = new TypeHash();
+}
+
+export class Duration {
+  static readonly typeName = "builtin_interfaces/msg/Duration" as const;
+  sec = 0;
+  nanosec = 0;
+}
+
+export class QoSProfile {
+  static readonly typeName = "rosgraph_msgs/msg/QoSProfile" as const;
+  static readonly HISTORY_SYSTEM_DEFAULT = 0;
+  static readonly HISTORY_KEEP_LAST = 1;
+  static readonly HISTORY_KEEP_ALL = 2;
+  static readonly HISTORY_UNKNOWN = 3;
+  static readonly RELIABILITY_SYSTEM_DEFAULT = 0;
+  static readonly RELIABILITY_RELIABLE = 1;
+  static readonly RELIABILITY_BEST_EFFORT = 2;
+  static readonly RELIABILITY_UNKNOWN = 3;
+  static readonly RELIABILITY_BEST_AVAILABLE = 4;
+  static readonly DURABILITY_SYSTEM_DEFAULT = 0;
+  static readonly DURABILITY_TRANSIENT_LOCAL = 1;
+  static readonly DURABILITY_VOLATILE = 2;
+  static readonly DURABILITY_UNKNOWN = 3;
+  static readonly DURABILITY_BEST_AVAILABLE = 4;
+  static readonly LIVELINESS_SYSTEM_DEFAULT = 0;
+  static readonly LIVELINESS_AUTOMATIC = 1;
+  static readonly LIVELINESS_MANUAL_BY_TOPIC = 3;
+  static readonly LIVELINESS_UNKNOWN = 4;
+  static readonly LIVELINESS_BEST_AVAILABLE = 5;
+  depth = 0;
+  deadline = new Duration();
+  lifespan = new Duration();
+  history = 0;
+  reliability = 0;
+  durability = 0;
+  liveliness = 0;
+  liveliness_lease_duration = new Duration();
+}
+
+export class Service {
+  static readonly typeName = "rosgraph_msgs/msg/Service" as const;
+  name = "";
+  request_type = new InterfaceType();
+  request_qos = new QoSProfile();
+  response_type = new InterfaceType();
+  response_qos = new QoSProfile();
+}
+
+export class Topic {
+  static readonly typeName = "rosgraph_msgs/msg/Topic" as const;
+  name = "";
+  type = new InterfaceType();
+  qos = new QoSProfile();
+}
+
+export class Action {
+  static readonly typeName = "rosgraph_msgs/msg/Action" as const;
+  name = "";
+  send_goal = new Service();
+  get_result = new Service();
+  cancel_goal = new Service();
+  feedback = new Topic();
+  status = new Topic();
+}
+
+export class AddDiagnostics_Request {
+  static readonly typeName = "diagnostic_msgs/srv/AddDiagnostics_Request" as const;
+  load_namespace = "";
+}
+
+export class AddDiagnostics_Response {
+  static readonly typeName = "diagnostic_msgs/srv/AddDiagnostics_Response" as const;
+  success = false;
+  message = "";
+}
+
+export class BatteryState {
+  static readonly typeName = "sensor_msgs/msg/BatteryState" as const;
+  static readonly POWER_SUPPLY_STATUS_UNKNOWN = 0;
+  static readonly POWER_SUPPLY_STATUS_CHARGING = 1;
+  static readonly POWER_SUPPLY_STATUS_DISCHARGING = 2;
+  static readonly POWER_SUPPLY_STATUS_NOT_CHARGING = 3;
+  static readonly POWER_SUPPLY_STATUS_FULL = 4;
+  static readonly POWER_SUPPLY_HEALTH_UNKNOWN = 0;
+  static readonly POWER_SUPPLY_HEALTH_GOOD = 1;
+  static readonly POWER_SUPPLY_HEALTH_OVERHEAT = 2;
+  static readonly POWER_SUPPLY_HEALTH_DEAD = 3;
+  static readonly POWER_SUPPLY_HEALTH_OVERVOLTAGE = 4;
+  static readonly POWER_SUPPLY_HEALTH_UNSPEC_FAILURE = 5;
+  static readonly POWER_SUPPLY_HEALTH_COLD = 6;
+  static readonly POWER_SUPPLY_HEALTH_WATCHDOG_TIMER_EXPIRE = 7;
+  static readonly POWER_SUPPLY_HEALTH_SAFETY_TIMER_EXPIRE = 8;
+  static readonly POWER_SUPPLY_TECHNOLOGY_UNKNOWN = 0;
+  static readonly POWER_SUPPLY_TECHNOLOGY_NIMH = 1;
+  static readonly POWER_SUPPLY_TECHNOLOGY_LION = 2;
+  static readonly POWER_SUPPLY_TECHNOLOGY_LIPO = 3;
+  static readonly POWER_SUPPLY_TECHNOLOGY_LIFE = 4;
+  static readonly POWER_SUPPLY_TECHNOLOGY_NICD = 5;
+  static readonly POWER_SUPPLY_TECHNOLOGY_LIMN = 6;
+  static readonly POWER_SUPPLY_TECHNOLOGY_TERNARY = 7;
+  static readonly POWER_SUPPLY_TECHNOLOGY_VRLA = 8;
+  header = new Header();
+  voltage = 0;
+  temperature = 0;
+  current = 0;
+  charge = 0;
+  capacity = 0;
+  design_capacity = 0;
+  percentage = 0;
+  power_supply_status = 0;
+  power_supply_health = 0;
+  power_supply_technology = 0;
+  present = false;
+  cell_voltage: number[] = [];
+  cell_temperature: number[] = [];
+  location = "";
+  serial_number = "";
+}
+
+export class Bool {
+  static readonly typeName = "std_msgs/msg/Bool" as const;
+  data = false;
+}
+
+export class Byte {
+  static readonly typeName = "std_msgs/msg/Byte" as const;
+  data = 0;
+}
+
+export class MultiArrayDimension {
+  static readonly typeName = "std_msgs/msg/MultiArrayDimension" as const;
+  label = "";
+  size = 0;
+  stride = 0;
+}
+
+export class MultiArrayLayout {
+  static readonly typeName = "std_msgs/msg/MultiArrayLayout" as const;
+  dim: MultiArrayDimension[] = [];
+  data_offset = 0;
+}
+
+export class ByteMultiArray {
+  static readonly typeName = "std_msgs/msg/ByteMultiArray" as const;
+  layout = new MultiArrayLayout();
+  data = new Uint8Array();
+}
+
+export class RegionOfInterest {
+  static readonly typeName = "sensor_msgs/msg/RegionOfInterest" as const;
+  x_offset = 0;
+  y_offset = 0;
+  height = 0;
+  width = 0;
+  do_rectify = false;
+}
+
+export class CameraInfo {
+  static readonly typeName = "sensor_msgs/msg/CameraInfo" as const;
+  header = new Header();
+  height = 0;
+  width = 0;
+  distortion_model = "";
+  d: number[] = [];
+  k: [number, number, number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+  r: [number, number, number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+  p: [number, number, number, number, number, number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  binning_x = 0;
+  binning_y = 0;
+  roi = new RegionOfInterest();
+}
+
+export class UUID {
+  static readonly typeName = "unique_identifier_msgs/msg/UUID" as const;
+  uuid = new Uint8Array();
+}
+
+export class GoalInfo {
+  static readonly typeName = "action_msgs/msg/GoalInfo" as const;
+  goal_id = new UUID();
+  stamp = new Time();
+}
+
+export class CancelGoal_Request {
+  static readonly typeName = "action_msgs/srv/CancelGoal_Request" as const;
+  goal_info = new GoalInfo();
+}
+
+export class CancelGoal_Response {
+  static readonly typeName = "action_msgs/srv/CancelGoal_Response" as const;
+  static readonly ERROR_NONE = 0;
+  static readonly ERROR_REJECTED = 1;
+  static readonly ERROR_UNKNOWN_GOAL_ID = 2;
+  static readonly ERROR_GOAL_TERMINATED = 3;
+  return_code = 0;
+  goals_canceling: GoalInfo[] = [];
+}
+
+export class Transition {
+  static readonly typeName = "lifecycle_msgs/msg/Transition" as const;
+  static readonly TRANSITION_CREATE = 0;
+  static readonly TRANSITION_CONFIGURE = 1;
+  static readonly TRANSITION_CLEANUP = 2;
+  static readonly TRANSITION_ACTIVATE = 3;
+  static readonly TRANSITION_DEACTIVATE = 4;
+  static readonly TRANSITION_UNCONFIGURED_SHUTDOWN = 5;
+  static readonly TRANSITION_INACTIVE_SHUTDOWN = 6;
+  static readonly TRANSITION_ACTIVE_SHUTDOWN = 7;
+  static readonly TRANSITION_DESTROY = 8;
+  static readonly TRANSITION_ON_CONFIGURE_SUCCESS = 10;
+  static readonly TRANSITION_ON_CONFIGURE_FAILURE = 11;
+  static readonly TRANSITION_ON_CONFIGURE_ERROR = 12;
+  static readonly TRANSITION_ON_CLEANUP_SUCCESS = 20;
+  static readonly TRANSITION_ON_CLEANUP_FAILURE = 21;
+  static readonly TRANSITION_ON_CLEANUP_ERROR = 22;
+  static readonly TRANSITION_ON_ACTIVATE_SUCCESS = 30;
+  static readonly TRANSITION_ON_ACTIVATE_FAILURE = 31;
+  static readonly TRANSITION_ON_ACTIVATE_ERROR = 32;
+  static readonly TRANSITION_ON_DEACTIVATE_SUCCESS = 40;
+  static readonly TRANSITION_ON_DEACTIVATE_FAILURE = 41;
+  static readonly TRANSITION_ON_DEACTIVATE_ERROR = 42;
+  static readonly TRANSITION_ON_SHUTDOWN_SUCCESS = 50;
+  static readonly TRANSITION_ON_SHUTDOWN_FAILURE = 51;
+  static readonly TRANSITION_ON_SHUTDOWN_ERROR = 52;
+  static readonly TRANSITION_ON_ERROR_SUCCESS = 60;
+  static readonly TRANSITION_ON_ERROR_FAILURE = 61;
+  static readonly TRANSITION_ON_ERROR_ERROR = 62;
+  static readonly TRANSITION_CALLBACK_SUCCESS = 97;
+  static readonly TRANSITION_CALLBACK_FAILURE = 98;
+  static readonly TRANSITION_CALLBACK_ERROR = 99;
+  id = 0;
+  label = "";
+}
+
+export class ChangeState_Request {
+  static readonly typeName = "lifecycle_msgs/srv/ChangeState_Request" as const;
+  transition = new Transition();
+}
+
+export class ChangeState_Response {
+  static readonly typeName = "lifecycle_msgs/srv/ChangeState_Response" as const;
+  success = false;
+}
+
+export class ChannelFloat32 {
+  static readonly typeName = "sensor_msgs/msg/ChannelFloat32" as const;
+  name = "";
+  values: number[] = [];
+}
+
+export class Char {
+  static readonly typeName = "std_msgs/msg/Char" as const;
+  data = 0;
+}
+
+export class Clock {
+  static readonly typeName = "rosgraph_msgs/msg/Clock" as const;
+  clock = new Time();
+}
+
 export class Collections {
   static readonly typeName = "rclweb_cdr_interfaces/msg/Collections" as const;
   fixed_i32: [number, number, number] = [0, 0, 0];
@@ -10,6 +323,105 @@ export class Collections {
   bytes_value = new Uint8Array();
   bounded_string = "";
   bounded_wstring = "";
+}
+
+export class ColorRGBA {
+  static readonly typeName = "std_msgs/msg/ColorRGBA" as const;
+  r = 0;
+  g = 0;
+  b = 0;
+  a = 0;
+}
+
+export class CompressedImage {
+  static readonly typeName = "sensor_msgs/msg/CompressedImage" as const;
+  header = new Header();
+  format = "";
+  data = new Uint8Array();
+}
+
+export class DescribeParameters_Request {
+  static readonly typeName = "rcl_interfaces/srv/DescribeParameters_Request" as const;
+  names: string[] = [];
+}
+
+export class FloatingPointRange {
+  static readonly typeName = "rcl_interfaces/msg/FloatingPointRange" as const;
+  from_value = 0;
+  to_value = 0;
+  step = 0;
+}
+
+export class IntegerRange {
+  static readonly typeName = "rcl_interfaces/msg/IntegerRange" as const;
+  from_value = 0n;
+  to_value = 0n;
+  step = 0n;
+}
+
+export class ParameterDescriptor {
+  static readonly typeName = "rcl_interfaces/msg/ParameterDescriptor" as const;
+  name = "";
+  type = 0;
+  description = "";
+  additional_constraints = "";
+  read_only = false;
+  dynamic_typing = false;
+  floating_point_range: FloatingPointRange[] = [];
+  integer_range: IntegerRange[] = [];
+}
+
+export class DescribeParameters_Response {
+  static readonly typeName = "rcl_interfaces/srv/DescribeParameters_Response" as const;
+  descriptors: ParameterDescriptor[] = [];
+}
+
+export class DiagnosticMsgsKeyValue {
+  static readonly typeName = "diagnostic_msgs/msg/KeyValue" as const;
+  key = "";
+  value = "";
+}
+
+export class DiagnosticStatus {
+  static readonly typeName = "diagnostic_msgs/msg/DiagnosticStatus" as const;
+  static readonly OK = 0;
+  static readonly WARN = 1;
+  static readonly ERROR = 2;
+  static readonly STALE = 3;
+  level = 0;
+  name = "";
+  message = "";
+  hardware_id = "";
+  values: DiagnosticMsgsKeyValue[] = [];
+}
+
+export class DiagnosticArray {
+  static readonly typeName = "diagnostic_msgs/msg/DiagnosticArray" as const;
+  header = new Header();
+  status: DiagnosticStatus[] = [];
+}
+
+export class Image {
+  static readonly typeName = "sensor_msgs/msg/Image" as const;
+  header = new Header();
+  height = 0;
+  width = 0;
+  encoding = "";
+  is_bigendian = 0;
+  step = 0;
+  data = new Uint8Array();
+}
+
+export class DisparityImage {
+  static readonly typeName = "stereo_msgs/msg/DisparityImage" as const;
+  header = new Header();
+  image = new Image();
+  f = 0;
+  t = 0;
+  valid_window = new RegionOfInterest();
+  min_disparity = 0;
+  max_disparity = 0;
+  delta_d = 0;
 }
 
 export class PrimitiveScalars {
@@ -31,12 +443,6 @@ export class PrimitiveScalars {
   wstring_value = "";
 }
 
-export class Time {
-  static readonly typeName = "builtin_interfaces/msg/Time" as const;
-  sec = 0;
-  nanosec = 0;
-}
-
 export class NestedSample {
   static readonly typeName = "rclweb_cdr_interfaces/msg/NestedSample" as const;
   stamp = new Time();
@@ -55,10 +461,896 @@ export class EchoNested_Response {
   accepted = false;
 }
 
-export class Header {
-  static readonly typeName = "std_msgs/msg/Header" as const;
+export class Empty {
+  static readonly typeName = "std_msgs/msg/Empty" as const;
+}
+
+export class Empty_Request {
+  static readonly typeName = "std_srvs/srv/Empty_Request" as const;
+}
+
+export class Empty_Response {
+  static readonly typeName = "std_srvs/srv/Empty_Response" as const;
+}
+
+export class FieldType {
+  static readonly typeName = "type_description_interfaces/msg/FieldType" as const;
+  static readonly FIELD_TYPE_NOT_SET = 0;
+  static readonly FIELD_TYPE_NESTED_TYPE = 1;
+  static readonly FIELD_TYPE_INT8 = 2;
+  static readonly FIELD_TYPE_UINT8 = 3;
+  static readonly FIELD_TYPE_INT16 = 4;
+  static readonly FIELD_TYPE_UINT16 = 5;
+  static readonly FIELD_TYPE_INT32 = 6;
+  static readonly FIELD_TYPE_UINT32 = 7;
+  static readonly FIELD_TYPE_INT64 = 8;
+  static readonly FIELD_TYPE_UINT64 = 9;
+  static readonly FIELD_TYPE_FLOAT = 10;
+  static readonly FIELD_TYPE_DOUBLE = 11;
+  static readonly FIELD_TYPE_LONG_DOUBLE = 12;
+  static readonly FIELD_TYPE_CHAR = 13;
+  static readonly FIELD_TYPE_WCHAR = 14;
+  static readonly FIELD_TYPE_BOOLEAN = 15;
+  static readonly FIELD_TYPE_BYTE = 16;
+  static readonly FIELD_TYPE_STRING = 17;
+  static readonly FIELD_TYPE_WSTRING = 18;
+  static readonly FIELD_TYPE_FIXED_STRING = 19;
+  static readonly FIELD_TYPE_FIXED_WSTRING = 20;
+  static readonly FIELD_TYPE_BOUNDED_STRING = 21;
+  static readonly FIELD_TYPE_BOUNDED_WSTRING = 22;
+  static readonly FIELD_TYPE_NESTED_TYPE_ARRAY = 49;
+  static readonly FIELD_TYPE_INT8_ARRAY = 50;
+  static readonly FIELD_TYPE_UINT8_ARRAY = 51;
+  static readonly FIELD_TYPE_INT16_ARRAY = 52;
+  static readonly FIELD_TYPE_UINT16_ARRAY = 53;
+  static readonly FIELD_TYPE_INT32_ARRAY = 54;
+  static readonly FIELD_TYPE_UINT32_ARRAY = 55;
+  static readonly FIELD_TYPE_INT64_ARRAY = 56;
+  static readonly FIELD_TYPE_UINT64_ARRAY = 57;
+  static readonly FIELD_TYPE_FLOAT_ARRAY = 58;
+  static readonly FIELD_TYPE_DOUBLE_ARRAY = 59;
+  static readonly FIELD_TYPE_LONG_DOUBLE_ARRAY = 60;
+  static readonly FIELD_TYPE_CHAR_ARRAY = 61;
+  static readonly FIELD_TYPE_WCHAR_ARRAY = 62;
+  static readonly FIELD_TYPE_BOOLEAN_ARRAY = 63;
+  static readonly FIELD_TYPE_BYTE_ARRAY = 64;
+  static readonly FIELD_TYPE_STRING_ARRAY = 65;
+  static readonly FIELD_TYPE_WSTRING_ARRAY = 66;
+  static readonly FIELD_TYPE_FIXED_STRING_ARRAY = 67;
+  static readonly FIELD_TYPE_FIXED_WSTRING_ARRAY = 68;
+  static readonly FIELD_TYPE_BOUNDED_STRING_ARRAY = 69;
+  static readonly FIELD_TYPE_BOUNDED_WSTRING_ARRAY = 70;
+  static readonly FIELD_TYPE_NESTED_TYPE_BOUNDED_SEQUENCE = 97;
+  static readonly FIELD_TYPE_INT8_BOUNDED_SEQUENCE = 98;
+  static readonly FIELD_TYPE_UINT8_BOUNDED_SEQUENCE = 99;
+  static readonly FIELD_TYPE_INT16_BOUNDED_SEQUENCE = 100;
+  static readonly FIELD_TYPE_UINT16_BOUNDED_SEQUENCE = 101;
+  static readonly FIELD_TYPE_INT32_BOUNDED_SEQUENCE = 102;
+  static readonly FIELD_TYPE_UINT32_BOUNDED_SEQUENCE = 103;
+  static readonly FIELD_TYPE_INT64_BOUNDED_SEQUENCE = 104;
+  static readonly FIELD_TYPE_UINT64_BOUNDED_SEQUENCE = 105;
+  static readonly FIELD_TYPE_FLOAT_BOUNDED_SEQUENCE = 106;
+  static readonly FIELD_TYPE_DOUBLE_BOUNDED_SEQUENCE = 107;
+  static readonly FIELD_TYPE_LONG_DOUBLE_BOUNDED_SEQUENCE = 108;
+  static readonly FIELD_TYPE_CHAR_BOUNDED_SEQUENCE = 109;
+  static readonly FIELD_TYPE_WCHAR_BOUNDED_SEQUENCE = 110;
+  static readonly FIELD_TYPE_BOOLEAN_BOUNDED_SEQUENCE = 111;
+  static readonly FIELD_TYPE_BYTE_BOUNDED_SEQUENCE = 112;
+  static readonly FIELD_TYPE_STRING_BOUNDED_SEQUENCE = 113;
+  static readonly FIELD_TYPE_WSTRING_BOUNDED_SEQUENCE = 114;
+  static readonly FIELD_TYPE_FIXED_STRING_BOUNDED_SEQUENCE = 115;
+  static readonly FIELD_TYPE_FIXED_WSTRING_BOUNDED_SEQUENCE = 116;
+  static readonly FIELD_TYPE_BOUNDED_STRING_BOUNDED_SEQUENCE = 117;
+  static readonly FIELD_TYPE_BOUNDED_WSTRING_BOUNDED_SEQUENCE = 118;
+  static readonly FIELD_TYPE_NESTED_TYPE_UNBOUNDED_SEQUENCE = 145;
+  static readonly FIELD_TYPE_INT8_UNBOUNDED_SEQUENCE = 146;
+  static readonly FIELD_TYPE_UINT8_UNBOUNDED_SEQUENCE = 147;
+  static readonly FIELD_TYPE_INT16_UNBOUNDED_SEQUENCE = 148;
+  static readonly FIELD_TYPE_UINT16_UNBOUNDED_SEQUENCE = 149;
+  static readonly FIELD_TYPE_INT32_UNBOUNDED_SEQUENCE = 150;
+  static readonly FIELD_TYPE_UINT32_UNBOUNDED_SEQUENCE = 151;
+  static readonly FIELD_TYPE_INT64_UNBOUNDED_SEQUENCE = 152;
+  static readonly FIELD_TYPE_UINT64_UNBOUNDED_SEQUENCE = 153;
+  static readonly FIELD_TYPE_FLOAT_UNBOUNDED_SEQUENCE = 154;
+  static readonly FIELD_TYPE_DOUBLE_UNBOUNDED_SEQUENCE = 155;
+  static readonly FIELD_TYPE_LONG_DOUBLE_UNBOUNDED_SEQUENCE = 156;
+  static readonly FIELD_TYPE_CHAR_UNBOUNDED_SEQUENCE = 157;
+  static readonly FIELD_TYPE_WCHAR_UNBOUNDED_SEQUENCE = 158;
+  static readonly FIELD_TYPE_BOOLEAN_UNBOUNDED_SEQUENCE = 159;
+  static readonly FIELD_TYPE_BYTE_UNBOUNDED_SEQUENCE = 160;
+  static readonly FIELD_TYPE_STRING_UNBOUNDED_SEQUENCE = 161;
+  static readonly FIELD_TYPE_WSTRING_UNBOUNDED_SEQUENCE = 162;
+  static readonly FIELD_TYPE_FIXED_STRING_UNBOUNDED_SEQUENCE = 163;
+  static readonly FIELD_TYPE_FIXED_WSTRING_UNBOUNDED_SEQUENCE = 164;
+  static readonly FIELD_TYPE_BOUNDED_STRING_UNBOUNDED_SEQUENCE = 165;
+  static readonly FIELD_TYPE_BOUNDED_WSTRING_UNBOUNDED_SEQUENCE = 166;
+  type_id = 0;
+  capacity = 0n;
+  string_capacity = 0n;
+  nested_type_name = "";
+}
+
+export class Field {
+  static readonly typeName = "type_description_interfaces/msg/Field" as const;
+  name = "";
+  type = new FieldType();
+  default_value = "";
+}
+
+export class Float32 {
+  static readonly typeName = "std_msgs/msg/Float32" as const;
+  data = 0;
+}
+
+export class Float32MultiArray {
+  static readonly typeName = "std_msgs/msg/Float32MultiArray" as const;
+  layout = new MultiArrayLayout();
+  data: number[] = [];
+}
+
+export class Float64 {
+  static readonly typeName = "std_msgs/msg/Float64" as const;
+  data = 0;
+}
+
+export class Float64MultiArray {
+  static readonly typeName = "std_msgs/msg/Float64MultiArray" as const;
+  layout = new MultiArrayLayout();
+  data: number[] = [];
+}
+
+export class FluidPressure {
+  static readonly typeName = "sensor_msgs/msg/FluidPressure" as const;
+  header = new Header();
+  fluid_pressure = 0;
+  variance = 0;
+}
+
+export class FrameGraph_Request {
+  static readonly typeName = "tf2_msgs/srv/FrameGraph_Request" as const;
+}
+
+export class FrameGraph_Response {
+  static readonly typeName = "tf2_msgs/srv/FrameGraph_Response" as const;
+  frame_yaml = "";
+}
+
+export class GetAvailableStates_Request {
+  static readonly typeName = "lifecycle_msgs/srv/GetAvailableStates_Request" as const;
+}
+
+export class State {
+  static readonly typeName = "lifecycle_msgs/msg/State" as const;
+  static readonly PRIMARY_STATE_UNKNOWN = 0;
+  static readonly PRIMARY_STATE_UNCONFIGURED = 1;
+  static readonly PRIMARY_STATE_INACTIVE = 2;
+  static readonly PRIMARY_STATE_ACTIVE = 3;
+  static readonly PRIMARY_STATE_FINALIZED = 4;
+  static readonly TRANSITION_STATE_CONFIGURING = 10;
+  static readonly TRANSITION_STATE_CLEANINGUP = 11;
+  static readonly TRANSITION_STATE_SHUTTINGDOWN = 12;
+  static readonly TRANSITION_STATE_ACTIVATING = 13;
+  static readonly TRANSITION_STATE_DEACTIVATING = 14;
+  static readonly TRANSITION_STATE_ERRORPROCESSING = 15;
+  id = 0;
+  label = "";
+}
+
+export class GetAvailableStates_Response {
+  static readonly typeName = "lifecycle_msgs/srv/GetAvailableStates_Response" as const;
+  available_states: State[] = [];
+}
+
+export class GetAvailableTransitions_Request {
+  static readonly typeName = "lifecycle_msgs/srv/GetAvailableTransitions_Request" as const;
+}
+
+export class TransitionDescription {
+  static readonly typeName = "lifecycle_msgs/msg/TransitionDescription" as const;
+  transition = new Transition();
+  start_state = new State();
+  goal_state = new State();
+}
+
+export class GetAvailableTransitions_Response {
+  static readonly typeName = "lifecycle_msgs/srv/GetAvailableTransitions_Response" as const;
+  available_transitions: TransitionDescription[] = [];
+}
+
+export class GetInteractiveMarkers_Request {
+  static readonly typeName = "visualization_msgs/srv/GetInteractiveMarkers_Request" as const;
+}
+
+export class MeshFile {
+  static readonly typeName = "visualization_msgs/msg/MeshFile" as const;
+  filename = "";
+  data = new Uint8Array();
+}
+
+export class Point {
+  static readonly typeName = "geometry_msgs/msg/Point" as const;
+  x = 0;
+  y = 0;
+  z = 0;
+}
+
+export class Quaternion {
+  static readonly typeName = "geometry_msgs/msg/Quaternion" as const;
+  x = 0;
+  y = 0;
+  z = 0;
+  w = 0;
+}
+
+export class Pose {
+  static readonly typeName = "geometry_msgs/msg/Pose" as const;
+  position = new Point();
+  orientation = new Quaternion();
+}
+
+export class UVCoordinate {
+  static readonly typeName = "visualization_msgs/msg/UVCoordinate" as const;
+  u = 0;
+  v = 0;
+}
+
+export class Marker {
+  static readonly typeName = "visualization_msgs/msg/Marker" as const;
+  static readonly ARROW = 0;
+  static readonly CUBE = 1;
+  static readonly SPHERE = 2;
+  static readonly CYLINDER = 3;
+  static readonly LINE_STRIP = 4;
+  static readonly LINE_LIST = 5;
+  static readonly CUBE_LIST = 6;
+  static readonly SPHERE_LIST = 7;
+  static readonly POINTS = 8;
+  static readonly TEXT_VIEW_FACING = 9;
+  static readonly MESH_RESOURCE = 10;
+  static readonly TRIANGLE_LIST = 11;
+  static readonly ARROW_STRIP = 12;
+  static readonly ADD = 0;
+  static readonly MODIFY = 0;
+  static readonly DELETE = 2;
+  static readonly DELETEALL = 3;
+  header = new Header();
+  ns = "";
+  id = 0;
+  type = 0;
+  action = 0;
+  pose = new Pose();
+  scale = new Vector3();
+  color = new ColorRGBA();
+  lifetime = new Duration();
+  frame_locked = false;
+  points: Point[] = [];
+  colors: ColorRGBA[] = [];
+  texture_resource = "";
+  texture = new CompressedImage();
+  uv_coordinates: UVCoordinate[] = [];
+  text = "";
+  mesh_resource = "";
+  mesh_file = new MeshFile();
+  mesh_use_embedded_materials = false;
+}
+
+export class InteractiveMarkerControl {
+  static readonly typeName = "visualization_msgs/msg/InteractiveMarkerControl" as const;
+  static readonly INHERIT = 0;
+  static readonly FIXED = 1;
+  static readonly VIEW_FACING = 2;
+  static readonly NONE = 0;
+  static readonly MENU = 1;
+  static readonly BUTTON = 2;
+  static readonly MOVE_AXIS = 3;
+  static readonly MOVE_PLANE = 4;
+  static readonly ROTATE_AXIS = 5;
+  static readonly MOVE_ROTATE = 6;
+  static readonly MOVE_3D = 7;
+  static readonly ROTATE_3D = 8;
+  static readonly MOVE_ROTATE_3D = 9;
+  name = "";
+  orientation = new Quaternion();
+  orientation_mode = 0;
+  interaction_mode = 0;
+  always_visible = false;
+  markers: Marker[] = [];
+  independent_marker_orientation = false;
+  description = "";
+}
+
+export class MenuEntry {
+  static readonly typeName = "visualization_msgs/msg/MenuEntry" as const;
+  static readonly FEEDBACK = 0;
+  static readonly ROSRUN = 1;
+  static readonly ROSLAUNCH = 2;
+  id = 0;
+  parent_id = 0;
+  title = "";
+  command = "";
+  command_type = 0;
+}
+
+export class InteractiveMarker {
+  static readonly typeName = "visualization_msgs/msg/InteractiveMarker" as const;
+  header = new Header();
+  pose = new Pose();
+  name = "";
+  description = "";
+  scale = 0;
+  menu_entries: MenuEntry[] = [];
+  controls: InteractiveMarkerControl[] = [];
+}
+
+export class GetInteractiveMarkers_Response {
+  static readonly typeName = "visualization_msgs/srv/GetInteractiveMarkers_Response" as const;
+  sequence_number = 0n;
+  markers: InteractiveMarker[] = [];
+}
+
+export class GetLoggerLevels_Request {
+  static readonly typeName = "rcl_interfaces/srv/GetLoggerLevels_Request" as const;
+  names: string[] = [];
+}
+
+export class LoggerLevel {
+  static readonly typeName = "rcl_interfaces/msg/LoggerLevel" as const;
+  static readonly LOG_LEVEL_UNKNOWN = 0;
+  static readonly LOG_LEVEL_DEBUG = 10;
+  static readonly LOG_LEVEL_INFO = 20;
+  static readonly LOG_LEVEL_WARN = 30;
+  static readonly LOG_LEVEL_ERROR = 40;
+  static readonly LOG_LEVEL_FATAL = 50;
+  name = "";
+  level = 0;
+}
+
+export class GetLoggerLevels_Response {
+  static readonly typeName = "rcl_interfaces/srv/GetLoggerLevels_Response" as const;
+  levels: LoggerLevel[] = [];
+}
+
+export class GetMap_Request {
+  static readonly typeName = "nav_msgs/srv/GetMap_Request" as const;
+}
+
+export class MapMetaData {
+  static readonly typeName = "nav_msgs/msg/MapMetaData" as const;
+  map_load_time = new Time();
+  resolution = 0;
+  width = 0;
+  height = 0;
+  origin = new Pose();
+}
+
+export class OccupancyGrid {
+  static readonly typeName = "nav_msgs/msg/OccupancyGrid" as const;
+  header = new Header();
+  info = new MapMetaData();
+  data: number[] = [];
+}
+
+export class GetMap_Response {
+  static readonly typeName = "nav_msgs/srv/GetMap_Response" as const;
+  map = new OccupancyGrid();
+}
+
+export class GetParameterTypes_Request {
+  static readonly typeName = "rcl_interfaces/srv/GetParameterTypes_Request" as const;
+  names: string[] = [];
+}
+
+export class GetParameterTypes_Response {
+  static readonly typeName = "rcl_interfaces/srv/GetParameterTypes_Response" as const;
+  types = new Uint8Array();
+}
+
+export class GetParameters_Request {
+  static readonly typeName = "rcl_interfaces/srv/GetParameters_Request" as const;
+  names: string[] = [];
+}
+
+export class ParameterValue {
+  static readonly typeName = "rcl_interfaces/msg/ParameterValue" as const;
+  type = 0;
+  bool_value = false;
+  integer_value = 0n;
+  double_value = 0;
+  string_value = "";
+  byte_array_value = new Uint8Array();
+  bool_array_value: boolean[] = [];
+  integer_array_value: bigint[] = [];
+  double_array_value: number[] = [];
+  string_array_value: string[] = [];
+}
+
+export class GetParameters_Response {
+  static readonly typeName = "rcl_interfaces/srv/GetParameters_Response" as const;
+  values: ParameterValue[] = [];
+}
+
+export class PoseStamped {
+  static readonly typeName = "geometry_msgs/msg/PoseStamped" as const;
+  header = new Header();
+  pose = new Pose();
+}
+
+export class GetPlan_Request {
+  static readonly typeName = "nav_msgs/srv/GetPlan_Request" as const;
+  start = new PoseStamped();
+  goal = new PoseStamped();
+  tolerance = 0;
+}
+
+export class Path {
+  static readonly typeName = "nav_msgs/msg/Path" as const;
+  header = new Header();
+  poses: PoseStamped[] = [];
+}
+
+export class GetPlan_Response {
+  static readonly typeName = "nav_msgs/srv/GetPlan_Response" as const;
+  plan = new Path();
+}
+
+export class GetState_Request {
+  static readonly typeName = "lifecycle_msgs/srv/GetState_Request" as const;
+}
+
+export class GetState_Response {
+  static readonly typeName = "lifecycle_msgs/srv/GetState_Response" as const;
+  current_state = new State();
+}
+
+export class GetTypeDescription_Request {
+  static readonly typeName = "type_description_interfaces/srv/GetTypeDescription_Request" as const;
+  type_name = "";
+  type_hash = "";
+  include_type_sources = false;
+}
+
+export class IndividualTypeDescription {
+  static readonly typeName = "type_description_interfaces/msg/IndividualTypeDescription" as const;
+  type_name = "";
+  fields: Field[] = [];
+}
+
+export class TypeDescription {
+  static readonly typeName = "type_description_interfaces/msg/TypeDescription" as const;
+  type_description = new IndividualTypeDescription();
+  referenced_type_descriptions: IndividualTypeDescription[] = [];
+}
+
+export class TypeDescriptionInterfacesKeyValue {
+  static readonly typeName = "type_description_interfaces/msg/KeyValue" as const;
+  key = "";
+  value = "";
+}
+
+export class TypeSource {
+  static readonly typeName = "type_description_interfaces/msg/TypeSource" as const;
+  type_name = "";
+  encoding = "";
+  raw_file_contents = "";
+}
+
+export class GetTypeDescription_Response {
+  static readonly typeName = "type_description_interfaces/srv/GetTypeDescription_Response" as const;
+  successful = false;
+  failure_reason = "";
+  type_description = new TypeDescription();
+  type_sources: TypeSource[] = [];
+  extra_information: TypeDescriptionInterfacesKeyValue[] = [];
+}
+
+export class GoalStatus {
+  static readonly typeName = "action_msgs/msg/GoalStatus" as const;
+  static readonly STATUS_UNKNOWN = 0;
+  static readonly STATUS_ACCEPTED = 1;
+  static readonly STATUS_EXECUTING = 2;
+  static readonly STATUS_CANCELING = 3;
+  static readonly STATUS_SUCCEEDED = 4;
+  static readonly STATUS_CANCELED = 5;
+  static readonly STATUS_ABORTED = 6;
+  goal_info = new GoalInfo();
+  status = 0;
+}
+
+export class GoalStatusArray {
+  static readonly typeName = "action_msgs/msg/GoalStatusArray" as const;
+  status_list: GoalStatus[] = [];
+}
+
+export class Goals {
+  static readonly typeName = "nav_msgs/msg/Goals" as const;
+  header = new Header();
+  goals: PoseStamped[] = [];
+}
+
+export class Node {
+  static readonly typeName = "rosgraph_msgs/msg/Node" as const;
+  name = "";
+  parameters: ParameterDescriptor[] = [];
+  parameter_values: ParameterValue[] = [];
+  publishers: Topic[] = [];
+  subscriptions: Topic[] = [];
+  service_clients: Service[] = [];
+  service_servers: Service[] = [];
+  action_clients: Action[] = [];
+  action_servers: Action[] = [];
+}
+
+export class Graph {
+  static readonly typeName = "rosgraph_msgs/msg/Graph" as const;
+  nodes: Node[] = [];
+}
+
+export class GridCells {
+  static readonly typeName = "nav_msgs/msg/GridCells" as const;
+  header = new Header();
+  cell_width = 0;
+  cell_height = 0;
+  cells: Point[] = [];
+}
+
+export class Illuminance {
+  static readonly typeName = "sensor_msgs/msg/Illuminance" as const;
+  header = new Header();
+  illuminance = 0;
+  variance = 0;
+}
+
+export class ImageMarker {
+  static readonly typeName = "visualization_msgs/msg/ImageMarker" as const;
+  static readonly CIRCLE = 0;
+  static readonly LINE_STRIP = 1;
+  static readonly LINE_LIST = 2;
+  static readonly POLYGON = 3;
+  static readonly POINTS = 4;
+  static readonly ADD = 0;
+  static readonly REMOVE = 1;
+  header = new Header();
+  ns = "";
+  id = 0;
+  type = 0;
+  action = 0;
+  position = new Point();
+  scale = 0;
+  outline_color = new ColorRGBA();
+  filled = 0;
+  fill_color = new ColorRGBA();
+  lifetime = new Duration();
+  points: Point[] = [];
+  outline_colors: ColorRGBA[] = [];
+}
+
+export class Imu {
+  static readonly typeName = "sensor_msgs/msg/Imu" as const;
+  header = new Header();
+  orientation = new Quaternion();
+  orientation_covariance: [number, number, number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+  angular_velocity = new Vector3();
+  angular_velocity_covariance: [number, number, number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+  linear_acceleration = new Vector3();
+  linear_acceleration_covariance: [number, number, number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+}
+
+export class Inertia {
+  static readonly typeName = "geometry_msgs/msg/Inertia" as const;
+  m = 0;
+  com = new Vector3();
+  ixx = 0;
+  ixy = 0;
+  ixz = 0;
+  iyy = 0;
+  iyz = 0;
+  izz = 0;
+}
+
+export class InertiaStamped {
+  static readonly typeName = "geometry_msgs/msg/InertiaStamped" as const;
+  header = new Header();
+  inertia = new Inertia();
+}
+
+export class Int16 {
+  static readonly typeName = "std_msgs/msg/Int16" as const;
+  data = 0;
+}
+
+export class Int16MultiArray {
+  static readonly typeName = "std_msgs/msg/Int16MultiArray" as const;
+  layout = new MultiArrayLayout();
+  data: number[] = [];
+}
+
+export class Int32 {
+  static readonly typeName = "std_msgs/msg/Int32" as const;
+  data = 0;
+}
+
+export class Int32MultiArray {
+  static readonly typeName = "std_msgs/msg/Int32MultiArray" as const;
+  layout = new MultiArrayLayout();
+  data: number[] = [];
+}
+
+export class Int64 {
+  static readonly typeName = "std_msgs/msg/Int64" as const;
+  data = 0n;
+}
+
+export class Int64MultiArray {
+  static readonly typeName = "std_msgs/msg/Int64MultiArray" as const;
+  layout = new MultiArrayLayout();
+  data: bigint[] = [];
+}
+
+export class Int8 {
+  static readonly typeName = "std_msgs/msg/Int8" as const;
+  data = 0;
+}
+
+export class Int8MultiArray {
+  static readonly typeName = "std_msgs/msg/Int8MultiArray" as const;
+  layout = new MultiArrayLayout();
+  data: number[] = [];
+}
+
+export class InteractiveMarkerFeedback {
+  static readonly typeName = "visualization_msgs/msg/InteractiveMarkerFeedback" as const;
+  static readonly KEEP_ALIVE = 0;
+  static readonly POSE_UPDATE = 1;
+  static readonly MENU_SELECT = 2;
+  static readonly BUTTON_CLICK = 3;
+  static readonly MOUSE_DOWN = 4;
+  static readonly MOUSE_UP = 5;
+  header = new Header();
+  client_id = "";
+  marker_name = "";
+  control_name = "";
+  event_type = 0;
+  pose = new Pose();
+  menu_entry_id = 0;
+  mouse_point = new Point();
+  mouse_point_valid = false;
+}
+
+export class InteractiveMarkerInit {
+  static readonly typeName = "visualization_msgs/msg/InteractiveMarkerInit" as const;
+  server_id = "";
+  seq_num = 0n;
+  markers: InteractiveMarker[] = [];
+}
+
+export class InteractiveMarkerPose {
+  static readonly typeName = "visualization_msgs/msg/InteractiveMarkerPose" as const;
+  header = new Header();
+  pose = new Pose();
+  name = "";
+}
+
+export class InteractiveMarkerUpdate {
+  static readonly typeName = "visualization_msgs/msg/InteractiveMarkerUpdate" as const;
+  static readonly KEEP_ALIVE = 0;
+  static readonly UPDATE = 1;
+  server_id = "";
+  seq_num = 0n;
+  type = 0;
+  markers: InteractiveMarker[] = [];
+  poses: InteractiveMarkerPose[] = [];
+  erases: string[] = [];
+}
+
+export class JointState {
+  static readonly typeName = "sensor_msgs/msg/JointState" as const;
+  header = new Header();
+  name: string[] = [];
+  position: number[] = [];
+  velocity: number[] = [];
+  effort: number[] = [];
+}
+
+export class JointTrajectoryPoint {
+  static readonly typeName = "trajectory_msgs/msg/JointTrajectoryPoint" as const;
+  positions: number[] = [];
+  velocities: number[] = [];
+  accelerations: number[] = [];
+  effort: number[] = [];
+  time_from_start = new Duration();
+}
+
+export class JointTrajectory {
+  static readonly typeName = "trajectory_msgs/msg/JointTrajectory" as const;
+  header = new Header();
+  joint_names: string[] = [];
+  points: JointTrajectoryPoint[] = [];
+}
+
+export class Joy {
+  static readonly typeName = "sensor_msgs/msg/Joy" as const;
+  header = new Header();
+  axes: number[] = [];
+  buttons: number[] = [];
+}
+
+export class JoyFeedback {
+  static readonly typeName = "sensor_msgs/msg/JoyFeedback" as const;
+  static readonly TYPE_LED = 0;
+  static readonly TYPE_RUMBLE = 1;
+  static readonly TYPE_BUZZER = 2;
+  type = 0;
+  id = 0;
+  intensity = 0;
+}
+
+export class JoyFeedbackArray {
+  static readonly typeName = "sensor_msgs/msg/JoyFeedbackArray" as const;
+  array: JoyFeedback[] = [];
+}
+
+export class LaserEcho {
+  static readonly typeName = "sensor_msgs/msg/LaserEcho" as const;
+  echoes: number[] = [];
+}
+
+export class LaserScan {
+  static readonly typeName = "sensor_msgs/msg/LaserScan" as const;
+  header = new Header();
+  angle_min = 0;
+  angle_max = 0;
+  angle_increment = 0;
+  time_increment = 0;
+  scan_time = 0;
+  range_min = 0;
+  range_max = 0;
+  ranges: number[] = [];
+  intensities: number[] = [];
+}
+
+export class ListNodes_Request {
+  static readonly typeName = "composition_interfaces/srv/ListNodes_Request" as const;
+}
+
+export class ListNodes_Response {
+  static readonly typeName = "composition_interfaces/srv/ListNodes_Response" as const;
+  full_node_names: string[] = [];
+  unique_ids: bigint[] = [];
+}
+
+export class ListParametersResult {
+  static readonly typeName = "rcl_interfaces/msg/ListParametersResult" as const;
+  names: string[] = [];
+  prefixes: string[] = [];
+}
+
+export class ListParameters_Request {
+  static readonly typeName = "rcl_interfaces/srv/ListParameters_Request" as const;
+  static readonly DEPTH_RECURSIVE = 0n;
+  prefixes: string[] = [];
+  depth = 0n;
+}
+
+export class ListParameters_Response {
+  static readonly typeName = "rcl_interfaces/srv/ListParameters_Response" as const;
+  result = new ListParametersResult();
+}
+
+export class LoadMap_Request {
+  static readonly typeName = "nav_msgs/srv/LoadMap_Request" as const;
+  map_url = "";
+}
+
+export class LoadMap_Response {
+  static readonly typeName = "nav_msgs/srv/LoadMap_Response" as const;
+  static readonly RESULT_SUCCESS = 0;
+  static readonly RESULT_MAP_DOES_NOT_EXIST = 1;
+  static readonly RESULT_INVALID_MAP_DATA = 2;
+  static readonly RESULT_INVALID_MAP_METADATA = 3;
+  static readonly RESULT_UNDEFINED_FAILURE = 255;
+  map = new OccupancyGrid();
+  result = 0;
+}
+
+export class Parameter {
+  static readonly typeName = "rcl_interfaces/msg/Parameter" as const;
+  name = "";
+  value = new ParameterValue();
+}
+
+export class LoadNode_Request {
+  static readonly typeName = "composition_interfaces/srv/LoadNode_Request" as const;
+  package_name = "";
+  plugin_name = "";
+  node_name = "";
+  node_namespace = "";
+  log_level = 0;
+  remap_rules: string[] = [];
+  parameters: Parameter[] = [];
+  extra_arguments: Parameter[] = [];
+}
+
+export class LoadNode_Response {
+  static readonly typeName = "composition_interfaces/srv/LoadNode_Response" as const;
+  success = false;
+  error_message = "";
+  full_node_name = "";
+  unique_id = 0n;
+}
+
+export class Log {
+  static readonly typeName = "rcl_interfaces/msg/Log" as const;
+  static readonly DEBUG = 10;
+  static readonly INFO = 20;
+  static readonly WARN = 30;
+  static readonly ERROR = 40;
+  static readonly FATAL = 50;
   stamp = new Time();
-  frame_id = "";
+  level = 0;
+  name = "";
+  msg = "";
+  file = "";
+  function = "";
+  line = 0;
+}
+
+export class LookupTransform_Feedback {
+  static readonly typeName = "tf2_msgs/action/LookupTransform_Feedback" as const;
+}
+
+export class LookupTransform_Goal {
+  static readonly typeName = "tf2_msgs/action/LookupTransform_Goal" as const;
+  target_frame = "";
+  source_frame = "";
+  source_time = new Time();
+  timeout = new Duration();
+  target_time = new Time();
+  fixed_frame = "";
+  advanced = false;
+}
+
+export class TF2Error {
+  static readonly typeName = "tf2_msgs/msg/TF2Error" as const;
+  static readonly NO_ERROR = 0;
+  static readonly LOOKUP_ERROR = 1;
+  static readonly CONNECTIVITY_ERROR = 2;
+  static readonly EXTRAPOLATION_ERROR = 3;
+  static readonly INVALID_ARGUMENT_ERROR = 4;
+  static readonly TIMEOUT_ERROR = 5;
+  static readonly TRANSFORM_ERROR = 6;
+  error = 0;
+  error_string = "";
+}
+
+export class Transform {
+  static readonly typeName = "geometry_msgs/msg/Transform" as const;
+  translation = new Vector3();
+  rotation = new Quaternion();
+}
+
+export class TransformStamped {
+  static readonly typeName = "geometry_msgs/msg/TransformStamped" as const;
+  header = new Header();
+  child_frame_id = "";
+  transform = new Transform();
+}
+
+export class LookupTransform_Result {
+  static readonly typeName = "tf2_msgs/action/LookupTransform_Result" as const;
+  transform = new TransformStamped();
+  error = new TF2Error();
+}
+
+export class MagneticField {
+  static readonly typeName = "sensor_msgs/msg/MagneticField" as const;
+  header = new Header();
+  magnetic_field = new Vector3();
+  magnetic_field_covariance: [number, number, number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+}
+
+export class MarkerArray {
+  static readonly typeName = "visualization_msgs/msg/MarkerArray" as const;
+  markers: Marker[] = [];
 }
 
 export class MeasureSequence_Feedback {
@@ -75,6 +1367,183 @@ export class MeasureSequence_Goal {
 export class MeasureSequence_Result {
   static readonly typeName = "rclweb_cdr_interfaces/action/MeasureSequence_Result" as const;
   result = new NestedSample();
+}
+
+export class MeshTriangle {
+  static readonly typeName = "shape_msgs/msg/MeshTriangle" as const;
+  vertex_indices: [number, number, number] = [0, 0, 0];
+}
+
+export class Mesh {
+  static readonly typeName = "shape_msgs/msg/Mesh" as const;
+  triangles: MeshTriangle[] = [];
+  vertices: Point[] = [];
+}
+
+export class StatisticDataPoint {
+  static readonly typeName = "statistics_msgs/msg/StatisticDataPoint" as const;
+  data_type = 0;
+  data = 0;
+}
+
+export class MetricsMessage {
+  static readonly typeName = "statistics_msgs/msg/MetricsMessage" as const;
+  measurement_source_name = "";
+  metrics_source = "";
+  unit = "";
+  window_start = new Time();
+  window_stop = new Time();
+  statistics: StatisticDataPoint[] = [];
+}
+
+export class Twist {
+  static readonly typeName = "geometry_msgs/msg/Twist" as const;
+  linear = new Vector3();
+  angular = new Vector3();
+}
+
+export class Wrench {
+  static readonly typeName = "geometry_msgs/msg/Wrench" as const;
+  force = new Vector3();
+  torque = new Vector3();
+}
+
+export class MultiDOFJointState {
+  static readonly typeName = "sensor_msgs/msg/MultiDOFJointState" as const;
+  header = new Header();
+  joint_names: string[] = [];
+  transforms: Transform[] = [];
+  twist: Twist[] = [];
+  wrench: Wrench[] = [];
+}
+
+export class MultiDOFJointTrajectoryPoint {
+  static readonly typeName = "trajectory_msgs/msg/MultiDOFJointTrajectoryPoint" as const;
+  transforms: Transform[] = [];
+  velocities: Twist[] = [];
+  accelerations: Twist[] = [];
+  time_from_start = new Duration();
+}
+
+export class MultiDOFJointTrajectory {
+  static readonly typeName = "trajectory_msgs/msg/MultiDOFJointTrajectory" as const;
+  header = new Header();
+  joint_names: string[] = [];
+  points: MultiDOFJointTrajectoryPoint[] = [];
+}
+
+export class MultiEchoLaserScan {
+  static readonly typeName = "sensor_msgs/msg/MultiEchoLaserScan" as const;
+  header = new Header();
+  angle_min = 0;
+  angle_max = 0;
+  angle_increment = 0;
+  time_increment = 0;
+  scan_time = 0;
+  range_min = 0;
+  range_max = 0;
+  ranges: LaserEcho[] = [];
+  intensities: LaserEcho[] = [];
+}
+
+export class NavSatStatus {
+  static readonly typeName = "sensor_msgs/msg/NavSatStatus" as const;
+  static readonly STATUS_UNKNOWN = -2;
+  static readonly STATUS_NO_FIX = -1;
+  static readonly STATUS_FIX = 0;
+  static readonly STATUS_SBAS_FIX = 1;
+  static readonly STATUS_GBAS_FIX = 2;
+  static readonly SERVICE_UNKNOWN = 0;
+  static readonly SERVICE_GPS = 1;
+  static readonly SERVICE_GLONASS = 2;
+  static readonly SERVICE_COMPASS = 4;
+  static readonly SERVICE_GALILEO = 8;
+  status = 0;
+  service = 0;
+}
+
+export class NavSatFix {
+  static readonly typeName = "sensor_msgs/msg/NavSatFix" as const;
+  static readonly COVARIANCE_TYPE_UNKNOWN = 0;
+  static readonly COVARIANCE_TYPE_APPROXIMATED = 1;
+  static readonly COVARIANCE_TYPE_DIAGONAL_KNOWN = 2;
+  static readonly COVARIANCE_TYPE_KNOWN = 3;
+  header = new Header();
+  status = new NavSatStatus();
+  latitude = 0;
+  longitude = 0;
+  altitude = 0;
+  position_covariance: [number, number, number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+  position_covariance_type = 0;
+}
+
+export class PoseWithCovariance {
+  static readonly typeName = "geometry_msgs/msg/PoseWithCovariance" as const;
+  pose = new Pose();
+  covariance: number[] = [];
+}
+
+export class TwistWithCovariance {
+  static readonly typeName = "geometry_msgs/msg/TwistWithCovariance" as const;
+  twist = new Twist();
+  covariance: number[] = [];
+}
+
+export class Odometry {
+  static readonly typeName = "nav_msgs/msg/Odometry" as const;
+  header = new Header();
+  child_frame_id = "";
+  pose = new PoseWithCovariance();
+  twist = new TwistWithCovariance();
+}
+
+export class ParameterEvent {
+  static readonly typeName = "rcl_interfaces/msg/ParameterEvent" as const;
+  stamp = new Time();
+  node = "";
+  new_parameters: Parameter[] = [];
+  changed_parameters: Parameter[] = [];
+  deleted_parameters: Parameter[] = [];
+}
+
+export class ParameterEventDescriptors {
+  static readonly typeName = "rcl_interfaces/msg/ParameterEventDescriptors" as const;
+  new_parameters: ParameterDescriptor[] = [];
+  changed_parameters: ParameterDescriptor[] = [];
+  deleted_parameters: ParameterDescriptor[] = [];
+}
+
+export class ParameterType {
+  static readonly typeName = "rcl_interfaces/msg/ParameterType" as const;
+  static readonly PARAMETER_NOT_SET = 0;
+  static readonly PARAMETER_BOOL = 1;
+  static readonly PARAMETER_INTEGER = 2;
+  static readonly PARAMETER_DOUBLE = 3;
+  static readonly PARAMETER_STRING = 4;
+  static readonly PARAMETER_BYTE_ARRAY = 5;
+  static readonly PARAMETER_BOOL_ARRAY = 6;
+  static readonly PARAMETER_INTEGER_ARRAY = 7;
+  static readonly PARAMETER_DOUBLE_ARRAY = 8;
+  static readonly PARAMETER_STRING_ARRAY = 9;
+}
+
+export class Plane {
+  static readonly typeName = "shape_msgs/msg/Plane" as const;
+  coef: [number, number, number, number] = [0, 0, 0, 0];
+}
+
+export class Point32 {
+  static readonly typeName = "geometry_msgs/msg/Point32" as const;
+  x = 0;
+  y = 0;
+  z = 0;
+}
+
+export class PointCloud {
+  static readonly typeName = "sensor_msgs/msg/PointCloud" as const;
+  header = new Header();
+  points: Point32[] = [];
+  channels: ChannelFloat32[] = [];
 }
 
 export class PointField {
@@ -106,10 +1575,480 @@ export class PointCloud2 {
   is_dense = false;
 }
 
+export class PointStamped {
+  static readonly typeName = "geometry_msgs/msg/PointStamped" as const;
+  header = new Header();
+  point = new Point();
+}
+
+export class Polygon {
+  static readonly typeName = "geometry_msgs/msg/Polygon" as const;
+  points: Point32[] = [];
+}
+
+export class PolygonInstance {
+  static readonly typeName = "geometry_msgs/msg/PolygonInstance" as const;
+  polygon = new Polygon();
+  id = 0n;
+}
+
+export class PolygonInstanceStamped {
+  static readonly typeName = "geometry_msgs/msg/PolygonInstanceStamped" as const;
+  header = new Header();
+  polygon = new PolygonInstance();
+}
+
+export class PolygonStamped {
+  static readonly typeName = "geometry_msgs/msg/PolygonStamped" as const;
+  header = new Header();
+  polygon = new Polygon();
+}
+
+export class Pose2D {
+  static readonly typeName = "geometry_msgs/msg/Pose2D" as const;
+  x = 0;
+  y = 0;
+  theta = 0;
+}
+
+export class PoseArray {
+  static readonly typeName = "geometry_msgs/msg/PoseArray" as const;
+  header = new Header();
+  poses: Pose[] = [];
+}
+
+export class PoseWithCovarianceStamped {
+  static readonly typeName = "geometry_msgs/msg/PoseWithCovarianceStamped" as const;
+  header = new Header();
+  pose = new PoseWithCovariance();
+}
+
+export class QuaternionStamped {
+  static readonly typeName = "geometry_msgs/msg/QuaternionStamped" as const;
+  header = new Header();
+  quaternion = new Quaternion();
+}
+
+export class Range {
+  static readonly typeName = "sensor_msgs/msg/Range" as const;
+  static readonly ULTRASOUND = 0;
+  static readonly INFRARED = 1;
+  header = new Header();
+  radiation_type = 0;
+  field_of_view = 0;
+  min_range = 0;
+  max_range = 0;
+  range = 0;
+  variance = 0;
+}
+
+export class RelativeHumidity {
+  static readonly typeName = "sensor_msgs/msg/RelativeHumidity" as const;
+  header = new Header();
+  relative_humidity = 0;
+  variance = 0;
+}
+
+export class SelfTest_Request {
+  static readonly typeName = "diagnostic_msgs/srv/SelfTest_Request" as const;
+}
+
+export class SelfTest_Response {
+  static readonly typeName = "diagnostic_msgs/srv/SelfTest_Response" as const;
+  id = "";
+  passed = 0;
+  status: DiagnosticStatus[] = [];
+}
+
+export class SetBool_Request {
+  static readonly typeName = "std_srvs/srv/SetBool_Request" as const;
+  data = false;
+}
+
+export class SetBool_Response {
+  static readonly typeName = "std_srvs/srv/SetBool_Response" as const;
+  success = false;
+  message = "";
+}
+
+export class SetCameraInfo_Request {
+  static readonly typeName = "sensor_msgs/srv/SetCameraInfo_Request" as const;
+  camera_info = new CameraInfo();
+}
+
+export class SetCameraInfo_Response {
+  static readonly typeName = "sensor_msgs/srv/SetCameraInfo_Response" as const;
+  success = false;
+  status_message = "";
+}
+
+export class SetLoggerLevelsResult {
+  static readonly typeName = "rcl_interfaces/msg/SetLoggerLevelsResult" as const;
+  successful = false;
+  reason = "";
+}
+
+export class SetLoggerLevels_Request {
+  static readonly typeName = "rcl_interfaces/srv/SetLoggerLevels_Request" as const;
+  levels: LoggerLevel[] = [];
+}
+
+export class SetLoggerLevels_Response {
+  static readonly typeName = "rcl_interfaces/srv/SetLoggerLevels_Response" as const;
+  results: SetLoggerLevelsResult[] = [];
+}
+
+export class SetMap_Request {
+  static readonly typeName = "nav_msgs/srv/SetMap_Request" as const;
+  map = new OccupancyGrid();
+  initial_pose = new PoseWithCovarianceStamped();
+}
+
+export class SetMap_Response {
+  static readonly typeName = "nav_msgs/srv/SetMap_Response" as const;
+  success = false;
+}
+
+export class SetParametersAtomically_Request {
+  static readonly typeName = "rcl_interfaces/srv/SetParametersAtomically_Request" as const;
+  parameters: Parameter[] = [];
+}
+
+export class SetParametersResult {
+  static readonly typeName = "rcl_interfaces/msg/SetParametersResult" as const;
+  successful = false;
+  reason = "";
+}
+
+export class SetParametersAtomically_Response {
+  static readonly typeName = "rcl_interfaces/srv/SetParametersAtomically_Response" as const;
+  result = new SetParametersResult();
+}
+
+export class SetParameters_Request {
+  static readonly typeName = "rcl_interfaces/srv/SetParameters_Request" as const;
+  parameters: Parameter[] = [];
+}
+
+export class SetParameters_Response {
+  static readonly typeName = "rcl_interfaces/srv/SetParameters_Response" as const;
+  results: SetParametersResult[] = [];
+}
+
+export class SolidPrimitive {
+  static readonly typeName = "shape_msgs/msg/SolidPrimitive" as const;
+  static readonly BOX = 1;
+  static readonly SPHERE = 2;
+  static readonly CYLINDER = 3;
+  static readonly CONE = 4;
+  static readonly PRISM = 5;
+  static readonly BOX_X = 0;
+  static readonly BOX_Y = 1;
+  static readonly BOX_Z = 2;
+  static readonly SPHERE_RADIUS = 0;
+  static readonly CYLINDER_HEIGHT = 0;
+  static readonly CYLINDER_RADIUS = 1;
+  static readonly CONE_HEIGHT = 0;
+  static readonly CONE_RADIUS = 1;
+  static readonly PRISM_HEIGHT = 0;
+  type = 0;
+  dimensions: number[] = [];
+  polygon = new Polygon();
+}
+
+export class StatisticDataType {
+  static readonly typeName = "statistics_msgs/msg/StatisticDataType" as const;
+  static readonly STATISTICS_DATA_TYPE_UNINITIALIZED = 0;
+  static readonly STATISTICS_DATA_TYPE_AVERAGE = 1;
+  static readonly STATISTICS_DATA_TYPE_MINIMUM = 2;
+  static readonly STATISTICS_DATA_TYPE_MAXIMUM = 3;
+  static readonly STATISTICS_DATA_TYPE_STDDEV = 4;
+  static readonly STATISTICS_DATA_TYPE_SAMPLE_COUNT = 5;
+}
+
 export class String {
   static readonly typeName = "std_msgs/msg/String" as const;
   data = "";
 }
+
+export class TFMessage {
+  static readonly typeName = "tf2_msgs/msg/TFMessage" as const;
+  transforms: TransformStamped[] = [];
+}
+
+export class Temperature {
+  static readonly typeName = "sensor_msgs/msg/Temperature" as const;
+  header = new Header();
+  temperature = 0;
+  variance = 0;
+}
+
+export class TimeReference {
+  static readonly typeName = "sensor_msgs/msg/TimeReference" as const;
+  header = new Header();
+  time_ref = new Time();
+  source = "";
+}
+
+export class TrajectoryPoint {
+  static readonly typeName = "nav_msgs/msg/TrajectoryPoint" as const;
+  header = new Header();
+  pose = new Pose();
+  velocity = new Twist();
+  acceleration = new Accel();
+  effort = new Wrench();
+}
+
+export class Trajectory {
+  static readonly typeName = "nav_msgs/msg/Trajectory" as const;
+  header = new Header();
+  points: TrajectoryPoint[] = [];
+}
+
+export class TransitionEvent {
+  static readonly typeName = "lifecycle_msgs/msg/TransitionEvent" as const;
+  timestamp = 0n;
+  transition = new Transition();
+  start_state = new State();
+  goal_state = new State();
+}
+
+export class Trigger_Request {
+  static readonly typeName = "std_srvs/srv/Trigger_Request" as const;
+}
+
+export class Trigger_Response {
+  static readonly typeName = "std_srvs/srv/Trigger_Response" as const;
+  success = false;
+  message = "";
+}
+
+export class TwistStamped {
+  static readonly typeName = "geometry_msgs/msg/TwistStamped" as const;
+  header = new Header();
+  twist = new Twist();
+}
+
+export class TwistWithCovarianceStamped {
+  static readonly typeName = "geometry_msgs/msg/TwistWithCovarianceStamped" as const;
+  header = new Header();
+  twist = new TwistWithCovariance();
+}
+
+export class UInt16 {
+  static readonly typeName = "std_msgs/msg/UInt16" as const;
+  data = 0;
+}
+
+export class UInt16MultiArray {
+  static readonly typeName = "std_msgs/msg/UInt16MultiArray" as const;
+  layout = new MultiArrayLayout();
+  data: number[] = [];
+}
+
+export class UInt32 {
+  static readonly typeName = "std_msgs/msg/UInt32" as const;
+  data = 0;
+}
+
+export class UInt32MultiArray {
+  static readonly typeName = "std_msgs/msg/UInt32MultiArray" as const;
+  layout = new MultiArrayLayout();
+  data: number[] = [];
+}
+
+export class UInt64 {
+  static readonly typeName = "std_msgs/msg/UInt64" as const;
+  data = 0n;
+}
+
+export class UInt64MultiArray {
+  static readonly typeName = "std_msgs/msg/UInt64MultiArray" as const;
+  layout = new MultiArrayLayout();
+  data: bigint[] = [];
+}
+
+export class UInt8 {
+  static readonly typeName = "std_msgs/msg/UInt8" as const;
+  data = 0;
+}
+
+export class UInt8MultiArray {
+  static readonly typeName = "std_msgs/msg/UInt8MultiArray" as const;
+  layout = new MultiArrayLayout();
+  data = new Uint8Array();
+}
+
+export class UnloadNode_Request {
+  static readonly typeName = "composition_interfaces/srv/UnloadNode_Request" as const;
+  unique_id = 0n;
+}
+
+export class UnloadNode_Response {
+  static readonly typeName = "composition_interfaces/srv/UnloadNode_Response" as const;
+  success = false;
+  error_message = "";
+}
+
+export class Vector3Stamped {
+  static readonly typeName = "geometry_msgs/msg/Vector3Stamped" as const;
+  header = new Header();
+  vector = new Vector3();
+}
+
+export class VelocityStamped {
+  static readonly typeName = "geometry_msgs/msg/VelocityStamped" as const;
+  header = new Header();
+  body_frame_id = "";
+  reference_frame_id = "";
+  velocity = new Twist();
+}
+
+export class VelocityWithCovarianceStamped {
+  static readonly typeName = "geometry_msgs/msg/VelocityWithCovarianceStamped" as const;
+  header = new Header();
+  body_frame_id = "";
+  reference_frame_id = "";
+  velocity = new TwistWithCovariance();
+}
+
+export class WrenchStamped {
+  static readonly typeName = "geometry_msgs/msg/WrenchStamped" as const;
+  header = new Header();
+  wrench = new Wrench();
+}
+
+export const CancelGoal = {
+  typeName: "action_msgs/srv/CancelGoal" as const,
+  Request: CancelGoal_Request,
+  Response: CancelGoal_Response,
+};
+
+export const ListNodes = {
+  typeName: "composition_interfaces/srv/ListNodes" as const,
+  Request: ListNodes_Request,
+  Response: ListNodes_Response,
+};
+
+export const LoadNode = {
+  typeName: "composition_interfaces/srv/LoadNode" as const,
+  Request: LoadNode_Request,
+  Response: LoadNode_Response,
+};
+
+export const UnloadNode = {
+  typeName: "composition_interfaces/srv/UnloadNode" as const,
+  Request: UnloadNode_Request,
+  Response: UnloadNode_Response,
+};
+
+export const AddDiagnostics = {
+  typeName: "diagnostic_msgs/srv/AddDiagnostics" as const,
+  Request: AddDiagnostics_Request,
+  Response: AddDiagnostics_Response,
+};
+
+export const SelfTest = {
+  typeName: "diagnostic_msgs/srv/SelfTest" as const,
+  Request: SelfTest_Request,
+  Response: SelfTest_Response,
+};
+
+export const ChangeState = {
+  typeName: "lifecycle_msgs/srv/ChangeState" as const,
+  Request: ChangeState_Request,
+  Response: ChangeState_Response,
+};
+
+export const GetAvailableStates = {
+  typeName: "lifecycle_msgs/srv/GetAvailableStates" as const,
+  Request: GetAvailableStates_Request,
+  Response: GetAvailableStates_Response,
+};
+
+export const GetAvailableTransitions = {
+  typeName: "lifecycle_msgs/srv/GetAvailableTransitions" as const,
+  Request: GetAvailableTransitions_Request,
+  Response: GetAvailableTransitions_Response,
+};
+
+export const GetState = {
+  typeName: "lifecycle_msgs/srv/GetState" as const,
+  Request: GetState_Request,
+  Response: GetState_Response,
+};
+
+export const GetMap = {
+  typeName: "nav_msgs/srv/GetMap" as const,
+  Request: GetMap_Request,
+  Response: GetMap_Response,
+};
+
+export const GetPlan = {
+  typeName: "nav_msgs/srv/GetPlan" as const,
+  Request: GetPlan_Request,
+  Response: GetPlan_Response,
+};
+
+export const LoadMap = {
+  typeName: "nav_msgs/srv/LoadMap" as const,
+  Request: LoadMap_Request,
+  Response: LoadMap_Response,
+};
+
+export const SetMap = {
+  typeName: "nav_msgs/srv/SetMap" as const,
+  Request: SetMap_Request,
+  Response: SetMap_Response,
+};
+
+export const DescribeParameters = {
+  typeName: "rcl_interfaces/srv/DescribeParameters" as const,
+  Request: DescribeParameters_Request,
+  Response: DescribeParameters_Response,
+};
+
+export const GetLoggerLevels = {
+  typeName: "rcl_interfaces/srv/GetLoggerLevels" as const,
+  Request: GetLoggerLevels_Request,
+  Response: GetLoggerLevels_Response,
+};
+
+export const GetParameterTypes = {
+  typeName: "rcl_interfaces/srv/GetParameterTypes" as const,
+  Request: GetParameterTypes_Request,
+  Response: GetParameterTypes_Response,
+};
+
+export const GetParameters = {
+  typeName: "rcl_interfaces/srv/GetParameters" as const,
+  Request: GetParameters_Request,
+  Response: GetParameters_Response,
+};
+
+export const ListParameters = {
+  typeName: "rcl_interfaces/srv/ListParameters" as const,
+  Request: ListParameters_Request,
+  Response: ListParameters_Response,
+};
+
+export const SetLoggerLevels = {
+  typeName: "rcl_interfaces/srv/SetLoggerLevels" as const,
+  Request: SetLoggerLevels_Request,
+  Response: SetLoggerLevels_Response,
+};
+
+export const SetParameters = {
+  typeName: "rcl_interfaces/srv/SetParameters" as const,
+  Request: SetParameters_Request,
+  Response: SetParameters_Response,
+};
+
+export const SetParametersAtomically = {
+  typeName: "rcl_interfaces/srv/SetParametersAtomically" as const,
+  Request: SetParametersAtomically_Request,
+  Response: SetParametersAtomically_Response,
+};
 
 export const EchoNested = {
   typeName: "rclweb_cdr_interfaces/srv/EchoNested" as const,
@@ -124,8 +2063,90 @@ export const MeasureSequence = {
   Feedback: MeasureSequence_Feedback,
 };
 
+export const SetCameraInfo = {
+  typeName: "sensor_msgs/srv/SetCameraInfo" as const,
+  Request: SetCameraInfo_Request,
+  Response: SetCameraInfo_Response,
+};
+
+export const StdSrvsEmpty = {
+  typeName: "std_srvs/srv/Empty" as const,
+  Request: Empty_Request,
+  Response: Empty_Response,
+};
+
+export const SetBool = {
+  typeName: "std_srvs/srv/SetBool" as const,
+  Request: SetBool_Request,
+  Response: SetBool_Response,
+};
+
+export const Trigger = {
+  typeName: "std_srvs/srv/Trigger" as const,
+  Request: Trigger_Request,
+  Response: Trigger_Response,
+};
+
+export const FrameGraph = {
+  typeName: "tf2_msgs/srv/FrameGraph" as const,
+  Request: FrameGraph_Request,
+  Response: FrameGraph_Response,
+};
+
+export const LookupTransform = {
+  typeName: "tf2_msgs/action/LookupTransform" as const,
+  Goal: LookupTransform_Goal,
+  Result: LookupTransform_Result,
+  Feedback: LookupTransform_Feedback,
+};
+
+export const GetTypeDescription = {
+  typeName: "type_description_interfaces/srv/GetTypeDescription" as const,
+  Request: GetTypeDescription_Request,
+  Response: GetTypeDescription_Response,
+};
+
+export const GetInteractiveMarkers = {
+  typeName: "visualization_msgs/srv/GetInteractiveMarkers" as const,
+  Request: GetInteractiveMarkers_Request,
+  Response: GetInteractiveMarkers_Response,
+};
+
+export const action_msgs = {
+  msg: { GoalInfo, GoalStatus, GoalStatusArray },
+  srv: { CancelGoal },
+};
+
 export const builtin_interfaces = {
-  msg: { Time },
+  msg: { Duration, Time },
+};
+
+export const composition_interfaces = {
+  srv: { ListNodes, LoadNode, UnloadNode },
+};
+
+export const diagnostic_msgs = {
+  msg: { DiagnosticArray, DiagnosticStatus, KeyValue: DiagnosticMsgsKeyValue },
+  srv: { AddDiagnostics, SelfTest },
+};
+
+export const geometry_msgs = {
+  msg: { Accel, AccelStamped, AccelWithCovariance, AccelWithCovarianceStamped, Inertia, InertiaStamped, Point, Point32, PointStamped, Polygon, PolygonInstance, PolygonInstanceStamped, PolygonStamped, Pose, Pose2D, PoseArray, PoseStamped, PoseWithCovariance, PoseWithCovarianceStamped, Quaternion, QuaternionStamped, Transform, TransformStamped, Twist, TwistStamped, TwistWithCovariance, TwistWithCovarianceStamped, Vector3, Vector3Stamped, VelocityStamped, VelocityWithCovarianceStamped, Wrench, WrenchStamped },
+};
+
+export const lifecycle_msgs = {
+  msg: { State, Transition, TransitionDescription, TransitionEvent },
+  srv: { ChangeState, GetAvailableStates, GetAvailableTransitions, GetState },
+};
+
+export const nav_msgs = {
+  msg: { Goals, GridCells, MapMetaData, OccupancyGrid, Odometry, Path, Trajectory, TrajectoryPoint },
+  srv: { GetMap, GetPlan, LoadMap, SetMap },
+};
+
+export const rcl_interfaces = {
+  msg: { FloatingPointRange, IntegerRange, ListParametersResult, Log, LoggerLevel, Parameter, ParameterDescriptor, ParameterEvent, ParameterEventDescriptors, ParameterType, ParameterValue, SetLoggerLevelsResult, SetParametersResult },
+  srv: { DescribeParameters, GetLoggerLevels, GetParameterTypes, GetParameters, ListParameters, SetLoggerLevels, SetParameters, SetParametersAtomically },
 };
 
 export const rclweb_cdr_interfaces = {
@@ -134,10 +2155,994 @@ export const rclweb_cdr_interfaces = {
   action: { MeasureSequence },
 };
 
+export const rosgraph_msgs = {
+  msg: { Action, Clock, Graph, InterfaceType, Node, QoSProfile, Service, Topic, TypeHash },
+};
+
 export const sensor_msgs = {
-  msg: { PointCloud2, PointField },
+  msg: { BatteryState, CameraInfo, ChannelFloat32, CompressedImage, FluidPressure, Illuminance, Image, Imu, JointState, Joy, JoyFeedback, JoyFeedbackArray, LaserEcho, LaserScan, MagneticField, MultiDOFJointState, MultiEchoLaserScan, NavSatFix, NavSatStatus, PointCloud, PointCloud2, PointField, Range, RegionOfInterest, RelativeHumidity, Temperature, TimeReference },
+  srv: { SetCameraInfo },
+};
+
+export const shape_msgs = {
+  msg: { Mesh, MeshTriangle, Plane, SolidPrimitive },
+};
+
+export const statistics_msgs = {
+  msg: { MetricsMessage, StatisticDataPoint, StatisticDataType },
 };
 
 export const std_msgs = {
-  msg: { Header, String },
+  msg: { Bool, Byte, ByteMultiArray, Char, ColorRGBA, Empty, Float32, Float32MultiArray, Float64, Float64MultiArray, Header, Int16, Int16MultiArray, Int32, Int32MultiArray, Int64, Int64MultiArray, Int8, Int8MultiArray, MultiArrayDimension, MultiArrayLayout, String, UInt16, UInt16MultiArray, UInt32, UInt32MultiArray, UInt64, UInt64MultiArray, UInt8, UInt8MultiArray },
 };
+
+export const std_srvs = {
+  srv: { Empty: StdSrvsEmpty, SetBool, Trigger },
+};
+
+export const stereo_msgs = {
+  msg: { DisparityImage },
+};
+
+export const tf2_msgs = {
+  msg: { TF2Error, TFMessage },
+  srv: { FrameGraph },
+  action: { LookupTransform },
+};
+
+export const trajectory_msgs = {
+  msg: { JointTrajectory, JointTrajectoryPoint, MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint },
+};
+
+export const type_description_interfaces = {
+  msg: { Field, FieldType, IndividualTypeDescription, KeyValue: TypeDescriptionInterfacesKeyValue, TypeDescription, TypeSource },
+  srv: { GetTypeDescription },
+};
+
+export const unique_identifier_msgs = {
+  msg: { UUID },
+};
+
+export const visualization_msgs = {
+  msg: { ImageMarker, InteractiveMarker, InteractiveMarkerControl, InteractiveMarkerFeedback, InteractiveMarkerInit, InteractiveMarkerPose, InteractiveMarkerUpdate, Marker, MarkerArray, MenuEntry, MeshFile, UVCoordinate },
+  srv: { GetInteractiveMarkers },
+};
+
+export type GeneratedLayoutArray =
+  | { kind: "none" }
+  | { kind: "unbounded" }
+  | { kind: "fixed"; size: number }
+  | { kind: "bounded"; size: number };
+
+export type GeneratedLayoutField =
+  | { name: string; kind: "prim"; prim: string; array: GeneratedLayoutArray }
+  | { name: string; kind: "str"; wide: boolean; bound?: number; array: GeneratedLayoutArray }
+  | { name: string; kind: "named"; typeName: string; array: GeneratedLayoutArray };
+
+export const GENERATED_LAYOUTS: { readonly [typeName: string]: readonly GeneratedLayoutField[] } = {
+  "action_msgs/msg/GoalInfo": [{"name":"goal_id","kind":"named","typeName":"unique_identifier_msgs/msg/UUID","array":{"kind":"none"}},{"name":"stamp","kind":"named","typeName":"builtin_interfaces/msg/Time","array":{"kind":"none"}}],
+  "action_msgs/msg/GoalStatus": [{"name":"goal_info","kind":"named","typeName":"action_msgs/msg/GoalInfo","array":{"kind":"none"}},{"name":"status","kind":"prim","prim":"int8","array":{"kind":"none"}}],
+  "action_msgs/msg/GoalStatusArray": [{"name":"status_list","kind":"named","typeName":"action_msgs/msg/GoalStatus","array":{"kind":"unbounded"}}],
+  "action_msgs/srv/CancelGoal_Request": [{"name":"goal_info","kind":"named","typeName":"action_msgs/msg/GoalInfo","array":{"kind":"none"}}],
+  "action_msgs/srv/CancelGoal_Response": [{"name":"return_code","kind":"prim","prim":"int8","array":{"kind":"none"}},{"name":"goals_canceling","kind":"named","typeName":"action_msgs/msg/GoalInfo","array":{"kind":"unbounded"}}],
+  "builtin_interfaces/msg/Duration": [{"name":"sec","kind":"prim","prim":"int32","array":{"kind":"none"}},{"name":"nanosec","kind":"prim","prim":"uint32","array":{"kind":"none"}}],
+  "builtin_interfaces/msg/Time": [{"name":"sec","kind":"prim","prim":"int32","array":{"kind":"none"}},{"name":"nanosec","kind":"prim","prim":"uint32","array":{"kind":"none"}}],
+  "composition_interfaces/srv/ListNodes_Request": [],
+  "composition_interfaces/srv/ListNodes_Response": [{"name":"full_node_names","kind":"str","wide":false,"array":{"kind":"unbounded"}},{"name":"unique_ids","kind":"prim","prim":"uint64","array":{"kind":"unbounded"}}],
+  "composition_interfaces/srv/LoadNode_Request": [{"name":"package_name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"plugin_name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"node_name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"node_namespace","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"log_level","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"remap_rules","kind":"str","wide":false,"array":{"kind":"unbounded"}},{"name":"parameters","kind":"named","typeName":"rcl_interfaces/msg/Parameter","array":{"kind":"unbounded"}},{"name":"extra_arguments","kind":"named","typeName":"rcl_interfaces/msg/Parameter","array":{"kind":"unbounded"}}],
+  "composition_interfaces/srv/LoadNode_Response": [{"name":"success","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"error_message","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"full_node_name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"unique_id","kind":"prim","prim":"uint64","array":{"kind":"none"}}],
+  "composition_interfaces/srv/UnloadNode_Request": [{"name":"unique_id","kind":"prim","prim":"uint64","array":{"kind":"none"}}],
+  "composition_interfaces/srv/UnloadNode_Response": [{"name":"success","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"error_message","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "diagnostic_msgs/msg/DiagnosticArray": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"status","kind":"named","typeName":"diagnostic_msgs/msg/DiagnosticStatus","array":{"kind":"unbounded"}}],
+  "diagnostic_msgs/msg/DiagnosticStatus": [{"name":"level","kind":"prim","prim":"byte","array":{"kind":"none"}},{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"message","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"hardware_id","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"values","kind":"named","typeName":"diagnostic_msgs/msg/KeyValue","array":{"kind":"unbounded"}}],
+  "diagnostic_msgs/msg/KeyValue": [{"name":"key","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"value","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "diagnostic_msgs/srv/AddDiagnostics_Request": [{"name":"load_namespace","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "diagnostic_msgs/srv/AddDiagnostics_Response": [{"name":"success","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"message","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "diagnostic_msgs/srv/SelfTest_Request": [],
+  "diagnostic_msgs/srv/SelfTest_Response": [{"name":"id","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"passed","kind":"prim","prim":"byte","array":{"kind":"none"}},{"name":"status","kind":"named","typeName":"diagnostic_msgs/msg/DiagnosticStatus","array":{"kind":"unbounded"}}],
+  "geometry_msgs/msg/Accel": [{"name":"linear","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}},{"name":"angular","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}}],
+  "geometry_msgs/msg/AccelStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"accel","kind":"named","typeName":"geometry_msgs/msg/Accel","array":{"kind":"none"}}],
+  "geometry_msgs/msg/AccelWithCovariance": [{"name":"accel","kind":"named","typeName":"geometry_msgs/msg/Accel","array":{"kind":"none"}},{"name":"covariance","kind":"prim","prim":"float64","array":{"kind":"fixed","size":36}}],
+  "geometry_msgs/msg/AccelWithCovarianceStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"accel","kind":"named","typeName":"geometry_msgs/msg/AccelWithCovariance","array":{"kind":"none"}}],
+  "geometry_msgs/msg/Inertia": [{"name":"m","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"com","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}},{"name":"ixx","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"ixy","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"ixz","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"iyy","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"iyz","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"izz","kind":"prim","prim":"float64","array":{"kind":"none"}}],
+  "geometry_msgs/msg/InertiaStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"inertia","kind":"named","typeName":"geometry_msgs/msg/Inertia","array":{"kind":"none"}}],
+  "geometry_msgs/msg/Point": [{"name":"x","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"y","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"z","kind":"prim","prim":"float64","array":{"kind":"none"}}],
+  "geometry_msgs/msg/Point32": [{"name":"x","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"y","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"z","kind":"prim","prim":"float32","array":{"kind":"none"}}],
+  "geometry_msgs/msg/PointStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"point","kind":"named","typeName":"geometry_msgs/msg/Point","array":{"kind":"none"}}],
+  "geometry_msgs/msg/Polygon": [{"name":"points","kind":"named","typeName":"geometry_msgs/msg/Point32","array":{"kind":"unbounded"}}],
+  "geometry_msgs/msg/PolygonInstance": [{"name":"polygon","kind":"named","typeName":"geometry_msgs/msg/Polygon","array":{"kind":"none"}},{"name":"id","kind":"prim","prim":"int64","array":{"kind":"none"}}],
+  "geometry_msgs/msg/PolygonInstanceStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"polygon","kind":"named","typeName":"geometry_msgs/msg/PolygonInstance","array":{"kind":"none"}}],
+  "geometry_msgs/msg/PolygonStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"polygon","kind":"named","typeName":"geometry_msgs/msg/Polygon","array":{"kind":"none"}}],
+  "geometry_msgs/msg/Pose": [{"name":"position","kind":"named","typeName":"geometry_msgs/msg/Point","array":{"kind":"none"}},{"name":"orientation","kind":"named","typeName":"geometry_msgs/msg/Quaternion","array":{"kind":"none"}}],
+  "geometry_msgs/msg/Pose2D": [{"name":"x","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"y","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"theta","kind":"prim","prim":"float64","array":{"kind":"none"}}],
+  "geometry_msgs/msg/PoseArray": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"poses","kind":"named","typeName":"geometry_msgs/msg/Pose","array":{"kind":"unbounded"}}],
+  "geometry_msgs/msg/PoseStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"pose","kind":"named","typeName":"geometry_msgs/msg/Pose","array":{"kind":"none"}}],
+  "geometry_msgs/msg/PoseWithCovariance": [{"name":"pose","kind":"named","typeName":"geometry_msgs/msg/Pose","array":{"kind":"none"}},{"name":"covariance","kind":"prim","prim":"float64","array":{"kind":"fixed","size":36}}],
+  "geometry_msgs/msg/PoseWithCovarianceStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"pose","kind":"named","typeName":"geometry_msgs/msg/PoseWithCovariance","array":{"kind":"none"}}],
+  "geometry_msgs/msg/Quaternion": [{"name":"x","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"y","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"z","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"w","kind":"prim","prim":"float64","array":{"kind":"none"}}],
+  "geometry_msgs/msg/QuaternionStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"quaternion","kind":"named","typeName":"geometry_msgs/msg/Quaternion","array":{"kind":"none"}}],
+  "geometry_msgs/msg/Transform": [{"name":"translation","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}},{"name":"rotation","kind":"named","typeName":"geometry_msgs/msg/Quaternion","array":{"kind":"none"}}],
+  "geometry_msgs/msg/TransformStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"child_frame_id","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"transform","kind":"named","typeName":"geometry_msgs/msg/Transform","array":{"kind":"none"}}],
+  "geometry_msgs/msg/Twist": [{"name":"linear","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}},{"name":"angular","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}}],
+  "geometry_msgs/msg/TwistStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"twist","kind":"named","typeName":"geometry_msgs/msg/Twist","array":{"kind":"none"}}],
+  "geometry_msgs/msg/TwistWithCovariance": [{"name":"twist","kind":"named","typeName":"geometry_msgs/msg/Twist","array":{"kind":"none"}},{"name":"covariance","kind":"prim","prim":"float64","array":{"kind":"fixed","size":36}}],
+  "geometry_msgs/msg/TwistWithCovarianceStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"twist","kind":"named","typeName":"geometry_msgs/msg/TwistWithCovariance","array":{"kind":"none"}}],
+  "geometry_msgs/msg/Vector3": [{"name":"x","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"y","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"z","kind":"prim","prim":"float64","array":{"kind":"none"}}],
+  "geometry_msgs/msg/Vector3Stamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"vector","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}}],
+  "geometry_msgs/msg/VelocityStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"body_frame_id","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"reference_frame_id","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"velocity","kind":"named","typeName":"geometry_msgs/msg/Twist","array":{"kind":"none"}}],
+  "geometry_msgs/msg/VelocityWithCovarianceStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"body_frame_id","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"reference_frame_id","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"velocity","kind":"named","typeName":"geometry_msgs/msg/TwistWithCovariance","array":{"kind":"none"}}],
+  "geometry_msgs/msg/Wrench": [{"name":"force","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}},{"name":"torque","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}}],
+  "geometry_msgs/msg/WrenchStamped": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"wrench","kind":"named","typeName":"geometry_msgs/msg/Wrench","array":{"kind":"none"}}],
+  "lifecycle_msgs/msg/State": [{"name":"id","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"label","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "lifecycle_msgs/msg/Transition": [{"name":"id","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"label","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "lifecycle_msgs/msg/TransitionDescription": [{"name":"transition","kind":"named","typeName":"lifecycle_msgs/msg/Transition","array":{"kind":"none"}},{"name":"start_state","kind":"named","typeName":"lifecycle_msgs/msg/State","array":{"kind":"none"}},{"name":"goal_state","kind":"named","typeName":"lifecycle_msgs/msg/State","array":{"kind":"none"}}],
+  "lifecycle_msgs/msg/TransitionEvent": [{"name":"timestamp","kind":"prim","prim":"uint64","array":{"kind":"none"}},{"name":"transition","kind":"named","typeName":"lifecycle_msgs/msg/Transition","array":{"kind":"none"}},{"name":"start_state","kind":"named","typeName":"lifecycle_msgs/msg/State","array":{"kind":"none"}},{"name":"goal_state","kind":"named","typeName":"lifecycle_msgs/msg/State","array":{"kind":"none"}}],
+  "lifecycle_msgs/srv/ChangeState_Request": [{"name":"transition","kind":"named","typeName":"lifecycle_msgs/msg/Transition","array":{"kind":"none"}}],
+  "lifecycle_msgs/srv/ChangeState_Response": [{"name":"success","kind":"prim","prim":"bool","array":{"kind":"none"}}],
+  "lifecycle_msgs/srv/GetAvailableStates_Request": [],
+  "lifecycle_msgs/srv/GetAvailableStates_Response": [{"name":"available_states","kind":"named","typeName":"lifecycle_msgs/msg/State","array":{"kind":"unbounded"}}],
+  "lifecycle_msgs/srv/GetAvailableTransitions_Request": [],
+  "lifecycle_msgs/srv/GetAvailableTransitions_Response": [{"name":"available_transitions","kind":"named","typeName":"lifecycle_msgs/msg/TransitionDescription","array":{"kind":"unbounded"}}],
+  "lifecycle_msgs/srv/GetState_Request": [],
+  "lifecycle_msgs/srv/GetState_Response": [{"name":"current_state","kind":"named","typeName":"lifecycle_msgs/msg/State","array":{"kind":"none"}}],
+  "nav_msgs/msg/Goals": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"goals","kind":"named","typeName":"geometry_msgs/msg/PoseStamped","array":{"kind":"unbounded"}}],
+  "nav_msgs/msg/GridCells": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"cell_width","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"cell_height","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"cells","kind":"named","typeName":"geometry_msgs/msg/Point","array":{"kind":"unbounded"}}],
+  "nav_msgs/msg/MapMetaData": [{"name":"map_load_time","kind":"named","typeName":"builtin_interfaces/msg/Time","array":{"kind":"none"}},{"name":"resolution","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"width","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"height","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"origin","kind":"named","typeName":"geometry_msgs/msg/Pose","array":{"kind":"none"}}],
+  "nav_msgs/msg/OccupancyGrid": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"info","kind":"named","typeName":"nav_msgs/msg/MapMetaData","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"int8","array":{"kind":"unbounded"}}],
+  "nav_msgs/msg/Odometry": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"child_frame_id","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"pose","kind":"named","typeName":"geometry_msgs/msg/PoseWithCovariance","array":{"kind":"none"}},{"name":"twist","kind":"named","typeName":"geometry_msgs/msg/TwistWithCovariance","array":{"kind":"none"}}],
+  "nav_msgs/msg/Path": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"poses","kind":"named","typeName":"geometry_msgs/msg/PoseStamped","array":{"kind":"unbounded"}}],
+  "nav_msgs/msg/Trajectory": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"points","kind":"named","typeName":"nav_msgs/msg/TrajectoryPoint","array":{"kind":"unbounded"}}],
+  "nav_msgs/msg/TrajectoryPoint": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"pose","kind":"named","typeName":"geometry_msgs/msg/Pose","array":{"kind":"none"}},{"name":"velocity","kind":"named","typeName":"geometry_msgs/msg/Twist","array":{"kind":"none"}},{"name":"acceleration","kind":"named","typeName":"geometry_msgs/msg/Accel","array":{"kind":"none"}},{"name":"effort","kind":"named","typeName":"geometry_msgs/msg/Wrench","array":{"kind":"none"}}],
+  "nav_msgs/srv/GetMap_Request": [],
+  "nav_msgs/srv/GetMap_Response": [{"name":"map","kind":"named","typeName":"nav_msgs/msg/OccupancyGrid","array":{"kind":"none"}}],
+  "nav_msgs/srv/GetPlan_Request": [{"name":"start","kind":"named","typeName":"geometry_msgs/msg/PoseStamped","array":{"kind":"none"}},{"name":"goal","kind":"named","typeName":"geometry_msgs/msg/PoseStamped","array":{"kind":"none"}},{"name":"tolerance","kind":"prim","prim":"float32","array":{"kind":"none"}}],
+  "nav_msgs/srv/GetPlan_Response": [{"name":"plan","kind":"named","typeName":"nav_msgs/msg/Path","array":{"kind":"none"}}],
+  "nav_msgs/srv/LoadMap_Request": [{"name":"map_url","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "nav_msgs/srv/LoadMap_Response": [{"name":"map","kind":"named","typeName":"nav_msgs/msg/OccupancyGrid","array":{"kind":"none"}},{"name":"result","kind":"prim","prim":"uint8","array":{"kind":"none"}}],
+  "nav_msgs/srv/SetMap_Request": [{"name":"map","kind":"named","typeName":"nav_msgs/msg/OccupancyGrid","array":{"kind":"none"}},{"name":"initial_pose","kind":"named","typeName":"geometry_msgs/msg/PoseWithCovarianceStamped","array":{"kind":"none"}}],
+  "nav_msgs/srv/SetMap_Response": [{"name":"success","kind":"prim","prim":"bool","array":{"kind":"none"}}],
+  "rcl_interfaces/msg/FloatingPointRange": [{"name":"from_value","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"to_value","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"step","kind":"prim","prim":"float64","array":{"kind":"none"}}],
+  "rcl_interfaces/msg/IntegerRange": [{"name":"from_value","kind":"prim","prim":"int64","array":{"kind":"none"}},{"name":"to_value","kind":"prim","prim":"int64","array":{"kind":"none"}},{"name":"step","kind":"prim","prim":"uint64","array":{"kind":"none"}}],
+  "rcl_interfaces/msg/ListParametersResult": [{"name":"names","kind":"str","wide":false,"array":{"kind":"unbounded"}},{"name":"prefixes","kind":"str","wide":false,"array":{"kind":"unbounded"}}],
+  "rcl_interfaces/msg/Log": [{"name":"stamp","kind":"named","typeName":"builtin_interfaces/msg/Time","array":{"kind":"none"}},{"name":"level","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"msg","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"file","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"function","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"line","kind":"prim","prim":"uint32","array":{"kind":"none"}}],
+  "rcl_interfaces/msg/LoggerLevel": [{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"level","kind":"prim","prim":"uint32","array":{"kind":"none"}}],
+  "rcl_interfaces/msg/Parameter": [{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"value","kind":"named","typeName":"rcl_interfaces/msg/ParameterValue","array":{"kind":"none"}}],
+  "rcl_interfaces/msg/ParameterDescriptor": [{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"type","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"description","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"additional_constraints","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"read_only","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"dynamic_typing","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"floating_point_range","kind":"named","typeName":"rcl_interfaces/msg/FloatingPointRange","array":{"kind":"bounded","size":1}},{"name":"integer_range","kind":"named","typeName":"rcl_interfaces/msg/IntegerRange","array":{"kind":"bounded","size":1}}],
+  "rcl_interfaces/msg/ParameterEvent": [{"name":"stamp","kind":"named","typeName":"builtin_interfaces/msg/Time","array":{"kind":"none"}},{"name":"node","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"new_parameters","kind":"named","typeName":"rcl_interfaces/msg/Parameter","array":{"kind":"unbounded"}},{"name":"changed_parameters","kind":"named","typeName":"rcl_interfaces/msg/Parameter","array":{"kind":"unbounded"}},{"name":"deleted_parameters","kind":"named","typeName":"rcl_interfaces/msg/Parameter","array":{"kind":"unbounded"}}],
+  "rcl_interfaces/msg/ParameterEventDescriptors": [{"name":"new_parameters","kind":"named","typeName":"rcl_interfaces/msg/ParameterDescriptor","array":{"kind":"unbounded"}},{"name":"changed_parameters","kind":"named","typeName":"rcl_interfaces/msg/ParameterDescriptor","array":{"kind":"unbounded"}},{"name":"deleted_parameters","kind":"named","typeName":"rcl_interfaces/msg/ParameterDescriptor","array":{"kind":"unbounded"}}],
+  "rcl_interfaces/msg/ParameterType": [],
+  "rcl_interfaces/msg/ParameterValue": [{"name":"type","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"bool_value","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"integer_value","kind":"prim","prim":"int64","array":{"kind":"none"}},{"name":"double_value","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"string_value","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"byte_array_value","kind":"prim","prim":"byte","array":{"kind":"unbounded"}},{"name":"bool_array_value","kind":"prim","prim":"bool","array":{"kind":"unbounded"}},{"name":"integer_array_value","kind":"prim","prim":"int64","array":{"kind":"unbounded"}},{"name":"double_array_value","kind":"prim","prim":"float64","array":{"kind":"unbounded"}},{"name":"string_array_value","kind":"str","wide":false,"array":{"kind":"unbounded"}}],
+  "rcl_interfaces/msg/SetLoggerLevelsResult": [{"name":"successful","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"reason","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "rcl_interfaces/msg/SetParametersResult": [{"name":"successful","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"reason","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "rcl_interfaces/srv/DescribeParameters_Request": [{"name":"names","kind":"str","wide":false,"array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/DescribeParameters_Response": [{"name":"descriptors","kind":"named","typeName":"rcl_interfaces/msg/ParameterDescriptor","array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/GetLoggerLevels_Request": [{"name":"names","kind":"str","wide":false,"array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/GetLoggerLevels_Response": [{"name":"levels","kind":"named","typeName":"rcl_interfaces/msg/LoggerLevel","array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/GetParameterTypes_Request": [{"name":"names","kind":"str","wide":false,"array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/GetParameterTypes_Response": [{"name":"types","kind":"prim","prim":"uint8","array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/GetParameters_Request": [{"name":"names","kind":"str","wide":false,"array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/GetParameters_Response": [{"name":"values","kind":"named","typeName":"rcl_interfaces/msg/ParameterValue","array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/ListParameters_Request": [{"name":"prefixes","kind":"str","wide":false,"array":{"kind":"unbounded"}},{"name":"depth","kind":"prim","prim":"uint64","array":{"kind":"none"}}],
+  "rcl_interfaces/srv/ListParameters_Response": [{"name":"result","kind":"named","typeName":"rcl_interfaces/msg/ListParametersResult","array":{"kind":"none"}}],
+  "rcl_interfaces/srv/SetLoggerLevels_Request": [{"name":"levels","kind":"named","typeName":"rcl_interfaces/msg/LoggerLevel","array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/SetLoggerLevels_Response": [{"name":"results","kind":"named","typeName":"rcl_interfaces/msg/SetLoggerLevelsResult","array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/SetParameters_Request": [{"name":"parameters","kind":"named","typeName":"rcl_interfaces/msg/Parameter","array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/SetParameters_Response": [{"name":"results","kind":"named","typeName":"rcl_interfaces/msg/SetParametersResult","array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/SetParametersAtomically_Request": [{"name":"parameters","kind":"named","typeName":"rcl_interfaces/msg/Parameter","array":{"kind":"unbounded"}}],
+  "rcl_interfaces/srv/SetParametersAtomically_Response": [{"name":"result","kind":"named","typeName":"rcl_interfaces/msg/SetParametersResult","array":{"kind":"none"}}],
+  "rclweb_cdr_interfaces/msg/Collections": [{"name":"fixed_i32","kind":"prim","prim":"int32","array":{"kind":"fixed","size":3}},{"name":"bounded_f64","kind":"prim","prim":"float64","array":{"kind":"bounded","size":4}},{"name":"bytes_value","kind":"prim","prim":"uint8","array":{"kind":"unbounded"}},{"name":"bounded_string","kind":"str","wide":false,"bound":16,"array":{"kind":"none"}},{"name":"bounded_wstring","kind":"str","wide":true,"bound":16,"array":{"kind":"none"}}],
+  "rclweb_cdr_interfaces/msg/NestedSample": [{"name":"stamp","kind":"named","typeName":"builtin_interfaces/msg/Time","array":{"kind":"none"}},{"name":"scalars","kind":"named","typeName":"rclweb_cdr_interfaces/msg/PrimitiveScalars","array":{"kind":"none"}},{"name":"collections","kind":"named","typeName":"rclweb_cdr_interfaces/msg/Collections","array":{"kind":"none"}}],
+  "rclweb_cdr_interfaces/msg/PrimitiveScalars": [{"name":"bool_value","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"byte_value","kind":"prim","prim":"byte","array":{"kind":"none"}},{"name":"char_value","kind":"prim","prim":"char","array":{"kind":"none"}},{"name":"float32_value","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"float64_value","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"int8_value","kind":"prim","prim":"int8","array":{"kind":"none"}},{"name":"uint8_value","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"int16_value","kind":"prim","prim":"int16","array":{"kind":"none"}},{"name":"uint16_value","kind":"prim","prim":"uint16","array":{"kind":"none"}},{"name":"int32_value","kind":"prim","prim":"int32","array":{"kind":"none"}},{"name":"uint32_value","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"int64_value","kind":"prim","prim":"int64","array":{"kind":"none"}},{"name":"uint64_value","kind":"prim","prim":"uint64","array":{"kind":"none"}},{"name":"string_value","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"wstring_value","kind":"str","wide":true,"array":{"kind":"none"}}],
+  "rclweb_cdr_interfaces/srv/EchoNested_Request": [{"name":"input","kind":"named","typeName":"rclweb_cdr_interfaces/msg/NestedSample","array":{"kind":"none"}}],
+  "rclweb_cdr_interfaces/srv/EchoNested_Response": [{"name":"output","kind":"named","typeName":"rclweb_cdr_interfaces/msg/NestedSample","array":{"kind":"none"}},{"name":"accepted","kind":"prim","prim":"bool","array":{"kind":"none"}}],
+  "rclweb_cdr_interfaces/action/MeasureSequence_Goal": [{"name":"target","kind":"named","typeName":"rclweb_cdr_interfaces/msg/Collections","array":{"kind":"none"}}],
+  "rclweb_cdr_interfaces/action/MeasureSequence_Result": [{"name":"result","kind":"named","typeName":"rclweb_cdr_interfaces/msg/NestedSample","array":{"kind":"none"}}],
+  "rclweb_cdr_interfaces/action/MeasureSequence_Feedback": [{"name":"progress","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"sample","kind":"named","typeName":"rclweb_cdr_interfaces/msg/NestedSample","array":{"kind":"none"}}],
+  "rosgraph_msgs/msg/Action": [{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"send_goal","kind":"named","typeName":"rosgraph_msgs/msg/Service","array":{"kind":"none"}},{"name":"get_result","kind":"named","typeName":"rosgraph_msgs/msg/Service","array":{"kind":"none"}},{"name":"cancel_goal","kind":"named","typeName":"rosgraph_msgs/msg/Service","array":{"kind":"none"}},{"name":"feedback","kind":"named","typeName":"rosgraph_msgs/msg/Topic","array":{"kind":"none"}},{"name":"status","kind":"named","typeName":"rosgraph_msgs/msg/Topic","array":{"kind":"none"}}],
+  "rosgraph_msgs/msg/Clock": [{"name":"clock","kind":"named","typeName":"builtin_interfaces/msg/Time","array":{"kind":"none"}}],
+  "rosgraph_msgs/msg/Graph": [{"name":"nodes","kind":"named","typeName":"rosgraph_msgs/msg/Node","array":{"kind":"unbounded"}}],
+  "rosgraph_msgs/msg/InterfaceType": [{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"hash","kind":"named","typeName":"rosgraph_msgs/msg/TypeHash","array":{"kind":"none"}}],
+  "rosgraph_msgs/msg/Node": [{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"parameters","kind":"named","typeName":"rcl_interfaces/msg/ParameterDescriptor","array":{"kind":"unbounded"}},{"name":"parameter_values","kind":"named","typeName":"rcl_interfaces/msg/ParameterValue","array":{"kind":"unbounded"}},{"name":"publishers","kind":"named","typeName":"rosgraph_msgs/msg/Topic","array":{"kind":"unbounded"}},{"name":"subscriptions","kind":"named","typeName":"rosgraph_msgs/msg/Topic","array":{"kind":"unbounded"}},{"name":"service_clients","kind":"named","typeName":"rosgraph_msgs/msg/Service","array":{"kind":"unbounded"}},{"name":"service_servers","kind":"named","typeName":"rosgraph_msgs/msg/Service","array":{"kind":"unbounded"}},{"name":"action_clients","kind":"named","typeName":"rosgraph_msgs/msg/Action","array":{"kind":"unbounded"}},{"name":"action_servers","kind":"named","typeName":"rosgraph_msgs/msg/Action","array":{"kind":"unbounded"}}],
+  "rosgraph_msgs/msg/QoSProfile": [{"name":"depth","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"deadline","kind":"named","typeName":"builtin_interfaces/msg/Duration","array":{"kind":"none"}},{"name":"lifespan","kind":"named","typeName":"builtin_interfaces/msg/Duration","array":{"kind":"none"}},{"name":"history","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"reliability","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"durability","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"liveliness","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"liveliness_lease_duration","kind":"named","typeName":"builtin_interfaces/msg/Duration","array":{"kind":"none"}}],
+  "rosgraph_msgs/msg/Service": [{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"request_type","kind":"named","typeName":"rosgraph_msgs/msg/InterfaceType","array":{"kind":"none"}},{"name":"request_qos","kind":"named","typeName":"rosgraph_msgs/msg/QoSProfile","array":{"kind":"none"}},{"name":"response_type","kind":"named","typeName":"rosgraph_msgs/msg/InterfaceType","array":{"kind":"none"}},{"name":"response_qos","kind":"named","typeName":"rosgraph_msgs/msg/QoSProfile","array":{"kind":"none"}}],
+  "rosgraph_msgs/msg/Topic": [{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"type","kind":"named","typeName":"rosgraph_msgs/msg/InterfaceType","array":{"kind":"none"}},{"name":"qos","kind":"named","typeName":"rosgraph_msgs/msg/QoSProfile","array":{"kind":"none"}}],
+  "rosgraph_msgs/msg/TypeHash": [{"name":"version","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"value","kind":"prim","prim":"uint8","array":{"kind":"fixed","size":32}}],
+  "sensor_msgs/msg/BatteryState": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"voltage","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"temperature","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"current","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"charge","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"capacity","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"design_capacity","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"percentage","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"power_supply_status","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"power_supply_health","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"power_supply_technology","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"present","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"cell_voltage","kind":"prim","prim":"float32","array":{"kind":"unbounded"}},{"name":"cell_temperature","kind":"prim","prim":"float32","array":{"kind":"unbounded"}},{"name":"location","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"serial_number","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "sensor_msgs/msg/CameraInfo": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"height","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"width","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"distortion_model","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"d","kind":"prim","prim":"float64","array":{"kind":"unbounded"}},{"name":"k","kind":"prim","prim":"float64","array":{"kind":"fixed","size":9}},{"name":"r","kind":"prim","prim":"float64","array":{"kind":"fixed","size":9}},{"name":"p","kind":"prim","prim":"float64","array":{"kind":"fixed","size":12}},{"name":"binning_x","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"binning_y","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"roi","kind":"named","typeName":"sensor_msgs/msg/RegionOfInterest","array":{"kind":"none"}}],
+  "sensor_msgs/msg/ChannelFloat32": [{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"values","kind":"prim","prim":"float32","array":{"kind":"unbounded"}}],
+  "sensor_msgs/msg/CompressedImage": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"format","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"uint8","array":{"kind":"unbounded"}}],
+  "sensor_msgs/msg/FluidPressure": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"fluid_pressure","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"variance","kind":"prim","prim":"float64","array":{"kind":"none"}}],
+  "sensor_msgs/msg/Illuminance": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"illuminance","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"variance","kind":"prim","prim":"float64","array":{"kind":"none"}}],
+  "sensor_msgs/msg/Image": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"height","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"width","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"encoding","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"is_bigendian","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"step","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"uint8","array":{"kind":"unbounded"}}],
+  "sensor_msgs/msg/Imu": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"orientation","kind":"named","typeName":"geometry_msgs/msg/Quaternion","array":{"kind":"none"}},{"name":"orientation_covariance","kind":"prim","prim":"float64","array":{"kind":"fixed","size":9}},{"name":"angular_velocity","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}},{"name":"angular_velocity_covariance","kind":"prim","prim":"float64","array":{"kind":"fixed","size":9}},{"name":"linear_acceleration","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}},{"name":"linear_acceleration_covariance","kind":"prim","prim":"float64","array":{"kind":"fixed","size":9}}],
+  "sensor_msgs/msg/JointState": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"name","kind":"str","wide":false,"array":{"kind":"unbounded"}},{"name":"position","kind":"prim","prim":"float64","array":{"kind":"unbounded"}},{"name":"velocity","kind":"prim","prim":"float64","array":{"kind":"unbounded"}},{"name":"effort","kind":"prim","prim":"float64","array":{"kind":"unbounded"}}],
+  "sensor_msgs/msg/Joy": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"axes","kind":"prim","prim":"float32","array":{"kind":"unbounded"}},{"name":"buttons","kind":"prim","prim":"int32","array":{"kind":"unbounded"}}],
+  "sensor_msgs/msg/JoyFeedback": [{"name":"type","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"id","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"intensity","kind":"prim","prim":"float32","array":{"kind":"none"}}],
+  "sensor_msgs/msg/JoyFeedbackArray": [{"name":"array","kind":"named","typeName":"sensor_msgs/msg/JoyFeedback","array":{"kind":"unbounded"}}],
+  "sensor_msgs/msg/LaserEcho": [{"name":"echoes","kind":"prim","prim":"float32","array":{"kind":"unbounded"}}],
+  "sensor_msgs/msg/LaserScan": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"angle_min","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"angle_max","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"angle_increment","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"time_increment","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"scan_time","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"range_min","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"range_max","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"ranges","kind":"prim","prim":"float32","array":{"kind":"unbounded"}},{"name":"intensities","kind":"prim","prim":"float32","array":{"kind":"unbounded"}}],
+  "sensor_msgs/msg/MagneticField": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"magnetic_field","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}},{"name":"magnetic_field_covariance","kind":"prim","prim":"float64","array":{"kind":"fixed","size":9}}],
+  "sensor_msgs/msg/MultiDOFJointState": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"joint_names","kind":"str","wide":false,"array":{"kind":"unbounded"}},{"name":"transforms","kind":"named","typeName":"geometry_msgs/msg/Transform","array":{"kind":"unbounded"}},{"name":"twist","kind":"named","typeName":"geometry_msgs/msg/Twist","array":{"kind":"unbounded"}},{"name":"wrench","kind":"named","typeName":"geometry_msgs/msg/Wrench","array":{"kind":"unbounded"}}],
+  "sensor_msgs/msg/MultiEchoLaserScan": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"angle_min","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"angle_max","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"angle_increment","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"time_increment","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"scan_time","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"range_min","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"range_max","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"ranges","kind":"named","typeName":"sensor_msgs/msg/LaserEcho","array":{"kind":"unbounded"}},{"name":"intensities","kind":"named","typeName":"sensor_msgs/msg/LaserEcho","array":{"kind":"unbounded"}}],
+  "sensor_msgs/msg/NavSatFix": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"status","kind":"named","typeName":"sensor_msgs/msg/NavSatStatus","array":{"kind":"none"}},{"name":"latitude","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"longitude","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"altitude","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"position_covariance","kind":"prim","prim":"float64","array":{"kind":"fixed","size":9}},{"name":"position_covariance_type","kind":"prim","prim":"uint8","array":{"kind":"none"}}],
+  "sensor_msgs/msg/NavSatStatus": [{"name":"status","kind":"prim","prim":"int8","array":{"kind":"none"}},{"name":"service","kind":"prim","prim":"uint16","array":{"kind":"none"}}],
+  "sensor_msgs/msg/PointCloud": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"points","kind":"named","typeName":"geometry_msgs/msg/Point32","array":{"kind":"unbounded"}},{"name":"channels","kind":"named","typeName":"sensor_msgs/msg/ChannelFloat32","array":{"kind":"unbounded"}}],
+  "sensor_msgs/msg/PointCloud2": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"height","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"width","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"fields","kind":"named","typeName":"sensor_msgs/msg/PointField","array":{"kind":"unbounded"}},{"name":"is_bigendian","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"point_step","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"row_step","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"uint8","array":{"kind":"unbounded"}},{"name":"is_dense","kind":"prim","prim":"bool","array":{"kind":"none"}}],
+  "sensor_msgs/msg/PointField": [{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"offset","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"datatype","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"count","kind":"prim","prim":"uint32","array":{"kind":"none"}}],
+  "sensor_msgs/msg/Range": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"radiation_type","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"field_of_view","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"min_range","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"max_range","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"range","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"variance","kind":"prim","prim":"float32","array":{"kind":"none"}}],
+  "sensor_msgs/msg/RegionOfInterest": [{"name":"x_offset","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"y_offset","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"height","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"width","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"do_rectify","kind":"prim","prim":"bool","array":{"kind":"none"}}],
+  "sensor_msgs/msg/RelativeHumidity": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"relative_humidity","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"variance","kind":"prim","prim":"float64","array":{"kind":"none"}}],
+  "sensor_msgs/msg/Temperature": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"temperature","kind":"prim","prim":"float64","array":{"kind":"none"}},{"name":"variance","kind":"prim","prim":"float64","array":{"kind":"none"}}],
+  "sensor_msgs/msg/TimeReference": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"time_ref","kind":"named","typeName":"builtin_interfaces/msg/Time","array":{"kind":"none"}},{"name":"source","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "sensor_msgs/srv/SetCameraInfo_Request": [{"name":"camera_info","kind":"named","typeName":"sensor_msgs/msg/CameraInfo","array":{"kind":"none"}}],
+  "sensor_msgs/srv/SetCameraInfo_Response": [{"name":"success","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"status_message","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "shape_msgs/msg/Mesh": [{"name":"triangles","kind":"named","typeName":"shape_msgs/msg/MeshTriangle","array":{"kind":"unbounded"}},{"name":"vertices","kind":"named","typeName":"geometry_msgs/msg/Point","array":{"kind":"unbounded"}}],
+  "shape_msgs/msg/MeshTriangle": [{"name":"vertex_indices","kind":"prim","prim":"uint32","array":{"kind":"fixed","size":3}}],
+  "shape_msgs/msg/Plane": [{"name":"coef","kind":"prim","prim":"float64","array":{"kind":"fixed","size":4}}],
+  "shape_msgs/msg/SolidPrimitive": [{"name":"type","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"dimensions","kind":"prim","prim":"float64","array":{"kind":"bounded","size":3}},{"name":"polygon","kind":"named","typeName":"geometry_msgs/msg/Polygon","array":{"kind":"none"}}],
+  "statistics_msgs/msg/MetricsMessage": [{"name":"measurement_source_name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"metrics_source","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"unit","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"window_start","kind":"named","typeName":"builtin_interfaces/msg/Time","array":{"kind":"none"}},{"name":"window_stop","kind":"named","typeName":"builtin_interfaces/msg/Time","array":{"kind":"none"}},{"name":"statistics","kind":"named","typeName":"statistics_msgs/msg/StatisticDataPoint","array":{"kind":"unbounded"}}],
+  "statistics_msgs/msg/StatisticDataPoint": [{"name":"data_type","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"float64","array":{"kind":"none"}}],
+  "statistics_msgs/msg/StatisticDataType": [],
+  "std_msgs/msg/Bool": [{"name":"data","kind":"prim","prim":"bool","array":{"kind":"none"}}],
+  "std_msgs/msg/Byte": [{"name":"data","kind":"prim","prim":"byte","array":{"kind":"none"}}],
+  "std_msgs/msg/ByteMultiArray": [{"name":"layout","kind":"named","typeName":"std_msgs/msg/MultiArrayLayout","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"byte","array":{"kind":"unbounded"}}],
+  "std_msgs/msg/Char": [{"name":"data","kind":"prim","prim":"char","array":{"kind":"none"}}],
+  "std_msgs/msg/ColorRGBA": [{"name":"r","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"g","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"b","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"a","kind":"prim","prim":"float32","array":{"kind":"none"}}],
+  "std_msgs/msg/Empty": [],
+  "std_msgs/msg/Float32": [{"name":"data","kind":"prim","prim":"float32","array":{"kind":"none"}}],
+  "std_msgs/msg/Float32MultiArray": [{"name":"layout","kind":"named","typeName":"std_msgs/msg/MultiArrayLayout","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"float32","array":{"kind":"unbounded"}}],
+  "std_msgs/msg/Float64": [{"name":"data","kind":"prim","prim":"float64","array":{"kind":"none"}}],
+  "std_msgs/msg/Float64MultiArray": [{"name":"layout","kind":"named","typeName":"std_msgs/msg/MultiArrayLayout","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"float64","array":{"kind":"unbounded"}}],
+  "std_msgs/msg/Header": [{"name":"stamp","kind":"named","typeName":"builtin_interfaces/msg/Time","array":{"kind":"none"}},{"name":"frame_id","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "std_msgs/msg/Int16": [{"name":"data","kind":"prim","prim":"int16","array":{"kind":"none"}}],
+  "std_msgs/msg/Int16MultiArray": [{"name":"layout","kind":"named","typeName":"std_msgs/msg/MultiArrayLayout","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"int16","array":{"kind":"unbounded"}}],
+  "std_msgs/msg/Int32": [{"name":"data","kind":"prim","prim":"int32","array":{"kind":"none"}}],
+  "std_msgs/msg/Int32MultiArray": [{"name":"layout","kind":"named","typeName":"std_msgs/msg/MultiArrayLayout","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"int32","array":{"kind":"unbounded"}}],
+  "std_msgs/msg/Int64": [{"name":"data","kind":"prim","prim":"int64","array":{"kind":"none"}}],
+  "std_msgs/msg/Int64MultiArray": [{"name":"layout","kind":"named","typeName":"std_msgs/msg/MultiArrayLayout","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"int64","array":{"kind":"unbounded"}}],
+  "std_msgs/msg/Int8": [{"name":"data","kind":"prim","prim":"int8","array":{"kind":"none"}}],
+  "std_msgs/msg/Int8MultiArray": [{"name":"layout","kind":"named","typeName":"std_msgs/msg/MultiArrayLayout","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"int8","array":{"kind":"unbounded"}}],
+  "std_msgs/msg/MultiArrayDimension": [{"name":"label","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"size","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"stride","kind":"prim","prim":"uint32","array":{"kind":"none"}}],
+  "std_msgs/msg/MultiArrayLayout": [{"name":"dim","kind":"named","typeName":"std_msgs/msg/MultiArrayDimension","array":{"kind":"unbounded"}},{"name":"data_offset","kind":"prim","prim":"uint32","array":{"kind":"none"}}],
+  "std_msgs/msg/String": [{"name":"data","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "std_msgs/msg/UInt16": [{"name":"data","kind":"prim","prim":"uint16","array":{"kind":"none"}}],
+  "std_msgs/msg/UInt16MultiArray": [{"name":"layout","kind":"named","typeName":"std_msgs/msg/MultiArrayLayout","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"uint16","array":{"kind":"unbounded"}}],
+  "std_msgs/msg/UInt32": [{"name":"data","kind":"prim","prim":"uint32","array":{"kind":"none"}}],
+  "std_msgs/msg/UInt32MultiArray": [{"name":"layout","kind":"named","typeName":"std_msgs/msg/MultiArrayLayout","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"uint32","array":{"kind":"unbounded"}}],
+  "std_msgs/msg/UInt64": [{"name":"data","kind":"prim","prim":"uint64","array":{"kind":"none"}}],
+  "std_msgs/msg/UInt64MultiArray": [{"name":"layout","kind":"named","typeName":"std_msgs/msg/MultiArrayLayout","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"uint64","array":{"kind":"unbounded"}}],
+  "std_msgs/msg/UInt8": [{"name":"data","kind":"prim","prim":"uint8","array":{"kind":"none"}}],
+  "std_msgs/msg/UInt8MultiArray": [{"name":"layout","kind":"named","typeName":"std_msgs/msg/MultiArrayLayout","array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"uint8","array":{"kind":"unbounded"}}],
+  "std_srvs/srv/Empty_Request": [],
+  "std_srvs/srv/Empty_Response": [],
+  "std_srvs/srv/SetBool_Request": [{"name":"data","kind":"prim","prim":"bool","array":{"kind":"none"}}],
+  "std_srvs/srv/SetBool_Response": [{"name":"success","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"message","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "std_srvs/srv/Trigger_Request": [],
+  "std_srvs/srv/Trigger_Response": [{"name":"success","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"message","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "stereo_msgs/msg/DisparityImage": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"image","kind":"named","typeName":"sensor_msgs/msg/Image","array":{"kind":"none"}},{"name":"f","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"t","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"valid_window","kind":"named","typeName":"sensor_msgs/msg/RegionOfInterest","array":{"kind":"none"}},{"name":"min_disparity","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"max_disparity","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"delta_d","kind":"prim","prim":"float32","array":{"kind":"none"}}],
+  "tf2_msgs/msg/TF2Error": [{"name":"error","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"error_string","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "tf2_msgs/msg/TFMessage": [{"name":"transforms","kind":"named","typeName":"geometry_msgs/msg/TransformStamped","array":{"kind":"unbounded"}}],
+  "tf2_msgs/srv/FrameGraph_Request": [],
+  "tf2_msgs/srv/FrameGraph_Response": [{"name":"frame_yaml","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "tf2_msgs/action/LookupTransform_Goal": [{"name":"target_frame","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"source_frame","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"source_time","kind":"named","typeName":"builtin_interfaces/msg/Time","array":{"kind":"none"}},{"name":"timeout","kind":"named","typeName":"builtin_interfaces/msg/Duration","array":{"kind":"none"}},{"name":"target_time","kind":"named","typeName":"builtin_interfaces/msg/Time","array":{"kind":"none"}},{"name":"fixed_frame","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"advanced","kind":"prim","prim":"bool","array":{"kind":"none"}}],
+  "tf2_msgs/action/LookupTransform_Result": [{"name":"transform","kind":"named","typeName":"geometry_msgs/msg/TransformStamped","array":{"kind":"none"}},{"name":"error","kind":"named","typeName":"tf2_msgs/msg/TF2Error","array":{"kind":"none"}}],
+  "tf2_msgs/action/LookupTransform_Feedback": [],
+  "trajectory_msgs/msg/JointTrajectory": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"joint_names","kind":"str","wide":false,"array":{"kind":"unbounded"}},{"name":"points","kind":"named","typeName":"trajectory_msgs/msg/JointTrajectoryPoint","array":{"kind":"unbounded"}}],
+  "trajectory_msgs/msg/JointTrajectoryPoint": [{"name":"positions","kind":"prim","prim":"float64","array":{"kind":"unbounded"}},{"name":"velocities","kind":"prim","prim":"float64","array":{"kind":"unbounded"}},{"name":"accelerations","kind":"prim","prim":"float64","array":{"kind":"unbounded"}},{"name":"effort","kind":"prim","prim":"float64","array":{"kind":"unbounded"}},{"name":"time_from_start","kind":"named","typeName":"builtin_interfaces/msg/Duration","array":{"kind":"none"}}],
+  "trajectory_msgs/msg/MultiDOFJointTrajectory": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"joint_names","kind":"str","wide":false,"array":{"kind":"unbounded"}},{"name":"points","kind":"named","typeName":"trajectory_msgs/msg/MultiDOFJointTrajectoryPoint","array":{"kind":"unbounded"}}],
+  "trajectory_msgs/msg/MultiDOFJointTrajectoryPoint": [{"name":"transforms","kind":"named","typeName":"geometry_msgs/msg/Transform","array":{"kind":"unbounded"}},{"name":"velocities","kind":"named","typeName":"geometry_msgs/msg/Twist","array":{"kind":"unbounded"}},{"name":"accelerations","kind":"named","typeName":"geometry_msgs/msg/Twist","array":{"kind":"unbounded"}},{"name":"time_from_start","kind":"named","typeName":"builtin_interfaces/msg/Duration","array":{"kind":"none"}}],
+  "type_description_interfaces/msg/Field": [{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"type","kind":"named","typeName":"type_description_interfaces/msg/FieldType","array":{"kind":"none"}},{"name":"default_value","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "type_description_interfaces/msg/FieldType": [{"name":"type_id","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"capacity","kind":"prim","prim":"uint64","array":{"kind":"none"}},{"name":"string_capacity","kind":"prim","prim":"uint64","array":{"kind":"none"}},{"name":"nested_type_name","kind":"str","wide":false,"bound":255,"array":{"kind":"none"}}],
+  "type_description_interfaces/msg/IndividualTypeDescription": [{"name":"type_name","kind":"str","wide":false,"bound":255,"array":{"kind":"none"}},{"name":"fields","kind":"named","typeName":"type_description_interfaces/msg/Field","array":{"kind":"unbounded"}}],
+  "type_description_interfaces/msg/KeyValue": [{"name":"key","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"value","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "type_description_interfaces/msg/TypeDescription": [{"name":"type_description","kind":"named","typeName":"type_description_interfaces/msg/IndividualTypeDescription","array":{"kind":"none"}},{"name":"referenced_type_descriptions","kind":"named","typeName":"type_description_interfaces/msg/IndividualTypeDescription","array":{"kind":"unbounded"}}],
+  "type_description_interfaces/msg/TypeSource": [{"name":"type_name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"encoding","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"raw_file_contents","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "type_description_interfaces/srv/GetTypeDescription_Request": [{"name":"type_name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"type_hash","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"include_type_sources","kind":"prim","prim":"bool","array":{"kind":"none"}}],
+  "type_description_interfaces/srv/GetTypeDescription_Response": [{"name":"successful","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"failure_reason","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"type_description","kind":"named","typeName":"type_description_interfaces/msg/TypeDescription","array":{"kind":"none"}},{"name":"type_sources","kind":"named","typeName":"type_description_interfaces/msg/TypeSource","array":{"kind":"unbounded"}},{"name":"extra_information","kind":"named","typeName":"type_description_interfaces/msg/KeyValue","array":{"kind":"unbounded"}}],
+  "unique_identifier_msgs/msg/UUID": [{"name":"uuid","kind":"prim","prim":"uint8","array":{"kind":"fixed","size":16}}],
+  "visualization_msgs/msg/ImageMarker": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"ns","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"id","kind":"prim","prim":"int32","array":{"kind":"none"}},{"name":"type","kind":"prim","prim":"int32","array":{"kind":"none"}},{"name":"action","kind":"prim","prim":"int32","array":{"kind":"none"}},{"name":"position","kind":"named","typeName":"geometry_msgs/msg/Point","array":{"kind":"none"}},{"name":"scale","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"outline_color","kind":"named","typeName":"std_msgs/msg/ColorRGBA","array":{"kind":"none"}},{"name":"filled","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"fill_color","kind":"named","typeName":"std_msgs/msg/ColorRGBA","array":{"kind":"none"}},{"name":"lifetime","kind":"named","typeName":"builtin_interfaces/msg/Duration","array":{"kind":"none"}},{"name":"points","kind":"named","typeName":"geometry_msgs/msg/Point","array":{"kind":"unbounded"}},{"name":"outline_colors","kind":"named","typeName":"std_msgs/msg/ColorRGBA","array":{"kind":"unbounded"}}],
+  "visualization_msgs/msg/InteractiveMarker": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"pose","kind":"named","typeName":"geometry_msgs/msg/Pose","array":{"kind":"none"}},{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"description","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"scale","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"menu_entries","kind":"named","typeName":"visualization_msgs/msg/MenuEntry","array":{"kind":"unbounded"}},{"name":"controls","kind":"named","typeName":"visualization_msgs/msg/InteractiveMarkerControl","array":{"kind":"unbounded"}}],
+  "visualization_msgs/msg/InteractiveMarkerControl": [{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"orientation","kind":"named","typeName":"geometry_msgs/msg/Quaternion","array":{"kind":"none"}},{"name":"orientation_mode","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"interaction_mode","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"always_visible","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"markers","kind":"named","typeName":"visualization_msgs/msg/Marker","array":{"kind":"unbounded"}},{"name":"independent_marker_orientation","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"description","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "visualization_msgs/msg/InteractiveMarkerFeedback": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"client_id","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"marker_name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"control_name","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"event_type","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"pose","kind":"named","typeName":"geometry_msgs/msg/Pose","array":{"kind":"none"}},{"name":"menu_entry_id","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"mouse_point","kind":"named","typeName":"geometry_msgs/msg/Point","array":{"kind":"none"}},{"name":"mouse_point_valid","kind":"prim","prim":"bool","array":{"kind":"none"}}],
+  "visualization_msgs/msg/InteractiveMarkerInit": [{"name":"server_id","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"seq_num","kind":"prim","prim":"uint64","array":{"kind":"none"}},{"name":"markers","kind":"named","typeName":"visualization_msgs/msg/InteractiveMarker","array":{"kind":"unbounded"}}],
+  "visualization_msgs/msg/InteractiveMarkerPose": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"pose","kind":"named","typeName":"geometry_msgs/msg/Pose","array":{"kind":"none"}},{"name":"name","kind":"str","wide":false,"array":{"kind":"none"}}],
+  "visualization_msgs/msg/InteractiveMarkerUpdate": [{"name":"server_id","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"seq_num","kind":"prim","prim":"uint64","array":{"kind":"none"}},{"name":"type","kind":"prim","prim":"uint8","array":{"kind":"none"}},{"name":"markers","kind":"named","typeName":"visualization_msgs/msg/InteractiveMarker","array":{"kind":"unbounded"}},{"name":"poses","kind":"named","typeName":"visualization_msgs/msg/InteractiveMarkerPose","array":{"kind":"unbounded"}},{"name":"erases","kind":"str","wide":false,"array":{"kind":"unbounded"}}],
+  "visualization_msgs/msg/Marker": [{"name":"header","kind":"named","typeName":"std_msgs/msg/Header","array":{"kind":"none"}},{"name":"ns","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"id","kind":"prim","prim":"int32","array":{"kind":"none"}},{"name":"type","kind":"prim","prim":"int32","array":{"kind":"none"}},{"name":"action","kind":"prim","prim":"int32","array":{"kind":"none"}},{"name":"pose","kind":"named","typeName":"geometry_msgs/msg/Pose","array":{"kind":"none"}},{"name":"scale","kind":"named","typeName":"geometry_msgs/msg/Vector3","array":{"kind":"none"}},{"name":"color","kind":"named","typeName":"std_msgs/msg/ColorRGBA","array":{"kind":"none"}},{"name":"lifetime","kind":"named","typeName":"builtin_interfaces/msg/Duration","array":{"kind":"none"}},{"name":"frame_locked","kind":"prim","prim":"bool","array":{"kind":"none"}},{"name":"points","kind":"named","typeName":"geometry_msgs/msg/Point","array":{"kind":"unbounded"}},{"name":"colors","kind":"named","typeName":"std_msgs/msg/ColorRGBA","array":{"kind":"unbounded"}},{"name":"texture_resource","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"texture","kind":"named","typeName":"sensor_msgs/msg/CompressedImage","array":{"kind":"none"}},{"name":"uv_coordinates","kind":"named","typeName":"visualization_msgs/msg/UVCoordinate","array":{"kind":"unbounded"}},{"name":"text","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"mesh_resource","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"mesh_file","kind":"named","typeName":"visualization_msgs/msg/MeshFile","array":{"kind":"none"}},{"name":"mesh_use_embedded_materials","kind":"prim","prim":"bool","array":{"kind":"none"}}],
+  "visualization_msgs/msg/MarkerArray": [{"name":"markers","kind":"named","typeName":"visualization_msgs/msg/Marker","array":{"kind":"unbounded"}}],
+  "visualization_msgs/msg/MenuEntry": [{"name":"id","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"parent_id","kind":"prim","prim":"uint32","array":{"kind":"none"}},{"name":"title","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"command","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"command_type","kind":"prim","prim":"uint8","array":{"kind":"none"}}],
+  "visualization_msgs/msg/MeshFile": [{"name":"filename","kind":"str","wide":false,"array":{"kind":"none"}},{"name":"data","kind":"prim","prim":"uint8","array":{"kind":"unbounded"}}],
+  "visualization_msgs/msg/UVCoordinate": [{"name":"u","kind":"prim","prim":"float32","array":{"kind":"none"}},{"name":"v","kind":"prim","prim":"float32","array":{"kind":"none"}}],
+  "visualization_msgs/srv/GetInteractiveMarkers_Request": [],
+  "visualization_msgs/srv/GetInteractiveMarkers_Response": [{"name":"sequence_number","kind":"prim","prim":"uint64","array":{"kind":"none"}},{"name":"markers","kind":"named","typeName":"visualization_msgs/msg/InteractiveMarker","array":{"kind":"unbounded"}}]
+};
+
+export const GENERATED_MSG_TYPE_NAMES: ReadonlySet<string> = new Set([
+  "action_msgs/msg/GoalInfo",
+  "action_msgs/msg/GoalStatus",
+  "action_msgs/msg/GoalStatusArray",
+  "builtin_interfaces/msg/Duration",
+  "builtin_interfaces/msg/Time",
+  "diagnostic_msgs/msg/DiagnosticArray",
+  "diagnostic_msgs/msg/DiagnosticStatus",
+  "diagnostic_msgs/msg/KeyValue",
+  "geometry_msgs/msg/Accel",
+  "geometry_msgs/msg/AccelStamped",
+  "geometry_msgs/msg/AccelWithCovariance",
+  "geometry_msgs/msg/AccelWithCovarianceStamped",
+  "geometry_msgs/msg/Inertia",
+  "geometry_msgs/msg/InertiaStamped",
+  "geometry_msgs/msg/Point",
+  "geometry_msgs/msg/Point32",
+  "geometry_msgs/msg/PointStamped",
+  "geometry_msgs/msg/Polygon",
+  "geometry_msgs/msg/PolygonInstance",
+  "geometry_msgs/msg/PolygonInstanceStamped",
+  "geometry_msgs/msg/PolygonStamped",
+  "geometry_msgs/msg/Pose",
+  "geometry_msgs/msg/Pose2D",
+  "geometry_msgs/msg/PoseArray",
+  "geometry_msgs/msg/PoseStamped",
+  "geometry_msgs/msg/PoseWithCovariance",
+  "geometry_msgs/msg/PoseWithCovarianceStamped",
+  "geometry_msgs/msg/Quaternion",
+  "geometry_msgs/msg/QuaternionStamped",
+  "geometry_msgs/msg/Transform",
+  "geometry_msgs/msg/TransformStamped",
+  "geometry_msgs/msg/Twist",
+  "geometry_msgs/msg/TwistStamped",
+  "geometry_msgs/msg/TwistWithCovariance",
+  "geometry_msgs/msg/TwistWithCovarianceStamped",
+  "geometry_msgs/msg/Vector3",
+  "geometry_msgs/msg/Vector3Stamped",
+  "geometry_msgs/msg/VelocityStamped",
+  "geometry_msgs/msg/VelocityWithCovarianceStamped",
+  "geometry_msgs/msg/Wrench",
+  "geometry_msgs/msg/WrenchStamped",
+  "lifecycle_msgs/msg/State",
+  "lifecycle_msgs/msg/Transition",
+  "lifecycle_msgs/msg/TransitionDescription",
+  "lifecycle_msgs/msg/TransitionEvent",
+  "nav_msgs/msg/Goals",
+  "nav_msgs/msg/GridCells",
+  "nav_msgs/msg/MapMetaData",
+  "nav_msgs/msg/OccupancyGrid",
+  "nav_msgs/msg/Odometry",
+  "nav_msgs/msg/Path",
+  "nav_msgs/msg/Trajectory",
+  "nav_msgs/msg/TrajectoryPoint",
+  "rcl_interfaces/msg/FloatingPointRange",
+  "rcl_interfaces/msg/IntegerRange",
+  "rcl_interfaces/msg/ListParametersResult",
+  "rcl_interfaces/msg/Log",
+  "rcl_interfaces/msg/LoggerLevel",
+  "rcl_interfaces/msg/Parameter",
+  "rcl_interfaces/msg/ParameterDescriptor",
+  "rcl_interfaces/msg/ParameterEvent",
+  "rcl_interfaces/msg/ParameterEventDescriptors",
+  "rcl_interfaces/msg/ParameterType",
+  "rcl_interfaces/msg/ParameterValue",
+  "rcl_interfaces/msg/SetLoggerLevelsResult",
+  "rcl_interfaces/msg/SetParametersResult",
+  "rclweb_cdr_interfaces/msg/Collections",
+  "rclweb_cdr_interfaces/msg/NestedSample",
+  "rclweb_cdr_interfaces/msg/PrimitiveScalars",
+  "rosgraph_msgs/msg/Action",
+  "rosgraph_msgs/msg/Clock",
+  "rosgraph_msgs/msg/Graph",
+  "rosgraph_msgs/msg/InterfaceType",
+  "rosgraph_msgs/msg/Node",
+  "rosgraph_msgs/msg/QoSProfile",
+  "rosgraph_msgs/msg/Service",
+  "rosgraph_msgs/msg/Topic",
+  "rosgraph_msgs/msg/TypeHash",
+  "sensor_msgs/msg/BatteryState",
+  "sensor_msgs/msg/CameraInfo",
+  "sensor_msgs/msg/ChannelFloat32",
+  "sensor_msgs/msg/CompressedImage",
+  "sensor_msgs/msg/FluidPressure",
+  "sensor_msgs/msg/Illuminance",
+  "sensor_msgs/msg/Image",
+  "sensor_msgs/msg/Imu",
+  "sensor_msgs/msg/JointState",
+  "sensor_msgs/msg/Joy",
+  "sensor_msgs/msg/JoyFeedback",
+  "sensor_msgs/msg/JoyFeedbackArray",
+  "sensor_msgs/msg/LaserEcho",
+  "sensor_msgs/msg/LaserScan",
+  "sensor_msgs/msg/MagneticField",
+  "sensor_msgs/msg/MultiDOFJointState",
+  "sensor_msgs/msg/MultiEchoLaserScan",
+  "sensor_msgs/msg/NavSatFix",
+  "sensor_msgs/msg/NavSatStatus",
+  "sensor_msgs/msg/PointCloud",
+  "sensor_msgs/msg/PointCloud2",
+  "sensor_msgs/msg/PointField",
+  "sensor_msgs/msg/Range",
+  "sensor_msgs/msg/RegionOfInterest",
+  "sensor_msgs/msg/RelativeHumidity",
+  "sensor_msgs/msg/Temperature",
+  "sensor_msgs/msg/TimeReference",
+  "shape_msgs/msg/Mesh",
+  "shape_msgs/msg/MeshTriangle",
+  "shape_msgs/msg/Plane",
+  "shape_msgs/msg/SolidPrimitive",
+  "statistics_msgs/msg/MetricsMessage",
+  "statistics_msgs/msg/StatisticDataPoint",
+  "statistics_msgs/msg/StatisticDataType",
+  "std_msgs/msg/Bool",
+  "std_msgs/msg/Byte",
+  "std_msgs/msg/ByteMultiArray",
+  "std_msgs/msg/Char",
+  "std_msgs/msg/ColorRGBA",
+  "std_msgs/msg/Empty",
+  "std_msgs/msg/Float32",
+  "std_msgs/msg/Float32MultiArray",
+  "std_msgs/msg/Float64",
+  "std_msgs/msg/Float64MultiArray",
+  "std_msgs/msg/Header",
+  "std_msgs/msg/Int16",
+  "std_msgs/msg/Int16MultiArray",
+  "std_msgs/msg/Int32",
+  "std_msgs/msg/Int32MultiArray",
+  "std_msgs/msg/Int64",
+  "std_msgs/msg/Int64MultiArray",
+  "std_msgs/msg/Int8",
+  "std_msgs/msg/Int8MultiArray",
+  "std_msgs/msg/MultiArrayDimension",
+  "std_msgs/msg/MultiArrayLayout",
+  "std_msgs/msg/String",
+  "std_msgs/msg/UInt16",
+  "std_msgs/msg/UInt16MultiArray",
+  "std_msgs/msg/UInt32",
+  "std_msgs/msg/UInt32MultiArray",
+  "std_msgs/msg/UInt64",
+  "std_msgs/msg/UInt64MultiArray",
+  "std_msgs/msg/UInt8",
+  "std_msgs/msg/UInt8MultiArray",
+  "stereo_msgs/msg/DisparityImage",
+  "tf2_msgs/msg/TF2Error",
+  "tf2_msgs/msg/TFMessage",
+  "trajectory_msgs/msg/JointTrajectory",
+  "trajectory_msgs/msg/JointTrajectoryPoint",
+  "trajectory_msgs/msg/MultiDOFJointTrajectory",
+  "trajectory_msgs/msg/MultiDOFJointTrajectoryPoint",
+  "type_description_interfaces/msg/Field",
+  "type_description_interfaces/msg/FieldType",
+  "type_description_interfaces/msg/IndividualTypeDescription",
+  "type_description_interfaces/msg/KeyValue",
+  "type_description_interfaces/msg/TypeDescription",
+  "type_description_interfaces/msg/TypeSource",
+  "unique_identifier_msgs/msg/UUID",
+  "visualization_msgs/msg/ImageMarker",
+  "visualization_msgs/msg/InteractiveMarker",
+  "visualization_msgs/msg/InteractiveMarkerControl",
+  "visualization_msgs/msg/InteractiveMarkerFeedback",
+  "visualization_msgs/msg/InteractiveMarkerInit",
+  "visualization_msgs/msg/InteractiveMarkerPose",
+  "visualization_msgs/msg/InteractiveMarkerUpdate",
+  "visualization_msgs/msg/Marker",
+  "visualization_msgs/msg/MarkerArray",
+  "visualization_msgs/msg/MenuEntry",
+  "visualization_msgs/msg/MeshFile",
+  "visualization_msgs/msg/UVCoordinate",
+]);
+
+export const GENERATED_TYPE_NAMES: ReadonlySet<string> = new Set([
+  "action_msgs/msg/GoalInfo",
+  "action_msgs/msg/GoalStatus",
+  "action_msgs/msg/GoalStatusArray",
+  "action_msgs/srv/CancelGoal_Request",
+  "action_msgs/srv/CancelGoal_Response",
+  "builtin_interfaces/msg/Duration",
+  "builtin_interfaces/msg/Time",
+  "composition_interfaces/srv/ListNodes_Request",
+  "composition_interfaces/srv/ListNodes_Response",
+  "composition_interfaces/srv/LoadNode_Request",
+  "composition_interfaces/srv/LoadNode_Response",
+  "composition_interfaces/srv/UnloadNode_Request",
+  "composition_interfaces/srv/UnloadNode_Response",
+  "diagnostic_msgs/msg/DiagnosticArray",
+  "diagnostic_msgs/msg/DiagnosticStatus",
+  "diagnostic_msgs/msg/KeyValue",
+  "diagnostic_msgs/srv/AddDiagnostics_Request",
+  "diagnostic_msgs/srv/AddDiagnostics_Response",
+  "diagnostic_msgs/srv/SelfTest_Request",
+  "diagnostic_msgs/srv/SelfTest_Response",
+  "geometry_msgs/msg/Accel",
+  "geometry_msgs/msg/AccelStamped",
+  "geometry_msgs/msg/AccelWithCovariance",
+  "geometry_msgs/msg/AccelWithCovarianceStamped",
+  "geometry_msgs/msg/Inertia",
+  "geometry_msgs/msg/InertiaStamped",
+  "geometry_msgs/msg/Point",
+  "geometry_msgs/msg/Point32",
+  "geometry_msgs/msg/PointStamped",
+  "geometry_msgs/msg/Polygon",
+  "geometry_msgs/msg/PolygonInstance",
+  "geometry_msgs/msg/PolygonInstanceStamped",
+  "geometry_msgs/msg/PolygonStamped",
+  "geometry_msgs/msg/Pose",
+  "geometry_msgs/msg/Pose2D",
+  "geometry_msgs/msg/PoseArray",
+  "geometry_msgs/msg/PoseStamped",
+  "geometry_msgs/msg/PoseWithCovariance",
+  "geometry_msgs/msg/PoseWithCovarianceStamped",
+  "geometry_msgs/msg/Quaternion",
+  "geometry_msgs/msg/QuaternionStamped",
+  "geometry_msgs/msg/Transform",
+  "geometry_msgs/msg/TransformStamped",
+  "geometry_msgs/msg/Twist",
+  "geometry_msgs/msg/TwistStamped",
+  "geometry_msgs/msg/TwistWithCovariance",
+  "geometry_msgs/msg/TwistWithCovarianceStamped",
+  "geometry_msgs/msg/Vector3",
+  "geometry_msgs/msg/Vector3Stamped",
+  "geometry_msgs/msg/VelocityStamped",
+  "geometry_msgs/msg/VelocityWithCovarianceStamped",
+  "geometry_msgs/msg/Wrench",
+  "geometry_msgs/msg/WrenchStamped",
+  "lifecycle_msgs/msg/State",
+  "lifecycle_msgs/msg/Transition",
+  "lifecycle_msgs/msg/TransitionDescription",
+  "lifecycle_msgs/msg/TransitionEvent",
+  "lifecycle_msgs/srv/ChangeState_Request",
+  "lifecycle_msgs/srv/ChangeState_Response",
+  "lifecycle_msgs/srv/GetAvailableStates_Request",
+  "lifecycle_msgs/srv/GetAvailableStates_Response",
+  "lifecycle_msgs/srv/GetAvailableTransitions_Request",
+  "lifecycle_msgs/srv/GetAvailableTransitions_Response",
+  "lifecycle_msgs/srv/GetState_Request",
+  "lifecycle_msgs/srv/GetState_Response",
+  "nav_msgs/msg/Goals",
+  "nav_msgs/msg/GridCells",
+  "nav_msgs/msg/MapMetaData",
+  "nav_msgs/msg/OccupancyGrid",
+  "nav_msgs/msg/Odometry",
+  "nav_msgs/msg/Path",
+  "nav_msgs/msg/Trajectory",
+  "nav_msgs/msg/TrajectoryPoint",
+  "nav_msgs/srv/GetMap_Request",
+  "nav_msgs/srv/GetMap_Response",
+  "nav_msgs/srv/GetPlan_Request",
+  "nav_msgs/srv/GetPlan_Response",
+  "nav_msgs/srv/LoadMap_Request",
+  "nav_msgs/srv/LoadMap_Response",
+  "nav_msgs/srv/SetMap_Request",
+  "nav_msgs/srv/SetMap_Response",
+  "rcl_interfaces/msg/FloatingPointRange",
+  "rcl_interfaces/msg/IntegerRange",
+  "rcl_interfaces/msg/ListParametersResult",
+  "rcl_interfaces/msg/Log",
+  "rcl_interfaces/msg/LoggerLevel",
+  "rcl_interfaces/msg/Parameter",
+  "rcl_interfaces/msg/ParameterDescriptor",
+  "rcl_interfaces/msg/ParameterEvent",
+  "rcl_interfaces/msg/ParameterEventDescriptors",
+  "rcl_interfaces/msg/ParameterType",
+  "rcl_interfaces/msg/ParameterValue",
+  "rcl_interfaces/msg/SetLoggerLevelsResult",
+  "rcl_interfaces/msg/SetParametersResult",
+  "rcl_interfaces/srv/DescribeParameters_Request",
+  "rcl_interfaces/srv/DescribeParameters_Response",
+  "rcl_interfaces/srv/GetLoggerLevels_Request",
+  "rcl_interfaces/srv/GetLoggerLevels_Response",
+  "rcl_interfaces/srv/GetParameterTypes_Request",
+  "rcl_interfaces/srv/GetParameterTypes_Response",
+  "rcl_interfaces/srv/GetParameters_Request",
+  "rcl_interfaces/srv/GetParameters_Response",
+  "rcl_interfaces/srv/ListParameters_Request",
+  "rcl_interfaces/srv/ListParameters_Response",
+  "rcl_interfaces/srv/SetLoggerLevels_Request",
+  "rcl_interfaces/srv/SetLoggerLevels_Response",
+  "rcl_interfaces/srv/SetParametersAtomically_Request",
+  "rcl_interfaces/srv/SetParametersAtomically_Response",
+  "rcl_interfaces/srv/SetParameters_Request",
+  "rcl_interfaces/srv/SetParameters_Response",
+  "rclweb_cdr_interfaces/action/MeasureSequence_Feedback",
+  "rclweb_cdr_interfaces/action/MeasureSequence_Goal",
+  "rclweb_cdr_interfaces/action/MeasureSequence_Result",
+  "rclweb_cdr_interfaces/msg/Collections",
+  "rclweb_cdr_interfaces/msg/NestedSample",
+  "rclweb_cdr_interfaces/msg/PrimitiveScalars",
+  "rclweb_cdr_interfaces/srv/EchoNested_Request",
+  "rclweb_cdr_interfaces/srv/EchoNested_Response",
+  "rosgraph_msgs/msg/Action",
+  "rosgraph_msgs/msg/Clock",
+  "rosgraph_msgs/msg/Graph",
+  "rosgraph_msgs/msg/InterfaceType",
+  "rosgraph_msgs/msg/Node",
+  "rosgraph_msgs/msg/QoSProfile",
+  "rosgraph_msgs/msg/Service",
+  "rosgraph_msgs/msg/Topic",
+  "rosgraph_msgs/msg/TypeHash",
+  "sensor_msgs/msg/BatteryState",
+  "sensor_msgs/msg/CameraInfo",
+  "sensor_msgs/msg/ChannelFloat32",
+  "sensor_msgs/msg/CompressedImage",
+  "sensor_msgs/msg/FluidPressure",
+  "sensor_msgs/msg/Illuminance",
+  "sensor_msgs/msg/Image",
+  "sensor_msgs/msg/Imu",
+  "sensor_msgs/msg/JointState",
+  "sensor_msgs/msg/Joy",
+  "sensor_msgs/msg/JoyFeedback",
+  "sensor_msgs/msg/JoyFeedbackArray",
+  "sensor_msgs/msg/LaserEcho",
+  "sensor_msgs/msg/LaserScan",
+  "sensor_msgs/msg/MagneticField",
+  "sensor_msgs/msg/MultiDOFJointState",
+  "sensor_msgs/msg/MultiEchoLaserScan",
+  "sensor_msgs/msg/NavSatFix",
+  "sensor_msgs/msg/NavSatStatus",
+  "sensor_msgs/msg/PointCloud",
+  "sensor_msgs/msg/PointCloud2",
+  "sensor_msgs/msg/PointField",
+  "sensor_msgs/msg/Range",
+  "sensor_msgs/msg/RegionOfInterest",
+  "sensor_msgs/msg/RelativeHumidity",
+  "sensor_msgs/msg/Temperature",
+  "sensor_msgs/msg/TimeReference",
+  "sensor_msgs/srv/SetCameraInfo_Request",
+  "sensor_msgs/srv/SetCameraInfo_Response",
+  "shape_msgs/msg/Mesh",
+  "shape_msgs/msg/MeshTriangle",
+  "shape_msgs/msg/Plane",
+  "shape_msgs/msg/SolidPrimitive",
+  "statistics_msgs/msg/MetricsMessage",
+  "statistics_msgs/msg/StatisticDataPoint",
+  "statistics_msgs/msg/StatisticDataType",
+  "std_msgs/msg/Bool",
+  "std_msgs/msg/Byte",
+  "std_msgs/msg/ByteMultiArray",
+  "std_msgs/msg/Char",
+  "std_msgs/msg/ColorRGBA",
+  "std_msgs/msg/Empty",
+  "std_msgs/msg/Float32",
+  "std_msgs/msg/Float32MultiArray",
+  "std_msgs/msg/Float64",
+  "std_msgs/msg/Float64MultiArray",
+  "std_msgs/msg/Header",
+  "std_msgs/msg/Int16",
+  "std_msgs/msg/Int16MultiArray",
+  "std_msgs/msg/Int32",
+  "std_msgs/msg/Int32MultiArray",
+  "std_msgs/msg/Int64",
+  "std_msgs/msg/Int64MultiArray",
+  "std_msgs/msg/Int8",
+  "std_msgs/msg/Int8MultiArray",
+  "std_msgs/msg/MultiArrayDimension",
+  "std_msgs/msg/MultiArrayLayout",
+  "std_msgs/msg/String",
+  "std_msgs/msg/UInt16",
+  "std_msgs/msg/UInt16MultiArray",
+  "std_msgs/msg/UInt32",
+  "std_msgs/msg/UInt32MultiArray",
+  "std_msgs/msg/UInt64",
+  "std_msgs/msg/UInt64MultiArray",
+  "std_msgs/msg/UInt8",
+  "std_msgs/msg/UInt8MultiArray",
+  "std_srvs/srv/Empty_Request",
+  "std_srvs/srv/Empty_Response",
+  "std_srvs/srv/SetBool_Request",
+  "std_srvs/srv/SetBool_Response",
+  "std_srvs/srv/Trigger_Request",
+  "std_srvs/srv/Trigger_Response",
+  "stereo_msgs/msg/DisparityImage",
+  "tf2_msgs/action/LookupTransform_Feedback",
+  "tf2_msgs/action/LookupTransform_Goal",
+  "tf2_msgs/action/LookupTransform_Result",
+  "tf2_msgs/msg/TF2Error",
+  "tf2_msgs/msg/TFMessage",
+  "tf2_msgs/srv/FrameGraph_Request",
+  "tf2_msgs/srv/FrameGraph_Response",
+  "trajectory_msgs/msg/JointTrajectory",
+  "trajectory_msgs/msg/JointTrajectoryPoint",
+  "trajectory_msgs/msg/MultiDOFJointTrajectory",
+  "trajectory_msgs/msg/MultiDOFJointTrajectoryPoint",
+  "type_description_interfaces/msg/Field",
+  "type_description_interfaces/msg/FieldType",
+  "type_description_interfaces/msg/IndividualTypeDescription",
+  "type_description_interfaces/msg/KeyValue",
+  "type_description_interfaces/msg/TypeDescription",
+  "type_description_interfaces/msg/TypeSource",
+  "type_description_interfaces/srv/GetTypeDescription_Request",
+  "type_description_interfaces/srv/GetTypeDescription_Response",
+  "unique_identifier_msgs/msg/UUID",
+  "visualization_msgs/msg/ImageMarker",
+  "visualization_msgs/msg/InteractiveMarker",
+  "visualization_msgs/msg/InteractiveMarkerControl",
+  "visualization_msgs/msg/InteractiveMarkerFeedback",
+  "visualization_msgs/msg/InteractiveMarkerInit",
+  "visualization_msgs/msg/InteractiveMarkerPose",
+  "visualization_msgs/msg/InteractiveMarkerUpdate",
+  "visualization_msgs/msg/Marker",
+  "visualization_msgs/msg/MarkerArray",
+  "visualization_msgs/msg/MenuEntry",
+  "visualization_msgs/msg/MeshFile",
+  "visualization_msgs/msg/UVCoordinate",
+  "visualization_msgs/srv/GetInteractiveMarkers_Request",
+  "visualization_msgs/srv/GetInteractiveMarkers_Response",
+]);
+
+export const GENERATED_OP_TYPES: {
+  readonly [typeName: string]: {
+    readonly Request?: string;
+    readonly Response?: string;
+    readonly Goal?: string;
+    readonly Result?: string;
+    readonly Feedback?: string;
+  };
+} = {
+  "action_msgs/srv/CancelGoal": { Request: "action_msgs/srv/CancelGoal_Request", Response: "action_msgs/srv/CancelGoal_Response" },
+  "composition_interfaces/srv/ListNodes": { Request: "composition_interfaces/srv/ListNodes_Request", Response: "composition_interfaces/srv/ListNodes_Response" },
+  "composition_interfaces/srv/LoadNode": { Request: "composition_interfaces/srv/LoadNode_Request", Response: "composition_interfaces/srv/LoadNode_Response" },
+  "composition_interfaces/srv/UnloadNode": { Request: "composition_interfaces/srv/UnloadNode_Request", Response: "composition_interfaces/srv/UnloadNode_Response" },
+  "diagnostic_msgs/srv/AddDiagnostics": { Request: "diagnostic_msgs/srv/AddDiagnostics_Request", Response: "diagnostic_msgs/srv/AddDiagnostics_Response" },
+  "diagnostic_msgs/srv/SelfTest": { Request: "diagnostic_msgs/srv/SelfTest_Request", Response: "diagnostic_msgs/srv/SelfTest_Response" },
+  "lifecycle_msgs/srv/ChangeState": { Request: "lifecycle_msgs/srv/ChangeState_Request", Response: "lifecycle_msgs/srv/ChangeState_Response" },
+  "lifecycle_msgs/srv/GetAvailableStates": { Request: "lifecycle_msgs/srv/GetAvailableStates_Request", Response: "lifecycle_msgs/srv/GetAvailableStates_Response" },
+  "lifecycle_msgs/srv/GetAvailableTransitions": { Request: "lifecycle_msgs/srv/GetAvailableTransitions_Request", Response: "lifecycle_msgs/srv/GetAvailableTransitions_Response" },
+  "lifecycle_msgs/srv/GetState": { Request: "lifecycle_msgs/srv/GetState_Request", Response: "lifecycle_msgs/srv/GetState_Response" },
+  "nav_msgs/srv/GetMap": { Request: "nav_msgs/srv/GetMap_Request", Response: "nav_msgs/srv/GetMap_Response" },
+  "nav_msgs/srv/GetPlan": { Request: "nav_msgs/srv/GetPlan_Request", Response: "nav_msgs/srv/GetPlan_Response" },
+  "nav_msgs/srv/LoadMap": { Request: "nav_msgs/srv/LoadMap_Request", Response: "nav_msgs/srv/LoadMap_Response" },
+  "nav_msgs/srv/SetMap": { Request: "nav_msgs/srv/SetMap_Request", Response: "nav_msgs/srv/SetMap_Response" },
+  "rcl_interfaces/srv/DescribeParameters": { Request: "rcl_interfaces/srv/DescribeParameters_Request", Response: "rcl_interfaces/srv/DescribeParameters_Response" },
+  "rcl_interfaces/srv/GetLoggerLevels": { Request: "rcl_interfaces/srv/GetLoggerLevels_Request", Response: "rcl_interfaces/srv/GetLoggerLevels_Response" },
+  "rcl_interfaces/srv/GetParameterTypes": { Request: "rcl_interfaces/srv/GetParameterTypes_Request", Response: "rcl_interfaces/srv/GetParameterTypes_Response" },
+  "rcl_interfaces/srv/GetParameters": { Request: "rcl_interfaces/srv/GetParameters_Request", Response: "rcl_interfaces/srv/GetParameters_Response" },
+  "rcl_interfaces/srv/ListParameters": { Request: "rcl_interfaces/srv/ListParameters_Request", Response: "rcl_interfaces/srv/ListParameters_Response" },
+  "rcl_interfaces/srv/SetLoggerLevels": { Request: "rcl_interfaces/srv/SetLoggerLevels_Request", Response: "rcl_interfaces/srv/SetLoggerLevels_Response" },
+  "rcl_interfaces/srv/SetParameters": { Request: "rcl_interfaces/srv/SetParameters_Request", Response: "rcl_interfaces/srv/SetParameters_Response" },
+  "rcl_interfaces/srv/SetParametersAtomically": { Request: "rcl_interfaces/srv/SetParametersAtomically_Request", Response: "rcl_interfaces/srv/SetParametersAtomically_Response" },
+  "rclweb_cdr_interfaces/action/MeasureSequence": { Goal: "rclweb_cdr_interfaces/action/MeasureSequence_Goal", Result: "rclweb_cdr_interfaces/action/MeasureSequence_Result", Feedback: "rclweb_cdr_interfaces/action/MeasureSequence_Feedback" },
+  "rclweb_cdr_interfaces/srv/EchoNested": { Request: "rclweb_cdr_interfaces/srv/EchoNested_Request", Response: "rclweb_cdr_interfaces/srv/EchoNested_Response" },
+  "sensor_msgs/srv/SetCameraInfo": { Request: "sensor_msgs/srv/SetCameraInfo_Request", Response: "sensor_msgs/srv/SetCameraInfo_Response" },
+  "std_srvs/srv/Empty": { Request: "std_srvs/srv/Empty_Request", Response: "std_srvs/srv/Empty_Response" },
+  "std_srvs/srv/SetBool": { Request: "std_srvs/srv/SetBool_Request", Response: "std_srvs/srv/SetBool_Response" },
+  "std_srvs/srv/Trigger": { Request: "std_srvs/srv/Trigger_Request", Response: "std_srvs/srv/Trigger_Response" },
+  "tf2_msgs/action/LookupTransform": { Goal: "tf2_msgs/action/LookupTransform_Goal", Result: "tf2_msgs/action/LookupTransform_Result", Feedback: "tf2_msgs/action/LookupTransform_Feedback" },
+  "tf2_msgs/srv/FrameGraph": { Request: "tf2_msgs/srv/FrameGraph_Request", Response: "tf2_msgs/srv/FrameGraph_Response" },
+  "type_description_interfaces/srv/GetTypeDescription": { Request: "type_description_interfaces/srv/GetTypeDescription_Request", Response: "type_description_interfaces/srv/GetTypeDescription_Response" },
+  "visualization_msgs/srv/GetInteractiveMarkers": { Request: "visualization_msgs/srv/GetInteractiveMarkers_Request", Response: "visualization_msgs/srv/GetInteractiveMarkers_Response" }
+};
+
+export function createGenerated(typeName: string): object | undefined {
+  switch (typeName) {
+    case "action_msgs/msg/GoalInfo": return new GoalInfo();
+    case "action_msgs/msg/GoalStatus": return new GoalStatus();
+    case "action_msgs/msg/GoalStatusArray": return new GoalStatusArray();
+    case "action_msgs/srv/CancelGoal_Request": return new CancelGoal_Request();
+    case "action_msgs/srv/CancelGoal_Response": return new CancelGoal_Response();
+    case "builtin_interfaces/msg/Duration": return new Duration();
+    case "builtin_interfaces/msg/Time": return new Time();
+    case "composition_interfaces/srv/ListNodes_Request": return new ListNodes_Request();
+    case "composition_interfaces/srv/ListNodes_Response": return new ListNodes_Response();
+    case "composition_interfaces/srv/LoadNode_Request": return new LoadNode_Request();
+    case "composition_interfaces/srv/LoadNode_Response": return new LoadNode_Response();
+    case "composition_interfaces/srv/UnloadNode_Request": return new UnloadNode_Request();
+    case "composition_interfaces/srv/UnloadNode_Response": return new UnloadNode_Response();
+    case "diagnostic_msgs/msg/DiagnosticArray": return new DiagnosticArray();
+    case "diagnostic_msgs/msg/DiagnosticStatus": return new DiagnosticStatus();
+    case "diagnostic_msgs/msg/KeyValue": return new DiagnosticMsgsKeyValue();
+    case "diagnostic_msgs/srv/AddDiagnostics_Request": return new AddDiagnostics_Request();
+    case "diagnostic_msgs/srv/AddDiagnostics_Response": return new AddDiagnostics_Response();
+    case "diagnostic_msgs/srv/SelfTest_Request": return new SelfTest_Request();
+    case "diagnostic_msgs/srv/SelfTest_Response": return new SelfTest_Response();
+    case "geometry_msgs/msg/Accel": return new Accel();
+    case "geometry_msgs/msg/AccelStamped": return new AccelStamped();
+    case "geometry_msgs/msg/AccelWithCovariance": return new AccelWithCovariance();
+    case "geometry_msgs/msg/AccelWithCovarianceStamped": return new AccelWithCovarianceStamped();
+    case "geometry_msgs/msg/Inertia": return new Inertia();
+    case "geometry_msgs/msg/InertiaStamped": return new InertiaStamped();
+    case "geometry_msgs/msg/Point": return new Point();
+    case "geometry_msgs/msg/Point32": return new Point32();
+    case "geometry_msgs/msg/PointStamped": return new PointStamped();
+    case "geometry_msgs/msg/Polygon": return new Polygon();
+    case "geometry_msgs/msg/PolygonInstance": return new PolygonInstance();
+    case "geometry_msgs/msg/PolygonInstanceStamped": return new PolygonInstanceStamped();
+    case "geometry_msgs/msg/PolygonStamped": return new PolygonStamped();
+    case "geometry_msgs/msg/Pose": return new Pose();
+    case "geometry_msgs/msg/Pose2D": return new Pose2D();
+    case "geometry_msgs/msg/PoseArray": return new PoseArray();
+    case "geometry_msgs/msg/PoseStamped": return new PoseStamped();
+    case "geometry_msgs/msg/PoseWithCovariance": return new PoseWithCovariance();
+    case "geometry_msgs/msg/PoseWithCovarianceStamped": return new PoseWithCovarianceStamped();
+    case "geometry_msgs/msg/Quaternion": return new Quaternion();
+    case "geometry_msgs/msg/QuaternionStamped": return new QuaternionStamped();
+    case "geometry_msgs/msg/Transform": return new Transform();
+    case "geometry_msgs/msg/TransformStamped": return new TransformStamped();
+    case "geometry_msgs/msg/Twist": return new Twist();
+    case "geometry_msgs/msg/TwistStamped": return new TwistStamped();
+    case "geometry_msgs/msg/TwistWithCovariance": return new TwistWithCovariance();
+    case "geometry_msgs/msg/TwistWithCovarianceStamped": return new TwistWithCovarianceStamped();
+    case "geometry_msgs/msg/Vector3": return new Vector3();
+    case "geometry_msgs/msg/Vector3Stamped": return new Vector3Stamped();
+    case "geometry_msgs/msg/VelocityStamped": return new VelocityStamped();
+    case "geometry_msgs/msg/VelocityWithCovarianceStamped": return new VelocityWithCovarianceStamped();
+    case "geometry_msgs/msg/Wrench": return new Wrench();
+    case "geometry_msgs/msg/WrenchStamped": return new WrenchStamped();
+    case "lifecycle_msgs/msg/State": return new State();
+    case "lifecycle_msgs/msg/Transition": return new Transition();
+    case "lifecycle_msgs/msg/TransitionDescription": return new TransitionDescription();
+    case "lifecycle_msgs/msg/TransitionEvent": return new TransitionEvent();
+    case "lifecycle_msgs/srv/ChangeState_Request": return new ChangeState_Request();
+    case "lifecycle_msgs/srv/ChangeState_Response": return new ChangeState_Response();
+    case "lifecycle_msgs/srv/GetAvailableStates_Request": return new GetAvailableStates_Request();
+    case "lifecycle_msgs/srv/GetAvailableStates_Response": return new GetAvailableStates_Response();
+    case "lifecycle_msgs/srv/GetAvailableTransitions_Request": return new GetAvailableTransitions_Request();
+    case "lifecycle_msgs/srv/GetAvailableTransitions_Response": return new GetAvailableTransitions_Response();
+    case "lifecycle_msgs/srv/GetState_Request": return new GetState_Request();
+    case "lifecycle_msgs/srv/GetState_Response": return new GetState_Response();
+    case "nav_msgs/msg/Goals": return new Goals();
+    case "nav_msgs/msg/GridCells": return new GridCells();
+    case "nav_msgs/msg/MapMetaData": return new MapMetaData();
+    case "nav_msgs/msg/OccupancyGrid": return new OccupancyGrid();
+    case "nav_msgs/msg/Odometry": return new Odometry();
+    case "nav_msgs/msg/Path": return new Path();
+    case "nav_msgs/msg/Trajectory": return new Trajectory();
+    case "nav_msgs/msg/TrajectoryPoint": return new TrajectoryPoint();
+    case "nav_msgs/srv/GetMap_Request": return new GetMap_Request();
+    case "nav_msgs/srv/GetMap_Response": return new GetMap_Response();
+    case "nav_msgs/srv/GetPlan_Request": return new GetPlan_Request();
+    case "nav_msgs/srv/GetPlan_Response": return new GetPlan_Response();
+    case "nav_msgs/srv/LoadMap_Request": return new LoadMap_Request();
+    case "nav_msgs/srv/LoadMap_Response": return new LoadMap_Response();
+    case "nav_msgs/srv/SetMap_Request": return new SetMap_Request();
+    case "nav_msgs/srv/SetMap_Response": return new SetMap_Response();
+    case "rcl_interfaces/msg/FloatingPointRange": return new FloatingPointRange();
+    case "rcl_interfaces/msg/IntegerRange": return new IntegerRange();
+    case "rcl_interfaces/msg/ListParametersResult": return new ListParametersResult();
+    case "rcl_interfaces/msg/Log": return new Log();
+    case "rcl_interfaces/msg/LoggerLevel": return new LoggerLevel();
+    case "rcl_interfaces/msg/Parameter": return new Parameter();
+    case "rcl_interfaces/msg/ParameterDescriptor": return new ParameterDescriptor();
+    case "rcl_interfaces/msg/ParameterEvent": return new ParameterEvent();
+    case "rcl_interfaces/msg/ParameterEventDescriptors": return new ParameterEventDescriptors();
+    case "rcl_interfaces/msg/ParameterType": return new ParameterType();
+    case "rcl_interfaces/msg/ParameterValue": return new ParameterValue();
+    case "rcl_interfaces/msg/SetLoggerLevelsResult": return new SetLoggerLevelsResult();
+    case "rcl_interfaces/msg/SetParametersResult": return new SetParametersResult();
+    case "rcl_interfaces/srv/DescribeParameters_Request": return new DescribeParameters_Request();
+    case "rcl_interfaces/srv/DescribeParameters_Response": return new DescribeParameters_Response();
+    case "rcl_interfaces/srv/GetLoggerLevels_Request": return new GetLoggerLevels_Request();
+    case "rcl_interfaces/srv/GetLoggerLevels_Response": return new GetLoggerLevels_Response();
+    case "rcl_interfaces/srv/GetParameterTypes_Request": return new GetParameterTypes_Request();
+    case "rcl_interfaces/srv/GetParameterTypes_Response": return new GetParameterTypes_Response();
+    case "rcl_interfaces/srv/GetParameters_Request": return new GetParameters_Request();
+    case "rcl_interfaces/srv/GetParameters_Response": return new GetParameters_Response();
+    case "rcl_interfaces/srv/ListParameters_Request": return new ListParameters_Request();
+    case "rcl_interfaces/srv/ListParameters_Response": return new ListParameters_Response();
+    case "rcl_interfaces/srv/SetLoggerLevels_Request": return new SetLoggerLevels_Request();
+    case "rcl_interfaces/srv/SetLoggerLevels_Response": return new SetLoggerLevels_Response();
+    case "rcl_interfaces/srv/SetParameters_Request": return new SetParameters_Request();
+    case "rcl_interfaces/srv/SetParameters_Response": return new SetParameters_Response();
+    case "rcl_interfaces/srv/SetParametersAtomically_Request": return new SetParametersAtomically_Request();
+    case "rcl_interfaces/srv/SetParametersAtomically_Response": return new SetParametersAtomically_Response();
+    case "rclweb_cdr_interfaces/msg/Collections": return new Collections();
+    case "rclweb_cdr_interfaces/msg/NestedSample": return new NestedSample();
+    case "rclweb_cdr_interfaces/msg/PrimitiveScalars": return new PrimitiveScalars();
+    case "rclweb_cdr_interfaces/srv/EchoNested_Request": return new EchoNested_Request();
+    case "rclweb_cdr_interfaces/srv/EchoNested_Response": return new EchoNested_Response();
+    case "rclweb_cdr_interfaces/action/MeasureSequence_Goal": return new MeasureSequence_Goal();
+    case "rclweb_cdr_interfaces/action/MeasureSequence_Result": return new MeasureSequence_Result();
+    case "rclweb_cdr_interfaces/action/MeasureSequence_Feedback": return new MeasureSequence_Feedback();
+    case "rosgraph_msgs/msg/Action": return new Action();
+    case "rosgraph_msgs/msg/Clock": return new Clock();
+    case "rosgraph_msgs/msg/Graph": return new Graph();
+    case "rosgraph_msgs/msg/InterfaceType": return new InterfaceType();
+    case "rosgraph_msgs/msg/Node": return new Node();
+    case "rosgraph_msgs/msg/QoSProfile": return new QoSProfile();
+    case "rosgraph_msgs/msg/Service": return new Service();
+    case "rosgraph_msgs/msg/Topic": return new Topic();
+    case "rosgraph_msgs/msg/TypeHash": return new TypeHash();
+    case "sensor_msgs/msg/BatteryState": return new BatteryState();
+    case "sensor_msgs/msg/CameraInfo": return new CameraInfo();
+    case "sensor_msgs/msg/ChannelFloat32": return new ChannelFloat32();
+    case "sensor_msgs/msg/CompressedImage": return new CompressedImage();
+    case "sensor_msgs/msg/FluidPressure": return new FluidPressure();
+    case "sensor_msgs/msg/Illuminance": return new Illuminance();
+    case "sensor_msgs/msg/Image": return new Image();
+    case "sensor_msgs/msg/Imu": return new Imu();
+    case "sensor_msgs/msg/JointState": return new JointState();
+    case "sensor_msgs/msg/Joy": return new Joy();
+    case "sensor_msgs/msg/JoyFeedback": return new JoyFeedback();
+    case "sensor_msgs/msg/JoyFeedbackArray": return new JoyFeedbackArray();
+    case "sensor_msgs/msg/LaserEcho": return new LaserEcho();
+    case "sensor_msgs/msg/LaserScan": return new LaserScan();
+    case "sensor_msgs/msg/MagneticField": return new MagneticField();
+    case "sensor_msgs/msg/MultiDOFJointState": return new MultiDOFJointState();
+    case "sensor_msgs/msg/MultiEchoLaserScan": return new MultiEchoLaserScan();
+    case "sensor_msgs/msg/NavSatFix": return new NavSatFix();
+    case "sensor_msgs/msg/NavSatStatus": return new NavSatStatus();
+    case "sensor_msgs/msg/PointCloud": return new PointCloud();
+    case "sensor_msgs/msg/PointCloud2": return new PointCloud2();
+    case "sensor_msgs/msg/PointField": return new PointField();
+    case "sensor_msgs/msg/Range": return new Range();
+    case "sensor_msgs/msg/RegionOfInterest": return new RegionOfInterest();
+    case "sensor_msgs/msg/RelativeHumidity": return new RelativeHumidity();
+    case "sensor_msgs/msg/Temperature": return new Temperature();
+    case "sensor_msgs/msg/TimeReference": return new TimeReference();
+    case "sensor_msgs/srv/SetCameraInfo_Request": return new SetCameraInfo_Request();
+    case "sensor_msgs/srv/SetCameraInfo_Response": return new SetCameraInfo_Response();
+    case "shape_msgs/msg/Mesh": return new Mesh();
+    case "shape_msgs/msg/MeshTriangle": return new MeshTriangle();
+    case "shape_msgs/msg/Plane": return new Plane();
+    case "shape_msgs/msg/SolidPrimitive": return new SolidPrimitive();
+    case "statistics_msgs/msg/MetricsMessage": return new MetricsMessage();
+    case "statistics_msgs/msg/StatisticDataPoint": return new StatisticDataPoint();
+    case "statistics_msgs/msg/StatisticDataType": return new StatisticDataType();
+    case "std_msgs/msg/Bool": return new Bool();
+    case "std_msgs/msg/Byte": return new Byte();
+    case "std_msgs/msg/ByteMultiArray": return new ByteMultiArray();
+    case "std_msgs/msg/Char": return new Char();
+    case "std_msgs/msg/ColorRGBA": return new ColorRGBA();
+    case "std_msgs/msg/Empty": return new Empty();
+    case "std_msgs/msg/Float32": return new Float32();
+    case "std_msgs/msg/Float32MultiArray": return new Float32MultiArray();
+    case "std_msgs/msg/Float64": return new Float64();
+    case "std_msgs/msg/Float64MultiArray": return new Float64MultiArray();
+    case "std_msgs/msg/Header": return new Header();
+    case "std_msgs/msg/Int16": return new Int16();
+    case "std_msgs/msg/Int16MultiArray": return new Int16MultiArray();
+    case "std_msgs/msg/Int32": return new Int32();
+    case "std_msgs/msg/Int32MultiArray": return new Int32MultiArray();
+    case "std_msgs/msg/Int64": return new Int64();
+    case "std_msgs/msg/Int64MultiArray": return new Int64MultiArray();
+    case "std_msgs/msg/Int8": return new Int8();
+    case "std_msgs/msg/Int8MultiArray": return new Int8MultiArray();
+    case "std_msgs/msg/MultiArrayDimension": return new MultiArrayDimension();
+    case "std_msgs/msg/MultiArrayLayout": return new MultiArrayLayout();
+    case "std_msgs/msg/String": return new String();
+    case "std_msgs/msg/UInt16": return new UInt16();
+    case "std_msgs/msg/UInt16MultiArray": return new UInt16MultiArray();
+    case "std_msgs/msg/UInt32": return new UInt32();
+    case "std_msgs/msg/UInt32MultiArray": return new UInt32MultiArray();
+    case "std_msgs/msg/UInt64": return new UInt64();
+    case "std_msgs/msg/UInt64MultiArray": return new UInt64MultiArray();
+    case "std_msgs/msg/UInt8": return new UInt8();
+    case "std_msgs/msg/UInt8MultiArray": return new UInt8MultiArray();
+    case "std_srvs/srv/Empty_Request": return new Empty_Request();
+    case "std_srvs/srv/Empty_Response": return new Empty_Response();
+    case "std_srvs/srv/SetBool_Request": return new SetBool_Request();
+    case "std_srvs/srv/SetBool_Response": return new SetBool_Response();
+    case "std_srvs/srv/Trigger_Request": return new Trigger_Request();
+    case "std_srvs/srv/Trigger_Response": return new Trigger_Response();
+    case "stereo_msgs/msg/DisparityImage": return new DisparityImage();
+    case "tf2_msgs/msg/TF2Error": return new TF2Error();
+    case "tf2_msgs/msg/TFMessage": return new TFMessage();
+    case "tf2_msgs/srv/FrameGraph_Request": return new FrameGraph_Request();
+    case "tf2_msgs/srv/FrameGraph_Response": return new FrameGraph_Response();
+    case "tf2_msgs/action/LookupTransform_Goal": return new LookupTransform_Goal();
+    case "tf2_msgs/action/LookupTransform_Result": return new LookupTransform_Result();
+    case "tf2_msgs/action/LookupTransform_Feedback": return new LookupTransform_Feedback();
+    case "trajectory_msgs/msg/JointTrajectory": return new JointTrajectory();
+    case "trajectory_msgs/msg/JointTrajectoryPoint": return new JointTrajectoryPoint();
+    case "trajectory_msgs/msg/MultiDOFJointTrajectory": return new MultiDOFJointTrajectory();
+    case "trajectory_msgs/msg/MultiDOFJointTrajectoryPoint": return new MultiDOFJointTrajectoryPoint();
+    case "type_description_interfaces/msg/Field": return new Field();
+    case "type_description_interfaces/msg/FieldType": return new FieldType();
+    case "type_description_interfaces/msg/IndividualTypeDescription": return new IndividualTypeDescription();
+    case "type_description_interfaces/msg/KeyValue": return new TypeDescriptionInterfacesKeyValue();
+    case "type_description_interfaces/msg/TypeDescription": return new TypeDescription();
+    case "type_description_interfaces/msg/TypeSource": return new TypeSource();
+    case "type_description_interfaces/srv/GetTypeDescription_Request": return new GetTypeDescription_Request();
+    case "type_description_interfaces/srv/GetTypeDescription_Response": return new GetTypeDescription_Response();
+    case "unique_identifier_msgs/msg/UUID": return new UUID();
+    case "visualization_msgs/msg/ImageMarker": return new ImageMarker();
+    case "visualization_msgs/msg/InteractiveMarker": return new InteractiveMarker();
+    case "visualization_msgs/msg/InteractiveMarkerControl": return new InteractiveMarkerControl();
+    case "visualization_msgs/msg/InteractiveMarkerFeedback": return new InteractiveMarkerFeedback();
+    case "visualization_msgs/msg/InteractiveMarkerInit": return new InteractiveMarkerInit();
+    case "visualization_msgs/msg/InteractiveMarkerPose": return new InteractiveMarkerPose();
+    case "visualization_msgs/msg/InteractiveMarkerUpdate": return new InteractiveMarkerUpdate();
+    case "visualization_msgs/msg/Marker": return new Marker();
+    case "visualization_msgs/msg/MarkerArray": return new MarkerArray();
+    case "visualization_msgs/msg/MenuEntry": return new MenuEntry();
+    case "visualization_msgs/msg/MeshFile": return new MeshFile();
+    case "visualization_msgs/msg/UVCoordinate": return new UVCoordinate();
+    case "visualization_msgs/srv/GetInteractiveMarkers_Request": return new GetInteractiveMarkers_Request();
+    case "visualization_msgs/srv/GetInteractiveMarkers_Response": return new GetInteractiveMarkers_Response();
+    default: return undefined;
+  }
+}

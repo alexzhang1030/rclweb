@@ -285,6 +285,46 @@ e2e: toolchain-check
     docker compose -f docker/compose.r1-e2e.yml build
     docker compose -f docker/compose.r1-e2e.yml run --rm e2e
 
+# Pack a prebuilt binary into rclwebd_*.deb (ADR 0019). Needs dpkg-deb.
+[group('quality')]
+pack-rclwebd-deb distro="jazzy" arch="amd64":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd "{{root}}"
+    bin="${RCLWEBD_BIN:-}"
+    if [[ -z "$bin" ]]; then
+        if [[ -x "{{root}}/target/release/rclwebd" ]]; then
+            bin="{{root}}/target/release/rclwebd"
+        else
+            echo "error: set RCLWEBD_BIN or build target/release/rclwebd" >&2
+            exit 1
+        fi
+    fi
+    bun run scripts/pack-rclwebd-deb.ts --bin "$bin" --distro "{{distro}}" --arch "{{arch}}" --out-dir "${RCLWEBD_DEB_OUT:-{{root}}/dist/deb}"
+
+# Generate a local apt archive keypair. Writes the secret under DIR. Do not commit it.
+[group('quality')]
+apt-key-generate dir="/tmp/rclweb-apt-key":
+    cd "{{root}}" && bun run scripts/apt-archive-key.ts --generate --out-dir "{{dir}}" --write-secret
+
+# Pack the four GitHub Release binaries into rclwebd_*~$suite_*.deb (ADR 0019).
+[group('quality')]
+pack-release-debs version="0.0.6" bin_dir="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd "{{root}}"
+    bin_dir="{{bin_dir}}"
+    if [[ -z "$bin_dir" ]]; then
+        echo "error: pass bin_dir=/path/to/rclwebd-<version>-<distro>-<arch> files" >&2
+        exit 1
+    fi
+    bun run scripts/pack-release-debs.ts --bin-dir "$bin_dir" --out-dir "${RCLWEBD_DEB_OUT:-{{root}}/dist/deb}" --version "{{version}}"
+
+# Pack + sign a local apt repo. Needs RCLWEB_APT_GPG_PRIVATE_KEY or --secret-file.
+[group('quality')]
+apt-repo:
+    cd "{{root}}" && bun run scripts/publish-apt-repo.ts --debs-dir "${RCLWEBD_DEB_OUT:-{{root}}/dist/deb}" --out-dir "${RCLWEBD_APT_OUT:-{{root}}/dist/apt-repo}"
+
 # J-FT runtime image for rclwebd. Requires Docker; not a CI foundation job.
 [group('quality')]
 image-rclwebd: toolchain-check

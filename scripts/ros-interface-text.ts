@@ -57,8 +57,5 @@ export function selectInterfaceSection(
     start = separators[1]! + 1;
   }
   const section = lines.slice(start, end).join("\n");
-  if (section.trim().length === 0) {
-    return { ok: false, reason: `empty interface section for ${kind}` };
-  }
   return { ok: true, section };
 }

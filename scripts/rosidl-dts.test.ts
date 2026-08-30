@@ -83,7 +83,8 @@ PointField[] fields
 
   test("rejects malformed field lines", () => {
     expect(parseInterfaceSection("int32").ok).toBe(false);
-    expect(parseInterfaceSection("# only comments").ok).toBe(false);
+    expect(parseInterfaceSection("# only comments").ok).toBe(true);
+    expect(parseInterfaceSection("").ok).toBe(true);
     expect(parseInterfaceSection("int32 9bad = 1").ok).toBe(false);
   });
 });
@@ -254,12 +255,10 @@ describe("rosidl-dts emit", () => {
     const built = await buildFromDirs(dirs);
     expect(built.ok).toBe(true);
     if (!built.ok) return;
-    expect(built.packages.map((p) => p.name)).toEqual([
-      "builtin_interfaces",
-      "rclweb_cdr_interfaces",
-      "sensor_msgs",
-      "std_msgs",
-    ]);
+    expect(built.packages.map((p) => p.name)).toContain("std_msgs");
+    expect(built.packages.map((p) => p.name)).toContain("geometry_msgs");
+    expect(built.packages.map((p) => p.name)).toContain("rclweb_cdr_interfaces");
+    expect(built.packages.map((p) => p.name)).not.toContain("test_msgs");
     expect(built.dts).toContain('static readonly typeName: "std_msgs/msg/String"');
     expect(built.dts).toContain('static readonly typeName: "sensor_msgs/msg/PointCloud2"');
     expect(built.dts).toContain("static readonly FLOAT32: number");

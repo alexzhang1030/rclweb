@@ -164,9 +164,20 @@ Inbound PointCloud2 `data` and Collections `bytes_value` are views of the host-r
 
 `CMD_SEND_POINT_CLOUD2` carries stamp, `frame_id`, and the PointField list with the point `data`. Do not reintroduce XYZ synthesis from `field_count == 3` — that dropped `frame_id` and made republish lie. Inbound `rclweb_point_cloud2_meta` writes the same header/fields after the numeric prefix; point `data` stays an offset/len view.
 
+## Do not delete the apt repo or systemd units
+
+`packaging/apt/`, `packaging/systemd/`, the apt scripts, and
+`.github/workflows/publish-apt.yml` are the host install
+([ADR 0019](../../docs/adr/0019-own-apt-repository.md)). The `.deb`
+packer also needs `scripts/install-rclwebd-ament.sh`,
+`packaging/ament/`, and `scripts/rclwebd-ros.sh`. A cut that dropped
+those left operators with docker-only install, which was rejected.
+Package name stays `rclwebd`. Enable is `enable-rclweb-apt.sh`
+(Signed-By). Do not `apt-key add`.
+
 ## Generated corpus messages use a packed host layout
 
-Generated msg roots (`PrimitiveScalars`, `Collections`, `NestedSample`) and the sectioned service/action types (`EchoNested_{Request,Response}`, `MeasureSequence_{Goal,Result,Feedback}`) decode inbound CDR in JS (`decodeGeneratedCdr` / `decodeOpPayload`). Outbound topics and ops still cross the poll ABI as packed little-endian host-value bytes, not CDR and not JSON. Topics use `CMD_SEND_GENERATED`. Service and action poll cmds stay opaque payload bytes: if the OpenChannel parent is generated, the engine converts outbound host-value → CDR; otherwise the payload stays CDR (`AddTwoInts`, Fibonacci). Wasm-backed inbound samples still call `rclweb_decode_generated`. Do not put that layout, CMD 18, or `rclweb_decode_generated` on `rcl-web`. Applications use `rclweb_cdr_interfaces.msg.*` / `.srv.EchoNested` / `.action.MeasureSequence`. `int64` / `uint64` are `bigint`. The I/O Worker must key inbound samples **and** service/action channels by `typeName` — guessing PointCloud2 for every non-String sample drops generated CDR, and guessing packed host-value for EchoNested inbound CDR breaks `Node` decode.
+Generated corpus msg roots (`PrimitiveScalars`, `Collections`, `NestedSample`) and the sectioned service/action types (`EchoNested_{Request,Response}`, `MeasureSequence_{Goal,Result,Feedback}`) decode inbound CDR in JS (`decodeGeneratedCdr` / `decodeOpPayload`). Outbound corpus topics and ops still cross the poll ABI as packed little-endian host-value bytes, not CDR and not JSON. Shipped ROS 2 core interface types (`std_msgs.msg.Int32`, `geometry_msgs.msg.Twist`, …) encode as little-endian CDR in TypeScript; the engine passes that payload through when host-value decode fails. Topics use `CMD_SEND_GENERATED`. Service and action poll cmds stay opaque payload bytes: if the OpenChannel parent is generated, the engine converts outbound host-value → CDR or passes already-CDR through; otherwise the payload stays CDR (`AddTwoInts`, Fibonacci). Wasm-backed inbound samples still call `rclweb_decode_generated`. Do not put that layout, CMD 18, or `rclweb_decode_generated` on `rcl-web`. Applications use `std_msgs.msg.*` / `geometry_msgs.msg.*` / `rclweb_cdr_interfaces.msg.*` / `.srv.EchoNested` / `.action.MeasureSequence`. `int64` / `uint64` are `bigint`. The I/O Worker must key inbound samples **and** service/action channels by `typeName` — guessing PointCloud2 for every non-String sample drops generated CDR, and guessing packed host-value for EchoNested inbound CDR breaks `Node` decode.
 
 ## Schema metadata JSON shape
 

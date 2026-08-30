@@ -38,6 +38,7 @@ license inventory, npm/crate pack members, `cargo fmt`, Clippy with
 | `just license-inventory` / `just license-inventory-check` | Third-party allowlist |
 | `just website` / `just website-check` | Docs site (`website/`) |
 | `just ros-test-pixi` | Optional RoboStack Jazzy prefix for `just ros-test` |
+| `just pack-rclwebd-deb` / `just pack-release-debs` / `just apt-key-generate` / `just apt-repo` | Pack `rclwebd_*~$suite_*.deb` (one binary or the four Release assets), generate the archive key, sign a local apt repo ([ADR 0019](docs/adr/0019-own-apt-repository.md)) |
 
 Pins: Bun `.bun-version`, Rust `rust-toolchain.toml` (1.97.1 +
 `wasm32-unknown-unknown`), just `.just-version`.

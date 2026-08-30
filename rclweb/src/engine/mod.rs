@@ -47,8 +47,8 @@ use crate::protocol::{
 };
 use crate::session::{ChannelState, Role, Session, SessionEffects, SessionPhase};
 use crate::types::{
-  CdrRepresentation, GeneratedOpKind, WIRE_ERROR_SCHEMA_UNAVAILABLE, decode_host_value,
-  encode_generated_cdr, generated_op_type_name, lookup_phase1_root_for_open,
+  CdrRepresentation, GeneratedOpKind, WIRE_ERROR_SCHEMA_UNAVAILABLE, encode_generated_or_cdr,
+  generated_op_type_name, lookup_phase1_root_for_open,
 };
 use bytes::Bytes;
 use std::borrow::Cow;
@@ -402,9 +402,7 @@ impl ClientEngine {
         }
       }
       AppCommand::SendGenerated { channel_id, type_name, value } => {
-        let encoded = crate::types::decode_host_value(type_name, value)
-          .ok()
-          .and_then(|msg| crate::types::encode_generated_cdr(&msg).ok());
+        let encoded = encode_generated_or_cdr(type_name, value);
         match encoded {
           Some(payload) => self.send_sample_payload(*channel_id, &payload, outcome),
           None => {
@@ -733,8 +731,7 @@ impl ClientEngine {
     let Some(section) = generated_op_type_name(type_name, op) else {
       return Ok(Cow::Borrowed(bytes));
     };
-    let msg = decode_host_value(section, bytes).map_err(|_| ())?;
-    let cdr = encode_generated_cdr(&msg).map_err(|_| ())?;
+    let cdr = encode_generated_or_cdr(section, bytes).ok_or(())?;
     Ok(Cow::Owned(cdr))
   }
 

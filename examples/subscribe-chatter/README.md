@@ -25,6 +25,8 @@ The demo binds loopback only.
 
    ```bash
    just gateway
+   # host: curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/enable-rclweb-apt.sh | sudo bash
+   #      sudo apt update && sudo apt install rclwebd
    # or: docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy
    ```
 

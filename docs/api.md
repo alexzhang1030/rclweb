@@ -22,6 +22,7 @@ import {
   KeepLast,
   builtin_interfaces,
   std_msgs,
+  geometry_msgs,
   sensor_msgs,
   rclweb_cdr_interfaces,
 } from "rcl-web";
@@ -211,8 +212,11 @@ Construct with `new`, set ROS IDL field names (snake_case).
 | Value | `typeName` | Fields |
 |---|---|---|
 | `std_msgs.msg.String` | `std_msgs/msg/String` | `data: string` |
+| `std_msgs.msg.Int32` | `std_msgs/msg/Int32` | `data: number` |
 | `std_msgs.msg.Header` | `std_msgs/msg/Header` | `stamp: Time`, `frame_id: string` |
 | `builtin_interfaces.msg.Time` | `builtin_interfaces/msg/Time` | `sec`, `nanosec` |
+| `builtin_interfaces.msg.Duration` | `builtin_interfaces/msg/Duration` | `sec`, `nanosec` |
+| `geometry_msgs.msg.Twist` | `geometry_msgs/msg/Twist` | `linear`, `angular` (`Vector3`) |
 | `sensor_msgs.msg.PointCloud2` | `sensor_msgs/msg/PointCloud2` | `header`, `height`, `width`, `fields`, `is_bigendian`, `point_step`, `row_step`, `data: Uint8Array`, `is_dense` |
 | `sensor_msgs.msg.PointField` | `sensor_msgs/msg/PointField` | `name`, `offset`, `datatype`, `count`. Constants: `INT8`…`FLOAT64`. |
 | `rclweb_cdr_interfaces.msg.PrimitiveScalars` | `rclweb_cdr_interfaces/msg/PrimitiveScalars` | Primitive IDL fields; `int64_value` / `uint64_value` are `bigint`. |
@@ -220,7 +224,10 @@ Construct with `new`, set ROS IDL field names (snake_case).
 | `rclweb_cdr_interfaces.msg.NestedSample` | `rclweb_cdr_interfaces/msg/NestedSample` | `stamp`, `scalars`, `collections` |
 
 Also exported as `String`, `Header`, `Time`, `PointCloud2`, `PointField`,
-`PrimitiveScalars`, `Collections`, `NestedSample`.
+`PrimitiveScalars`, `Collections`, `NestedSample`. The other ROS 2 core
+interface packages (`std_srvs`, `nav_msgs`, `tf2_msgs`,
+`rcl_interfaces`, …) export the same `pkg.msg` / `.srv` / `.action`
+shape. Construct with `new std_msgs.msg.Int32()`.
 
 ### EchoNested
 
@@ -241,9 +248,9 @@ Also exported as `String`, `Header`, `Time`, `PointCloud2`, `PointField`,
 | `.Result` | `result: NestedSample` |
 | `.Feedback` | `progress: number`, `sample: NestedSample` |
 
-Anything else: pass `{ typeName: "pkg/srv/Foo" }` or
-`{ typeName: "pkg/action/Bar" }` and use `Uint8Array` CDR. Unknown
-**topic** types are not delivered.
+Workspace types outside the shipped core set: pass
+`{ typeName: "pkg/srv/Foo" }` or `{ typeName: "pkg/action/Bar" }` and
+use `Uint8Array` CDR. Unknown **topic** types are not delivered.
 
 To generate the same class shape from your own ROS 2 `.msg` / `.srv` /
 `.action` files: `npx rcl-web gen --package ./my_interfaces --out src/generated/my_interfaces.ts`.

@@ -1,15 +1,39 @@
 # Deploying `rclwebd`
 
-Operator profile for the runtime images and process operations. The
-gateway remains the trust boundary ([security](./security.md)); this
-page covers how to run it.
+Operator profile for the host install, runtime images, and process
+operations. The gateway remains the trust boundary
+([security](./security.md)); this page covers how to run it.
+
+`init()` talks to `ws://127.0.0.1:8794/ws`.
+
+## apt
+
+Ubuntu 24.04 (Jazzy / `noble`) and 22.04 (Humble / `jammy`). This is
+this project's repo, not bloom and not `packages.ros.org`
+([ADR 0019](./adr/0019-own-apt-repository.md)). The package name is
+`rclwebd`. Never `ros-jazzy-rclwebd` / `ros-humble-rclwebd`. The
+index is
+[https://alexzhang1030.github.io/rclweb/apt](https://alexzhang1030.github.io/rclweb/apt).
+`enable-rclweb-apt.sh` writes a `Signed-By` deb822 source. Do not
+`apt-key add`.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/enable-rclweb-apt.sh | sudo bash
+sudo apt update
+sudo apt install rclwebd
+```
+
+The systemd unit is installed and **not** enabled. After you edit
+`/etc/rclwebd/rclwebd.env`, `systemctl enable --now rclwebd`. Offline:
+`dpkg -i rclweb-apt-source_*_all.deb` from the Release, or
+`dpkg -i rclwebd_*~noble_amd64.deb` / `~jammy` without a source.
 
 ## Prebuilt image
 
-The release workflow publishes the Jazzy (J-FT) and Humble (H-FT)
+The release workflow also publishes the Jazzy (J-FT) and Humble (H-FT)
 images to GHCR
 ([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md),
-[release](./release.md)). No clone or toolchain required:
+[release](./release.md)):
 
 ```bash
 docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy

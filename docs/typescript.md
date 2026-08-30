@@ -142,10 +142,12 @@ node.createPublisher(std_msgs.msg.String, "chatter", new QoS(10).bestEffort());
 
 The callback gets an owned message. You do not release a lease.
 
-Typed topic types today: `std_msgs.msg.String`,
-`sensor_msgs.msg.PointCloud2`, and
+Typed topic types: the ROS 2 core interface packages shipped in
+`rcl-web` (`std_msgs.msg.Int32`, `geometry_msgs.msg.Twist`,
+`builtin_interfaces.msg.Duration`, …), plus `std_msgs.msg.String`,
+`sensor_msgs.msg.PointCloud2`, and the conformance corpus
 `rclweb_cdr_interfaces.msg.{PrimitiveScalars,Collections,NestedSample}`.
-Other inbound topic types are dropped. `int64` / `uint64` are `bigint`.
+`int64` / `uint64` are `bigint`.
 
 `createWallTimer(periodMs, callback)` is `setInterval` scoped to the node.
 
@@ -274,13 +276,15 @@ The classes match `std_msgs.msg.String`: `typeName`, ROS field names,
 `int64` / `uint64` as `bigint`, `uint8[]` as `Uint8Array`. OMG `.idl`
 is not accepted.
 
-Topic encode/decode still covers only the types this package ships
-(`std_msgs.msg.String`, `sensor_msgs.msg.PointCloud2`,
-`rclweb_cdr_interfaces.msg.*`). A generated topic type is a typed
+Topic encode/decode covers the ROS 2 core interface packages this
+package ships, plus `std_msgs.msg.String`,
+`sensor_msgs.msg.PointCloud2`, and `rclweb_cdr_interfaces.msg.*`.
+A type from `npx rcl-web gen` that is not in that set is a typed
 object and a `typeName`; inbound samples of other topic types are
 dropped. Generated services and actions open the channel by
 `typeName`; `sendRequest` / `sendGoal` still take `Uint8Array` CDR
-unless the type is `EchoNested` or `MeasureSequence`.
+unless the type is a generated service/action the package ships
+(`EchoNested`, `MeasureSequence`, `std_srvs`, …).
 
 ## Public vs internal
 

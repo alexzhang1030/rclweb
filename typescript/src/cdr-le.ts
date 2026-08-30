@@ -8,6 +8,12 @@
  */
 
 import {
+  GENERATED_LAYOUTS,
+  GENERATED_TYPE_NAMES,
+  createGenerated,
+  type GeneratedLayoutField,
+} from "./interfaces.generated.ts";
+import {
   Collections,
   EchoNested_Request,
   EchoNested_Response,
@@ -20,24 +26,16 @@ import {
 } from "./interfaces.ts";
 import type { PointCloud2 } from "./types.ts";
 
-export type GeneratedCdrMsg = PrimitiveScalars | NestedSample | Collections;
+export type GeneratedCdrMsg = object;
 
-export type GeneratedCdrValue =
-  | GeneratedCdrMsg
-  | EchoNested_Request
-  | EchoNested_Response
-  | MeasureSequence_Goal
-  | MeasureSequence_Result
-  | MeasureSequence_Feedback;
+export type GeneratedCdrValue = object;
 
 export function isGeneratedCdrMsg(
   value: GeneratedCdrValue | null,
 ): value is GeneratedCdrMsg {
-  return (
-    value instanceof PrimitiveScalars ||
-    value instanceof NestedSample ||
-    value instanceof Collections
-  );
+  if (value == null || typeof value !== "object") return false;
+  const typeName = (value.constructor as { typeName?: string }).typeName;
+  return typeof typeName === "string" && GENERATED_TYPE_NAMES.has(typeName);
 }
 
 const td = new TextDecoder();
@@ -308,7 +306,7 @@ export function decodeGeneratedCdr(
       msg.sample = readNestedSample(r);
       return msg;
     }
-    return null;
+    return readCatalogCdr(typeName, r);
   } catch {
     return null;
   }
@@ -357,4 +355,311 @@ function readNestedSample(r: CdrLeReader): NestedSample {
   msg.scalars = readPrimitiveScalars(r);
   msg.collections = readCollections(r);
   return msg;
+}
+
+const te = new TextEncoder();
+
+export class CdrLeWriter {
+  #buf: number[] = [0, 1, 0, 0];
+  #o = 4;
+
+  private pad(n: number): void {
+    const rem = (this.#o - 4) % n;
+    if (rem === 0) return;
+    const add = n - rem;
+    for (let i = 0; i < add; i++) this.#buf.push(0);
+    this.#o += add;
+  }
+
+  private writeAligned(n: number, write: (view: DataView) => void): void {
+    this.pad(n);
+    const tmp = new ArrayBuffer(n);
+    write(new DataView(tmp));
+    const bytes = new Uint8Array(tmp);
+    for (let i = 0; i < bytes.length; i++) this.#buf.push(bytes[i]!);
+    this.#o += bytes.length;
+  }
+
+  u8(v: number): void {
+    this.#buf.push(v & 0xff);
+    this.#o += 1;
+  }
+
+  i8(v: number): void {
+    this.u8(v);
+  }
+
+  u16(v: number): void {
+    this.writeAligned(2, (view) => view.setUint16(0, v, true));
+  }
+
+  i16(v: number): void {
+    this.writeAligned(2, (view) => view.setInt16(0, v, true));
+  }
+
+  u32(v: number): void {
+    this.writeAligned(4, (view) => view.setUint32(0, v, true));
+  }
+
+  i32(v: number): void {
+    this.writeAligned(4, (view) => view.setInt32(0, v, true));
+  }
+
+  u64(v: bigint | number): void {
+    this.writeAligned(8, (view) => view.setBigUint64(0, toBigUint(v), true));
+  }
+
+  i64(v: bigint | number): void {
+    this.writeAligned(8, (view) => view.setBigInt64(0, toBigInt(v), true));
+  }
+
+  f32(v: number): void {
+    this.writeAligned(4, (view) => view.setFloat32(0, v, true));
+  }
+
+  f64(v: number): void {
+    this.writeAligned(8, (view) => view.setFloat64(0, v, true));
+  }
+
+  bool(v: boolean): void {
+    this.u8(v ? 1 : 0);
+  }
+
+  str(value: string, maxBytes?: number): void {
+    const bytes = te.encode(value);
+    if (maxBytes !== undefined && bytes.length > maxBytes) {
+      throw new Error("CDR string exceeds bound");
+    }
+    this.u32(bytes.length + 1);
+    for (let i = 0; i < bytes.length; i++) this.#buf.push(bytes[i]!);
+    this.#buf.push(0);
+    this.#o += bytes.length + 1;
+  }
+
+  wstring(value: string, maxScalars?: number): void {
+    const scalars = [...value].map((ch) => ch.codePointAt(0)!);
+    if (maxScalars !== undefined && scalars.length > maxScalars) {
+      throw new Error("CDR wstring exceeds bound");
+    }
+    this.u32(scalars.length);
+    for (const slot of scalars) {
+      if (!isAcceptedWstringScalar(slot)) {
+        throw new Error("invalid CDR wstring scalar");
+      }
+      this.u32(slot);
+    }
+  }
+
+  byteSeq(bytes: Uint8Array): void {
+    this.u32(bytes.length);
+    for (let i = 0; i < bytes.length; i++) this.#buf.push(bytes[i]!);
+    this.#o += bytes.length;
+  }
+
+  finish(): Uint8Array {
+    return Uint8Array.from(this.#buf);
+  }
+}
+
+function toBigInt(value: bigint | number | undefined): bigint {
+  if (typeof value === "bigint") return value;
+  return BigInt(value ?? 0);
+}
+
+function toBigUint(value: bigint | number | undefined): bigint {
+  const n = toBigInt(value);
+  return n < 0n ? 0n : n;
+}
+
+function isBytePrim(prim: string): boolean {
+  return prim === "uint8" || prim === "byte";
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value != null && typeof value === "object" ? (value as Record<string, unknown>) : {};
+}
+
+function writePrim(w: CdrLeWriter, prim: string, value: unknown): void {
+  const n = typeof value === "number" ? value : Number(value ?? 0);
+  switch (prim) {
+    case "bool":
+      w.bool(Boolean(value));
+      return;
+    case "byte":
+    case "char":
+    case "uint8":
+      w.u8(n);
+      return;
+    case "int8":
+      w.i8(n);
+      return;
+    case "uint16":
+      w.u16(n);
+      return;
+    case "int16":
+      w.i16(n);
+      return;
+    case "uint32":
+      w.u32(n);
+      return;
+    case "int32":
+      w.i32(n);
+      return;
+    case "uint64":
+      w.u64(value as bigint | number);
+      return;
+    case "int64":
+      w.i64(value as bigint | number);
+      return;
+    case "float32":
+      w.f32(n);
+      return;
+    case "float64":
+      w.f64(n);
+      return;
+    default:
+      throw new Error(`unsupported primitive ${prim}`);
+  }
+}
+
+function readPrim(r: CdrLeReader, prim: string): unknown {
+  switch (prim) {
+    case "bool":
+      return r.bool();
+    case "byte":
+    case "char":
+    case "uint8":
+      return r.u8();
+    case "int8":
+      return r.i8();
+    case "uint16":
+      return r.u16();
+    case "int16":
+      return r.i16();
+    case "uint32":
+      return r.u32();
+    case "int32":
+      return r.i32();
+    case "uint64":
+      return r.u64();
+    case "int64":
+      return r.i64();
+    case "float32":
+      return r.f32();
+    case "float64":
+      return r.f64();
+    default:
+      throw new Error(`unsupported primitive ${prim}`);
+  }
+}
+
+function writeLayoutField(w: CdrLeWriter, field: GeneratedLayoutField, value: unknown): void {
+  const writeOne = (item: unknown) => {
+    if (field.kind === "prim") {
+      writePrim(w, field.prim, item);
+      return;
+    }
+    if (field.kind === "str") {
+      const text = typeof item === "string" ? item : String(item ?? "");
+      if (field.wide) w.wstring(text, field.bound);
+      else w.str(text, field.bound);
+      return;
+    }
+    writeCatalogObject(w, field.typeName, item);
+  };
+
+  if (field.array.kind === "none") {
+    writeOne(value);
+    return;
+  }
+  if (field.kind === "prim" && isBytePrim(field.prim)) {
+    const bytes = value instanceof Uint8Array ? value : new Uint8Array();
+    if (field.array.kind === "fixed") {
+      if (bytes.length !== field.array.size) {
+        const padded = new Uint8Array(field.array.size);
+        padded.set(bytes.subarray(0, field.array.size));
+        for (let i = 0; i < padded.length; i++) w.u8(padded[i]!);
+        return;
+      }
+      for (let i = 0; i < field.array.size; i++) w.u8(bytes[i]!);
+      return;
+    }
+    if (field.array.kind === "bounded" && bytes.length > field.array.size) {
+      throw new Error(`${field.name} exceeds bound ${field.array.size}`);
+    }
+    w.byteSeq(bytes);
+    return;
+  }
+  const items = Array.isArray(value) ? value : [];
+  if (field.array.kind === "fixed") {
+    for (let i = 0; i < field.array.size; i++) writeOne(items[i]);
+    return;
+  }
+  if (field.array.kind === "bounded" && items.length > field.array.size) {
+    throw new Error(`${field.name} exceeds bound ${field.array.size}`);
+  }
+  w.u32(items.length);
+  for (const item of items) writeOne(item);
+}
+
+function readLayoutField(r: CdrLeReader, field: GeneratedLayoutField): unknown {
+  const readOne = (): unknown => {
+    if (field.kind === "prim") return readPrim(r, field.prim);
+    if (field.kind === "str") {
+      return field.wide ? r.wstring(field.bound) : r.str(field.bound);
+    }
+    return readCatalogCdr(field.typeName, r);
+  };
+
+  if (field.array.kind === "none") return readOne();
+  if (field.kind === "prim" && isBytePrim(field.prim)) {
+    if (field.array.kind === "fixed") {
+      const out = new Uint8Array(field.array.size);
+      for (let i = 0; i < field.array.size; i++) out[i] = r.u8();
+      return out;
+    }
+    const bytes = r.byteSeq();
+    if (field.array.kind === "bounded" && bytes.length > field.array.size) {
+      throw new Error(`${field.name} exceeds bound ${field.array.size}`);
+    }
+    return bytes;
+  }
+  if (field.array.kind === "fixed") {
+    const out: unknown[] = [];
+    for (let i = 0; i < field.array.size; i++) out.push(readOne());
+    return out;
+  }
+  const n = r.u32();
+  if (field.array.kind === "bounded" && n > field.array.size) {
+    throw new Error(`${field.name} exceeds bound ${field.array.size}`);
+  }
+  const out: unknown[] = [];
+  for (let i = 0; i < n; i++) out.push(readOne());
+  return out;
+}
+
+function writeCatalogObject(w: CdrLeWriter, typeName: string, value: unknown): void {
+  const layout = GENERATED_LAYOUTS[typeName];
+  if (!layout) throw new Error(`unknown generated type ${typeName}`);
+  const rec = asRecord(value);
+  for (const field of layout) {
+    writeLayoutField(w, field, rec[field.name]);
+  }
+}
+
+function readCatalogCdr(typeName: string, r: CdrLeReader): object | null {
+  const layout = GENERATED_LAYOUTS[typeName];
+  const created = createGenerated(typeName);
+  if (!layout || !created) return null;
+  const rec = created as Record<string, unknown>;
+  for (const field of layout) {
+    rec[field.name] = readLayoutField(r, field);
+  }
+  return created;
+}
+
+export function encodeCatalogCdr(typeName: string, message: unknown): Uint8Array {
+  const w = new CdrLeWriter();
+  writeCatalogObject(w, typeName, message);
+  return w.finish();
 }

@@ -3,10 +3,15 @@
 `rcl-web` publishes to npm with [trusted publishing](https://docs.npmjs.com/trusted-publishers)
 (OIDC). `rclweb` / `rclwebd` publish to crates.io. The Jazzy and Humble
 `rclwebd` runtime images publish to GHCR
-([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md)).
+([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md)). The
+`rclwebd` apt repo (package name `rclwebd`, never `ros-*-rclwebd`)
+publishes from existing GitHub Release binaries via
+`publish-apt.yml` / `apt-v<version>`
+([ADR 0019](./adr/0019-own-apt-repository.md)).
 There is no `NPM_TOKEN` or `CARGO_REGISTRY_TOKEN` in GitHub secrets
 after the crates.io bootstrap below; images use the workflow
-`GITHUB_TOKEN` (`packages: write` on that job only).
+`GITHUB_TOKEN` (`packages: write` on that job only). Apt signing uses
+`RCLWEB_APT_GPG_PRIVATE_KEY` (the apt exception to OIDC).
 
 npm's trusted-publisher identity is the workflow **filename**
 `release.yml` (not the path). Do not put a GitHub `environment:` on the
@@ -58,6 +63,19 @@ as soon as this workflow is on the default branch.
    - Workflow filename: `release.yml`
    - Environment: *leave blank*
 
+5. Apt archive key ([ADR 0019](./adr/0019-own-apt-repository.md)). Generate
+   on a machine you trust. Do not commit the secret.
+
+   ```bash
+   bun run scripts/apt-archive-key.ts --generate --out-dir /tmp/rclweb-apt-key --write-secret
+   ```
+
+   Add `/tmp/rclweb-apt-key/rclweb-archive-key.secret.asc` as the
+   repository secret `RCLWEB_APT_GPG_PRIVATE_KEY`. Optional:
+   `RCLWEB_APT_GPG_PASSPHRASE` if you protected the key. Enable GitHub
+   Pages on branch `gh-pages` (site root). Until the secret exists,
+   `publish-apt` still uploads `rclwebd_*.deb` for `dpkg -i`.
+
 ## Publish a version
 
 Bump the version in the tree (`typescript/package.json` and
@@ -72,6 +90,14 @@ git push origin v0.0.6
 or run **Actions → release → Run workflow** (`npm` / `crates` /
 `images` checkboxes; dispatched image jobs resolve the version from
 `Cargo.toml`).
+
+To publish **apt** from binaries already on the GitHub Release (no
+image rebuild), push `apt-v<version>` or run
+**Actions → publish-apt → Run workflow**:
+
+```bash
+git tag apt-v0.0.6 && git push origin apt-v0.0.6
+```
 
 To republish **only images** of an existing version (for example after
 a workflow fix), push `rebuild-v<version>`; the npm and crates jobs
@@ -94,6 +120,12 @@ runner) and pushes
 `ghcr.io/alexzhang1030/rclwebd:<version>-<row>-<arch>`; the manifests
 job then combines them into `jazzy` / `humble` / `latest`
 ([deploy](./deploy.md#prebuilt-image)).
+
+`publish-apt.yml` wraps Release binaries into `rclwebd_*~$suite_*.deb`,
+signs `InRelease` when `RCLWEB_APT_GPG_PRIVATE_KEY` is set, and
+force-pushes `gh-pages` ([deploy](./deploy.md#apt)). That secret is
+the apt exception to OIDC. Leave it unset and the Release still gets
+the `.deb` files.
 
 This cut: `0.0.6` everywhere — npm and crate versions stay aligned so
 the tag-named images match the crate version. This cut ships

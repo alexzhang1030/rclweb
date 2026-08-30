@@ -10,39 +10,11 @@
  */
 
 import {
-  Collections,
-  EchoNested,
-  EchoNested_Request,
-  EchoNested_Response,
-  MeasureSequence,
-  MeasureSequence_Feedback,
-  MeasureSequence_Goal,
-  MeasureSequence_Result,
-  NestedSample,
-  PrimitiveScalars,
+  GENERATED_MSG_TYPE_NAMES,
+  GENERATED_OP_TYPES,
 } from "./interfaces.generated.ts";
 
-export {
-  Time,
-  Header,
-  String,
-  PointField,
-  PointCloud2,
-  PrimitiveScalars,
-  NestedSample,
-  Collections,
-  EchoNested,
-  EchoNested_Request,
-  EchoNested_Response,
-  MeasureSequence,
-  MeasureSequence_Goal,
-  MeasureSequence_Result,
-  MeasureSequence_Feedback,
-  builtin_interfaces,
-  std_msgs,
-  sensor_msgs,
-  rclweb_cdr_interfaces,
-} from "./interfaces.generated.ts";
+export * from "./interfaces.generated.ts";
 
 export type MessageType<T> = {
   readonly typeName: string;
@@ -56,12 +28,18 @@ export function typeNameOf(type: TypeNameLike): string {
   return typeof type === "string" ? type : type.typeName;
 }
 
+/**
+ * Topic types the generated catalog can encode/decode.
+ * String and PointCloud2 stay on their dedicated host paths.
+ */
+const DEDICATED_TOPIC_TYPES = new Set([
+  "std_msgs/msg/String",
+  "sensor_msgs/msg/PointCloud2",
+  "sensor_msgs/PointCloud2",
+]);
+
 export function isGeneratedMsgType(typeName: string): boolean {
-  return (
-    typeName === PrimitiveScalars.typeName ||
-    typeName === NestedSample.typeName ||
-    typeName === Collections.typeName
-  );
+  return GENERATED_MSG_TYPE_NAMES.has(typeName) && !DEDICATED_TOPIC_TYPES.has(typeName);
 }
 
 export type GeneratedOpKind = "Request" | "Response" | "Goal" | "Result" | "Feedback";
@@ -71,15 +49,7 @@ export function generatedOpTypeName(
   channelType: string,
   op: GeneratedOpKind,
 ): string | undefined {
-  if (channelType === EchoNested.typeName) {
-    if (op === "Request") return EchoNested_Request.typeName;
-    if (op === "Response") return EchoNested_Response.typeName;
-    return undefined;
-  }
-  if (channelType === MeasureSequence.typeName) {
-    if (op === "Goal") return MeasureSequence_Goal.typeName;
-    if (op === "Result") return MeasureSequence_Result.typeName;
-    if (op === "Feedback") return MeasureSequence_Feedback.typeName;
-  }
-  return undefined;
+  const ops = GENERATED_OP_TYPES[channelType];
+  if (!ops) return undefined;
+  return ops[op];
 }

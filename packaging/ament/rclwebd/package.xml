@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>rclwebd</name>
+  <version>0.0.6</version>
+  <description>rclweb edge process: R2WP sessions attached to one ROS 2 support row</description>
+  <maintainer email="maintainers@localhost">rclweb maintainers</maintainer>
+  <license>Apache-2.0</license>
+  <url type="website">https://github.com/alexzhang1030/rclweb</url>
+  <url type="repository">https://github.com/alexzhang1030/rclweb</url>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
