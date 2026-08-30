@@ -1,6 +1,5 @@
 //! Gateway telemetry for copy budget and disposition counters (R1-05 / R2-01).
 
-use crate::budgets::DispositionCounters;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Process-wide gateway telemetry (daemon + ros-feature paths).
@@ -43,13 +42,6 @@ impl GatewayTelemetry {
 
   pub fn record_sample_framed(&self) {
     self.samples_framed.fetch_add(1, Ordering::Relaxed);
-  }
-
-  pub fn merge_dispositions(&self, counters: &DispositionCounters) {
-    self.delivered.fetch_add(counters.delivered, Ordering::Relaxed);
-    self.sequence_gap.fetch_add(counters.sequence_gap, Ordering::Relaxed);
-    self.stale_sequence.fetch_add(counters.stale_sequence, Ordering::Relaxed);
-    self.reliable_queue_drop.fetch_add(counters.reliable_queue_drop, Ordering::Relaxed);
   }
 
   pub fn add_delivered(&self, n: u64) {

@@ -434,12 +434,6 @@ pub fn graph_delta_add_endpoint(
   CborValue::Map(vec![(1, CborValue::Unsigned(2)), (3, graph_endpoint_value(endpoint, row))])
 }
 
-/// `add_or_update_node` delta op (graph_delta_ops = 0).
-#[must_use]
-pub fn graph_delta_add_node(node: &GraphNodeInfo) -> CborValue<'static> {
-  CborValue::Map(vec![(1, CborValue::Unsigned(0)), (2, graph_node_value(node))])
-}
-
 /// Server Heartbeat (unsolicited; zero correlation).
 #[must_use]
 pub fn heartbeat(counter: u64) -> CborValue<'static> {

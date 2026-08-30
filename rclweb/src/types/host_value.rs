@@ -80,10 +80,6 @@ impl GeneratedMessage {
   }
 }
 
-pub fn is_generated_msg_type(type_name: &str) -> bool {
-  matches!(type_name, PRIMITIVE_SCALARS_TYPE_NAME | COLLECTIONS_TYPE_NAME | NESTED_SAMPLE_TYPE_NAME)
-}
-
 /// CDR → generated model for a live sample (0 / 4 / 12 zero-tail).
 pub fn decode_generated_cdr(
   type_name: &str,

@@ -26,16 +26,3 @@ pub use nested_sample::{NestedSample, TYPE_NAME as NESTED_SAMPLE_TYPE_NAME};
 pub use point_cloud2::{PointCloud2, TYPE_NAME as POINT_CLOUD2_TYPE_NAME};
 pub use primitive_scalars::{PrimitiveScalars, TYPE_NAME as PRIMITIVE_SCALARS_TYPE_NAME};
 pub use time::Time;
-
-/// The nine Phase 1 registry root type names (sorted).
-pub const PHASE1_ROOT_TYPE_NAMES: &[&str] = &[
-  "rclweb_cdr_interfaces/action/MeasureSequence_Feedback",
-  "rclweb_cdr_interfaces/action/MeasureSequence_Goal",
-  "rclweb_cdr_interfaces/action/MeasureSequence_Result",
-  "rclweb_cdr_interfaces/msg/Collections",
-  "rclweb_cdr_interfaces/msg/NestedSample",
-  "rclweb_cdr_interfaces/msg/PrimitiveScalars",
-  "rclweb_cdr_interfaces/srv/EchoNested_Request",
-  "rclweb_cdr_interfaces/srv/EchoNested_Response",
-  "sensor_msgs/msg/PointCloud2",
-];

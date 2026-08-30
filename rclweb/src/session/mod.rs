@@ -53,11 +53,6 @@ impl Session {
   }
 
   #[must_use]
-  pub fn role(&self) -> Role {
-    self.inner.role
-  }
-
-  #[must_use]
   pub fn phase(&self) -> SessionPhase {
     self.inner.phase
   }
@@ -77,12 +72,6 @@ impl Session {
   #[must_use]
   pub fn graph_generation(&self) -> Option<u64> {
     self.inner.graph_generation
-  }
-
-  /// Operation kind recorded for `id`, when the channel exists.
-  #[must_use]
-  pub fn channel_kind(&self, id: u32) -> Option<OperationKind> {
-    self.inner.channels.get(id).map(|e| e.operation_kind)
   }
 
   /// Apply a bootstrap record received from the peer.

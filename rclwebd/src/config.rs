@@ -54,18 +54,6 @@ pub const SUPPORT_ROW_H_CY: SupportRow =
 pub const SUPPORT_ROW_H_ZN: SupportRow =
   SupportRow { id: "H-ZN", ros_distro: "humble", rmw_identifier: "rmw_zenoh_cpp" };
 
-/// Deprecated alias for [`SUPPORT_ROW_J_FT`].id — prefer `config.support_row.id`.
-#[deprecated(note = "use GatewayConfig::support_row.id or SUPPORT_ROW_J_FT.id")]
-pub const SUPPORT_ROW_ID: &str = SUPPORT_ROW_J_FT.id;
-
-/// Deprecated alias for [`SUPPORT_ROW_J_FT`].ros_distro.
-#[deprecated(note = "use GatewayConfig::support_row.ros_distro")]
-pub const ROS_DISTRO: &str = SUPPORT_ROW_J_FT.ros_distro;
-
-/// Deprecated alias for [`SUPPORT_ROW_J_FT`].rmw_identifier.
-#[deprecated(note = "use GatewayConfig::support_row.rmw_identifier")]
-pub const RMW_IDENTIFIER: &str = SUPPORT_ROW_J_FT.rmw_identifier;
-
 /// Parse `RCLWEBD_SUPPORT_ROW` (`J-FT` default; all six Phase 1 rows accepted).
 #[must_use]
 pub fn parse_support_row(id: &str) -> Option<SupportRow> {
