@@ -13,7 +13,9 @@ use super::generated::{
   PrimitiveScalars, Time, collections, echo_nested, measure_sequence, nested_sample,
   primitive_scalars,
 };
-use crate::cdr::{CdrEndian, CdrError, CdrNesting, CdrReader};
+use crate::cdr::{
+  CdrEndian, CdrError, CdrNesting, CdrReader, HEADER_LENGTH, REPRESENTATION_CDR_LE,
+};
 
 /// Parent service type used on OpenChannel (`rclcpp` `EchoNested`, not `_Request`).
 pub const ECHO_NESTED_TYPE_NAME: &str = "rclweb_cdr_interfaces/srv/EchoNested";
@@ -134,6 +136,20 @@ pub fn decode_generated_cdr(
       })?))
     }
     _ => Err(GeneratedValueError::UnknownType),
+  }
+}
+
+fn is_little_endian_cdr(value: &[u8]) -> bool {
+  value.len() >= HEADER_LENGTH && u16::from_be_bytes([value[0], value[1]]) == REPRESENTATION_CDR_LE
+}
+
+/// Corpus types still arrive as packed host-value. Core interface types
+/// arrive as little-endian CDR already encoded in TypeScript.
+pub fn encode_generated_or_cdr(type_name: &str, value: &[u8]) -> Option<Vec<u8>> {
+  match decode_host_value(type_name, value) {
+    Ok(msg) => encode_generated_cdr(&msg).ok(),
+    Err(_) if is_little_endian_cdr(value) => Some(value.to_vec()),
+    Err(_) => None,
   }
 }
 
@@ -581,5 +597,13 @@ mod tests {
     let host = encode_host_value(&GeneratedMessage::EchoNestedRequest(got.clone()));
     let round = decode_host_value(ECHO_NESTED_REQUEST_TYPE_NAME, &host).unwrap();
     assert_eq!(round, GeneratedMessage::EchoNestedRequest(original));
+  }
+
+  #[test]
+  fn already_cdr_passthrough_for_unknown_host_layout() {
+    let cdr = [0u8, 1, 0, 0, 7, 0, 0, 0];
+    let out = encode_generated_or_cdr("std_msgs/msg/Int32", &cdr).expect("cdr passthrough");
+    assert_eq!(out, cdr);
+    assert!(encode_generated_or_cdr("std_msgs/msg/Int32", &[1, 2, 3]).is_none());
   }
 }

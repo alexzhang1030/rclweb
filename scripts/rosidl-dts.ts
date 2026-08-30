@@ -4,8 +4,9 @@
  *
  * Emits declaration files (`.d.ts`) and optional runtime classes (`.ts`)
  * in the `pkg.msg.Type` / `pkg.srv.Name` / `pkg.action.Name` shape used by
- * `rcl-web`. OMG `.idl` is not accepted. Codecs and topic delivery for
- * types outside the shipped surface stay later work.
+ * `rcl-web`. OMG `.idl` is not accepted. Topic encode/decode covers the
+ * ROS 2 core interface packages shipped in this repository plus the
+ * conformance corpus.
  *
  *   bun run scripts/rosidl-dts.ts --write
  *   bun run scripts/rosidl-dts.ts --check
@@ -17,9 +18,26 @@ import path from "node:path";
 import { selectInterfaceSection, type RootKind } from "./ros-interface-text.ts";
 
 export const PROJECT_PACKAGE_RELS = [
+  "typescript/rosidl/action_msgs",
   "typescript/rosidl/builtin_interfaces",
-  "typescript/rosidl/std_msgs",
+  "typescript/rosidl/composition_interfaces",
+  "typescript/rosidl/diagnostic_msgs",
+  "typescript/rosidl/geometry_msgs",
+  "typescript/rosidl/lifecycle_msgs",
+  "typescript/rosidl/nav_msgs",
+  "typescript/rosidl/rcl_interfaces",
+  "typescript/rosidl/rosgraph_msgs",
   "typescript/rosidl/sensor_msgs",
+  "typescript/rosidl/shape_msgs",
+  "typescript/rosidl/statistics_msgs",
+  "typescript/rosidl/std_msgs",
+  "typescript/rosidl/std_srvs",
+  "typescript/rosidl/stereo_msgs",
+  "typescript/rosidl/tf2_msgs",
+  "typescript/rosidl/trajectory_msgs",
+  "typescript/rosidl/type_description_interfaces",
+  "typescript/rosidl/unique_identifier_msgs",
+  "typescript/rosidl/visualization_msgs",
   "conformance/interfaces/rclweb_cdr_interfaces",
 ] as const;
 
@@ -118,16 +136,30 @@ export type IrField = {
   defaultExpr: string;
 };
 
+export type IrLayoutArray =
+  | { kind: "none" }
+  | { kind: "unbounded" }
+  | { kind: "fixed"; size: number }
+  | { kind: "bounded"; size: number };
+
+export type IrLayoutField =
+  | { name: string; kind: "prim"; prim: PrimitiveName; array: IrLayoutArray }
+  | { name: string; kind: "str"; wide: boolean; bound?: number; array: IrLayoutArray }
+  | { name: string; kind: "named"; typeName: string; array: IrLayoutArray };
+
 export type IrClass = {
   className: string;
+  nsKey: string;
   typeName: string;
   fields: IrField[];
+  layout: IrLayoutField[];
   constants: Array<{ name: string; tsType: string; valueExpr: string }>;
   dependsOn: string[];
 };
 
 export type IrService = {
   className: string;
+  nsKey: string;
   typeName: string;
   request: IrClass;
   response: IrClass;
@@ -135,6 +167,7 @@ export type IrService = {
 
 export type IrAction = {
   className: string;
+  nsKey: string;
   typeName: string;
   goal: IrClass;
   result: IrClass;
@@ -181,9 +214,9 @@ Options:
   --out FILE      .ts (runtime classes) or .d.ts (types only)
   --out DIR       one file per package
 
-OMG .idl is not accepted. Topic encode/decode still covers only the
-types shipped in rcl-web; generated classes give you typeName and
-field names. Other services/actions still send Uint8Array CDR.
+OMG .idl is not accepted. Topic encode/decode covers the ROS 2 core
+interface packages shipped in rcl-web plus the conformance corpus.
+Other workspace types still send Uint8Array CDR.
 `;
 
 function fail(reason: string): BuildErr {
@@ -292,9 +325,6 @@ export function parseInterfaceSection(
     const field: Field = { name, type: parsedType.type };
     if (tokens.length > 2) field.defaultText = tokens.slice(2).join(" ");
     fields.push(field);
-  }
-  if (fields.length === 0 && constants.length === 0) {
-    return { ok: false, reason: "interface section has no fields" };
   }
   return { ok: true, parsed: { fields, constants } };
 }
@@ -632,9 +662,27 @@ function resolveFieldTypes(
   return { ok: true, fields };
 }
 
+function layoutFieldOf(field: Field): IrLayoutField {
+  const array = field.type.array;
+  if (field.type.base.kind === "primitive") {
+    return { name: field.name, kind: "prim", prim: field.type.base.name, array };
+  }
+  if (field.type.base.kind === "string") {
+    return {
+      name: field.name,
+      kind: "str",
+      wide: field.type.base.wide,
+      ...(field.type.base.bound !== undefined ? { bound: field.type.base.bound } : {}),
+      array,
+    };
+  }
+  return { name: field.name, kind: "named", typeName: field.type.base.raw, array };
+}
+
 function classFromSection(
   typeName: string,
   className: string,
+  nsKey: string,
   section: ParsedSection,
   currentPackage: string,
   catalog: Map<string, CatalogEntry>,
@@ -663,8 +711,26 @@ function classFromSection(
     .filter((n) => n && n !== className);
   return {
     ok: true,
-    ir: { className, typeName, fields, constants, dependsOn: [...new Set(dependsOn)] },
+    ir: {
+      className,
+      nsKey,
+      typeName,
+      fields,
+      layout: resolved.fields.map(layoutFieldOf),
+      constants,
+      dependsOn: [...new Set(dependsOn)],
+    },
   };
+}
+
+function allocateBundleName(shortName: string, packageName: string, used: Set<string>): string {
+  if (!used.has(shortName)) {
+    used.add(shortName);
+    return shortName;
+  }
+  const prefixed = `${pascalPackage(packageName)}${shortName}`;
+  used.add(prefixed);
+  return prefixed;
 }
 
 export function buildIr(
@@ -673,6 +739,7 @@ export function buildIr(
 ): BuildResult {
   const catalog = catalogOf(packages);
   const classNames = allocateClassNames(catalog);
+  const usedNames = new Set<string>(classNames.values());
   const irPackages: IrPackage[] = [];
 
   for (const pkg of packages) {
@@ -683,6 +750,7 @@ export function buildIr(
       const built = classFromSection(
         msg.typeName,
         className,
+        msg.shortName,
         { fields: msg.fields, constants: msg.constants },
         pkg.name,
         catalog,
@@ -701,6 +769,7 @@ export function buildIr(
       const request = classFromSection(
         `${srv.typeName}_Request`,
         reqName,
+        `${srv.shortName}_Request`,
         srv.request,
         pkg.name,
         catalog,
@@ -710,6 +779,7 @@ export function buildIr(
       const response = classFromSection(
         `${srv.typeName}_Response`,
         resName,
+        `${srv.shortName}_Response`,
         srv.response,
         pkg.name,
         catalog,
@@ -717,7 +787,8 @@ export function buildIr(
       );
       if (!response.ok) return response;
       services.push({
-        className: srv.shortName,
+        className: allocateBundleName(srv.shortName, pkg.name, usedNames),
+        nsKey: srv.shortName,
         typeName: srv.typeName,
         request: request.ir,
         response: response.ir,
@@ -736,6 +807,7 @@ export function buildIr(
       const goal = classFromSection(
         `${action.typeName}_Goal`,
         goalName,
+        `${action.shortName}_Goal`,
         action.goal,
         pkg.name,
         catalog,
@@ -745,6 +817,7 @@ export function buildIr(
       const result = classFromSection(
         `${action.typeName}_Result`,
         resultName,
+        `${action.shortName}_Result`,
         action.result,
         pkg.name,
         catalog,
@@ -754,6 +827,7 @@ export function buildIr(
       const feedback = classFromSection(
         `${action.typeName}_Feedback`,
         feedbackName,
+        `${action.shortName}_Feedback`,
         action.feedback,
         pkg.name,
         catalog,
@@ -761,7 +835,8 @@ export function buildIr(
       );
       if (!feedback.ok) return feedback;
       actions.push({
-        className: action.shortName,
+        className: allocateBundleName(action.shortName, pkg.name, usedNames),
+        nsKey: action.shortName,
         typeName: action.typeName,
         goal: goal.ir,
         result: result.ir,
@@ -849,12 +924,16 @@ function emitClassDts(cls: IrClass): string {
   return lines.join("\n");
 }
 
+function nsBinding(nsKey: string, className: string): string {
+  return nsKey === className ? className : `${nsKey}: ${className}`;
+}
+
 function emitNamespacesTs(packages: IrPackage[]): string {
   const blocks: string[] = [];
   for (const pkg of packages) {
-    const msg = pkg.messages.map((m) => m.className).join(", ");
-    const srv = pkg.services.map((s) => s.className).join(", ");
-    const action = pkg.actions.map((a) => a.className).join(", ");
+    const msg = pkg.messages.map((m) => nsBinding(m.nsKey, m.className)).join(", ");
+    const srv = pkg.services.map((s) => nsBinding(s.nsKey, s.className)).join(", ");
+    const action = pkg.actions.map((a) => nsBinding(a.nsKey, a.className)).join(", ");
     const parts: string[] = [];
     if (pkg.messages.length) parts.push(`  msg: { ${msg} },`);
     if (pkg.services.length) parts.push(`  srv: { ${srv} },`);
@@ -870,19 +949,19 @@ function emitNamespacesDts(packages: IrPackage[]): string {
     const parts: string[] = [];
     if (pkg.messages.length) {
       const rows = pkg.messages
-        .map((m) => `    readonly ${m.className}: typeof ${m.className};`)
+        .map((m) => `    readonly ${m.nsKey}: typeof ${m.className};`)
         .join("\n");
       parts.push(`  readonly msg: {\n${rows}\n  };`);
     }
     if (pkg.services.length) {
       const rows = pkg.services
-        .map((s) => `    readonly ${s.className}: typeof ${s.className};`)
+        .map((s) => `    readonly ${s.nsKey}: typeof ${s.className};`)
         .join("\n");
       parts.push(`  readonly srv: {\n${rows}\n  };`);
     }
     if (pkg.actions.length) {
       const rows = pkg.actions
-        .map((a) => `    readonly ${a.className}: typeof ${a.className};`)
+        .map((a) => `    readonly ${a.nsKey}: typeof ${a.className};`)
         .join("\n");
       parts.push(`  readonly action: {\n${rows}\n  };`);
     }
@@ -933,6 +1012,118 @@ function emitActionConstDts(action: IrAction): string {
   ].join("\n");
 }
 
+function emitCatalogTs(packages: IrPackage[]): string {
+  const classes = allClasses(packages);
+  const layoutEntries = classes
+    .map((cls) => `  ${JSON.stringify(cls.typeName)}: ${JSON.stringify(cls.layout)}`)
+    .join(",\n");
+  const msgNames = packages
+    .flatMap((pkg) => pkg.messages.map((m) => m.typeName))
+    .sort()
+    .map((name) => `  ${JSON.stringify(name)},`)
+    .join("\n");
+  const allNames = classes
+    .map((cls) => cls.typeName)
+    .sort()
+    .map((name) => `  ${JSON.stringify(name)},`)
+    .join("\n");
+  const opEntries: string[] = [];
+  for (const pkg of packages) {
+    for (const srv of pkg.services) {
+      opEntries.push(
+        `  ${JSON.stringify(srv.typeName)}: { Request: ${JSON.stringify(srv.request.typeName)}, Response: ${JSON.stringify(srv.response.typeName)} }`,
+      );
+    }
+    for (const action of pkg.actions) {
+      opEntries.push(
+        `  ${JSON.stringify(action.typeName)}: { Goal: ${JSON.stringify(action.goal.typeName)}, Result: ${JSON.stringify(action.result.typeName)}, Feedback: ${JSON.stringify(action.feedback.typeName)} }`,
+      );
+    }
+  }
+  opEntries.sort();
+  const ctorCases = classes
+    .map((cls) => `    case ${JSON.stringify(cls.typeName)}: return new ${cls.className}();`)
+    .join("\n");
+  return [
+    "export type GeneratedLayoutArray =",
+    '  | { kind: "none" }',
+    '  | { kind: "unbounded" }',
+    '  | { kind: "fixed"; size: number }',
+    '  | { kind: "bounded"; size: number };',
+    "",
+    "export type GeneratedLayoutField =",
+    '  | { name: string; kind: "prim"; prim: string; array: GeneratedLayoutArray }',
+    '  | { name: string; kind: "str"; wide: boolean; bound?: number; array: GeneratedLayoutArray }',
+    '  | { name: string; kind: "named"; typeName: string; array: GeneratedLayoutArray };',
+    "",
+    "export const GENERATED_LAYOUTS: { readonly [typeName: string]: readonly GeneratedLayoutField[] } = {",
+    layoutEntries,
+    "};",
+    "",
+    "export const GENERATED_MSG_TYPE_NAMES: ReadonlySet<string> = new Set([",
+    msgNames,
+    "]);",
+    "",
+    "export const GENERATED_TYPE_NAMES: ReadonlySet<string> = new Set([",
+    allNames,
+    "]);",
+    "",
+    "export const GENERATED_OP_TYPES: {",
+    "  readonly [typeName: string]: {",
+    "    readonly Request?: string;",
+    "    readonly Response?: string;",
+    "    readonly Goal?: string;",
+    "    readonly Result?: string;",
+    "    readonly Feedback?: string;",
+    "  };",
+    "} = {",
+    opEntries.join(",\n"),
+    "};",
+    "",
+    "export function createGenerated(typeName: string): object | undefined {",
+    "  switch (typeName) {",
+    ctorCases,
+    "    default: return undefined;",
+    "  }",
+    "}",
+  ].join("\n");
+}
+
+function emitCatalogDts(packages: IrPackage[]): string {
+  return [
+    "export type GeneratedLayoutArray =",
+    '  | { kind: "none" }',
+    '  | { kind: "unbounded" }',
+    '  | { kind: "fixed"; size: number }',
+    '  | { kind: "bounded"; size: number };',
+    "",
+    "export type GeneratedLayoutField =",
+    '  | { name: string; kind: "prim"; prim: string; array: GeneratedLayoutArray }',
+    '  | { name: string; kind: "str"; wide: boolean; bound?: number; array: GeneratedLayoutArray }',
+    '  | { name: string; kind: "named"; typeName: string; array: GeneratedLayoutArray };',
+    "",
+    "export declare const GENERATED_LAYOUTS: {",
+    "  readonly [typeName: string]: readonly GeneratedLayoutField[];",
+    "};",
+    "",
+    "export declare const GENERATED_MSG_TYPE_NAMES: ReadonlySet<string>;",
+    "",
+    "export declare const GENERATED_TYPE_NAMES: ReadonlySet<string>;",
+    "",
+    "export declare const GENERATED_OP_TYPES: {",
+    "  readonly [typeName: string]: {",
+    "    readonly Request?: string;",
+    "    readonly Response?: string;",
+    "    readonly Goal?: string;",
+    "    readonly Result?: string;",
+    "    readonly Feedback?: string;",
+    "  };",
+    "};",
+    "",
+    "export declare function createGenerated(typeName: string): object | undefined;",
+  ].join("\n");
+}
+
 export function emitTs(packages: IrPackage[], banner = REPO_BANNER): string {
   const classes = topoSortClasses(allClasses(packages));
   const parts = [banner.trimEnd(), ""];
@@ -948,6 +1139,7 @@ export function emitTs(packages: IrPackage[], banner = REPO_BANNER): string {
     }
   }
   parts.push(emitNamespacesTs(packages), "");
+  parts.push(emitCatalogTs(packages), "");
   return `${parts.join("\n").trimEnd()}\n`;
 }
 
@@ -966,6 +1158,7 @@ export function emitDts(packages: IrPackage[], banner = REPO_BANNER): string {
     }
   }
   parts.push(emitNamespacesDts(packages), "");
+  parts.push(emitCatalogDts(packages), "");
   return `${parts.join("\n").trimEnd()}\n`;
 }
 

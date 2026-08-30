@@ -3,7 +3,7 @@
  * Mirrors `rclweb::types::host_value`. Not CDR.
  */
 
-import { decodeGeneratedCdr } from "./cdr-le.ts";
+import { decodeGeneratedCdr, encodeCatalogCdr } from "./cdr-le.ts";
 import {
   Collections,
   EchoNested_Request,
@@ -14,6 +14,7 @@ import {
   NestedSample,
   PrimitiveScalars,
   Time,
+  createGenerated,
   generatedOpTypeName,
   type GeneratedOpKind,
 } from "./interfaces.ts";
@@ -21,15 +22,9 @@ import {
 const te = new TextEncoder();
 const td = new TextDecoder();
 
-export type GeneratedMsg = PrimitiveScalars | NestedSample | Collections;
+export type GeneratedMsg = object;
 
-export type GeneratedValue =
-  | GeneratedMsg
-  | EchoNested_Request
-  | EchoNested_Response
-  | MeasureSequence_Goal
-  | MeasureSequence_Result
-  | MeasureSequence_Feedback;
+export type GeneratedValue = object;
 
 export function encodeGeneratedHostValue(
   typeName: string,
@@ -59,7 +54,7 @@ export function encodeGeneratedHostValue(
   if (typeName === MeasureSequence_Feedback.typeName) {
     return encodeMeasureFeedback(asMeasureFeedback(message));
   }
-  throw new Error(`unsupported generated type ${typeName}`);
+  return encodeCatalogCdr(typeName, message);
 }
 
 export function encodeOpPayload(
@@ -126,6 +121,8 @@ export function reviveGenerated(typeName: string, value: unknown): GeneratedValu
     msg.sample = reviveNested(src?.sample);
     return msg;
   }
+  const created = createGenerated(typeName);
+  if (created) return Object.assign(created, value);
   throw new Error(`unsupported generated type ${typeName}`);
 }
 

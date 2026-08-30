@@ -3,6 +3,353 @@
  * Do not edit by hand. Regenerate with `bun run rosidl-dts:write`.
  */
 
+export declare class Vector3 {
+  static readonly typeName: "geometry_msgs/msg/Vector3";
+  x: number;
+  y: number;
+  z: number;
+  constructor();
+}
+
+export declare class Accel {
+  static readonly typeName: "geometry_msgs/msg/Accel";
+  linear: Vector3;
+  angular: Vector3;
+  constructor();
+}
+
+export declare class Time {
+  static readonly typeName: "builtin_interfaces/msg/Time";
+  sec: number;
+  nanosec: number;
+  constructor();
+}
+
+export declare class Header {
+  static readonly typeName: "std_msgs/msg/Header";
+  stamp: Time;
+  frame_id: string;
+  constructor();
+}
+
+export declare class AccelStamped {
+  static readonly typeName: "geometry_msgs/msg/AccelStamped";
+  header: Header;
+  accel: Accel;
+  constructor();
+}
+
+export declare class AccelWithCovariance {
+  static readonly typeName: "geometry_msgs/msg/AccelWithCovariance";
+  accel: Accel;
+  covariance: number[];
+  constructor();
+}
+
+export declare class AccelWithCovarianceStamped {
+  static readonly typeName: "geometry_msgs/msg/AccelWithCovarianceStamped";
+  header: Header;
+  accel: AccelWithCovariance;
+  constructor();
+}
+
+export declare class TypeHash {
+  static readonly typeName: "rosgraph_msgs/msg/TypeHash";
+  version: number;
+  value: Uint8Array;
+  constructor();
+}
+
+export declare class InterfaceType {
+  static readonly typeName: "rosgraph_msgs/msg/InterfaceType";
+  name: string;
+  hash: TypeHash;
+  constructor();
+}
+
+export declare class Duration {
+  static readonly typeName: "builtin_interfaces/msg/Duration";
+  sec: number;
+  nanosec: number;
+  constructor();
+}
+
+export declare class QoSProfile {
+  static readonly typeName: "rosgraph_msgs/msg/QoSProfile";
+  static readonly HISTORY_SYSTEM_DEFAULT: number;
+  static readonly HISTORY_KEEP_LAST: number;
+  static readonly HISTORY_KEEP_ALL: number;
+  static readonly HISTORY_UNKNOWN: number;
+  static readonly RELIABILITY_SYSTEM_DEFAULT: number;
+  static readonly RELIABILITY_RELIABLE: number;
+  static readonly RELIABILITY_BEST_EFFORT: number;
+  static readonly RELIABILITY_UNKNOWN: number;
+  static readonly RELIABILITY_BEST_AVAILABLE: number;
+  static readonly DURABILITY_SYSTEM_DEFAULT: number;
+  static readonly DURABILITY_TRANSIENT_LOCAL: number;
+  static readonly DURABILITY_VOLATILE: number;
+  static readonly DURABILITY_UNKNOWN: number;
+  static readonly DURABILITY_BEST_AVAILABLE: number;
+  static readonly LIVELINESS_SYSTEM_DEFAULT: number;
+  static readonly LIVELINESS_AUTOMATIC: number;
+  static readonly LIVELINESS_MANUAL_BY_TOPIC: number;
+  static readonly LIVELINESS_UNKNOWN: number;
+  static readonly LIVELINESS_BEST_AVAILABLE: number;
+  depth: number;
+  deadline: Duration;
+  lifespan: Duration;
+  history: number;
+  reliability: number;
+  durability: number;
+  liveliness: number;
+  liveliness_lease_duration: Duration;
+  constructor();
+}
+
+export declare class Service {
+  static readonly typeName: "rosgraph_msgs/msg/Service";
+  name: string;
+  request_type: InterfaceType;
+  request_qos: QoSProfile;
+  response_type: InterfaceType;
+  response_qos: QoSProfile;
+  constructor();
+}
+
+export declare class Topic {
+  static readonly typeName: "rosgraph_msgs/msg/Topic";
+  name: string;
+  type: InterfaceType;
+  qos: QoSProfile;
+  constructor();
+}
+
+export declare class Action {
+  static readonly typeName: "rosgraph_msgs/msg/Action";
+  name: string;
+  send_goal: Service;
+  get_result: Service;
+  cancel_goal: Service;
+  feedback: Topic;
+  status: Topic;
+  constructor();
+}
+
+export declare class AddDiagnostics_Request {
+  static readonly typeName: "diagnostic_msgs/srv/AddDiagnostics_Request";
+  load_namespace: string;
+  constructor();
+}
+
+export declare class AddDiagnostics_Response {
+  static readonly typeName: "diagnostic_msgs/srv/AddDiagnostics_Response";
+  success: boolean;
+  message: string;
+  constructor();
+}
+
+export declare class BatteryState {
+  static readonly typeName: "sensor_msgs/msg/BatteryState";
+  static readonly POWER_SUPPLY_STATUS_UNKNOWN: number;
+  static readonly POWER_SUPPLY_STATUS_CHARGING: number;
+  static readonly POWER_SUPPLY_STATUS_DISCHARGING: number;
+  static readonly POWER_SUPPLY_STATUS_NOT_CHARGING: number;
+  static readonly POWER_SUPPLY_STATUS_FULL: number;
+  static readonly POWER_SUPPLY_HEALTH_UNKNOWN: number;
+  static readonly POWER_SUPPLY_HEALTH_GOOD: number;
+  static readonly POWER_SUPPLY_HEALTH_OVERHEAT: number;
+  static readonly POWER_SUPPLY_HEALTH_DEAD: number;
+  static readonly POWER_SUPPLY_HEALTH_OVERVOLTAGE: number;
+  static readonly POWER_SUPPLY_HEALTH_UNSPEC_FAILURE: number;
+  static readonly POWER_SUPPLY_HEALTH_COLD: number;
+  static readonly POWER_SUPPLY_HEALTH_WATCHDOG_TIMER_EXPIRE: number;
+  static readonly POWER_SUPPLY_HEALTH_SAFETY_TIMER_EXPIRE: number;
+  static readonly POWER_SUPPLY_TECHNOLOGY_UNKNOWN: number;
+  static readonly POWER_SUPPLY_TECHNOLOGY_NIMH: number;
+  static readonly POWER_SUPPLY_TECHNOLOGY_LION: number;
+  static readonly POWER_SUPPLY_TECHNOLOGY_LIPO: number;
+  static readonly POWER_SUPPLY_TECHNOLOGY_LIFE: number;
+  static readonly POWER_SUPPLY_TECHNOLOGY_NICD: number;
+  static readonly POWER_SUPPLY_TECHNOLOGY_LIMN: number;
+  static readonly POWER_SUPPLY_TECHNOLOGY_TERNARY: number;
+  static readonly POWER_SUPPLY_TECHNOLOGY_VRLA: number;
+  header: Header;
+  voltage: number;
+  temperature: number;
+  current: number;
+  charge: number;
+  capacity: number;
+  design_capacity: number;
+  percentage: number;
+  power_supply_status: number;
+  power_supply_health: number;
+  power_supply_technology: number;
+  present: boolean;
+  cell_voltage: number[];
+  cell_temperature: number[];
+  location: string;
+  serial_number: string;
+  constructor();
+}
+
+export declare class Bool {
+  static readonly typeName: "std_msgs/msg/Bool";
+  data: boolean;
+  constructor();
+}
+
+export declare class Byte {
+  static readonly typeName: "std_msgs/msg/Byte";
+  data: number;
+  constructor();
+}
+
+export declare class MultiArrayDimension {
+  static readonly typeName: "std_msgs/msg/MultiArrayDimension";
+  label: string;
+  size: number;
+  stride: number;
+  constructor();
+}
+
+export declare class MultiArrayLayout {
+  static readonly typeName: "std_msgs/msg/MultiArrayLayout";
+  dim: MultiArrayDimension[];
+  data_offset: number;
+  constructor();
+}
+
+export declare class ByteMultiArray {
+  static readonly typeName: "std_msgs/msg/ByteMultiArray";
+  layout: MultiArrayLayout;
+  data: Uint8Array;
+  constructor();
+}
+
+export declare class RegionOfInterest {
+  static readonly typeName: "sensor_msgs/msg/RegionOfInterest";
+  x_offset: number;
+  y_offset: number;
+  height: number;
+  width: number;
+  do_rectify: boolean;
+  constructor();
+}
+
+export declare class CameraInfo {
+  static readonly typeName: "sensor_msgs/msg/CameraInfo";
+  header: Header;
+  height: number;
+  width: number;
+  distortion_model: string;
+  d: number[];
+  k: [number, number, number, number, number, number, number, number, number];
+  r: [number, number, number, number, number, number, number, number, number];
+  p: [number, number, number, number, number, number, number, number, number, number, number, number];
+  binning_x: number;
+  binning_y: number;
+  roi: RegionOfInterest;
+  constructor();
+}
+
+export declare class UUID {
+  static readonly typeName: "unique_identifier_msgs/msg/UUID";
+  uuid: Uint8Array;
+  constructor();
+}
+
+export declare class GoalInfo {
+  static readonly typeName: "action_msgs/msg/GoalInfo";
+  goal_id: UUID;
+  stamp: Time;
+  constructor();
+}
+
+export declare class CancelGoal_Request {
+  static readonly typeName: "action_msgs/srv/CancelGoal_Request";
+  goal_info: GoalInfo;
+  constructor();
+}
+
+export declare class CancelGoal_Response {
+  static readonly typeName: "action_msgs/srv/CancelGoal_Response";
+  static readonly ERROR_NONE: number;
+  static readonly ERROR_REJECTED: number;
+  static readonly ERROR_UNKNOWN_GOAL_ID: number;
+  static readonly ERROR_GOAL_TERMINATED: number;
+  return_code: number;
+  goals_canceling: GoalInfo[];
+  constructor();
+}
+
+export declare class Transition {
+  static readonly typeName: "lifecycle_msgs/msg/Transition";
+  static readonly TRANSITION_CREATE: number;
+  static readonly TRANSITION_CONFIGURE: number;
+  static readonly TRANSITION_CLEANUP: number;
+  static readonly TRANSITION_ACTIVATE: number;
+  static readonly TRANSITION_DEACTIVATE: number;
+  static readonly TRANSITION_UNCONFIGURED_SHUTDOWN: number;
+  static readonly TRANSITION_INACTIVE_SHUTDOWN: number;
+  static readonly TRANSITION_ACTIVE_SHUTDOWN: number;
+  static readonly TRANSITION_DESTROY: number;
+  static readonly TRANSITION_ON_CONFIGURE_SUCCESS: number;
+  static readonly TRANSITION_ON_CONFIGURE_FAILURE: number;
+  static readonly TRANSITION_ON_CONFIGURE_ERROR: number;
+  static readonly TRANSITION_ON_CLEANUP_SUCCESS: number;
+  static readonly TRANSITION_ON_CLEANUP_FAILURE: number;
+  static readonly TRANSITION_ON_CLEANUP_ERROR: number;
+  static readonly TRANSITION_ON_ACTIVATE_SUCCESS: number;
+  static readonly TRANSITION_ON_ACTIVATE_FAILURE: number;
+  static readonly TRANSITION_ON_ACTIVATE_ERROR: number;
+  static readonly TRANSITION_ON_DEACTIVATE_SUCCESS: number;
+  static readonly TRANSITION_ON_DEACTIVATE_FAILURE: number;
+  static readonly TRANSITION_ON_DEACTIVATE_ERROR: number;
+  static readonly TRANSITION_ON_SHUTDOWN_SUCCESS: number;
+  static readonly TRANSITION_ON_SHUTDOWN_FAILURE: number;
+  static readonly TRANSITION_ON_SHUTDOWN_ERROR: number;
+  static readonly TRANSITION_ON_ERROR_SUCCESS: number;
+  static readonly TRANSITION_ON_ERROR_FAILURE: number;
+  static readonly TRANSITION_ON_ERROR_ERROR: number;
+  static readonly TRANSITION_CALLBACK_SUCCESS: number;
+  static readonly TRANSITION_CALLBACK_FAILURE: number;
+  static readonly TRANSITION_CALLBACK_ERROR: number;
+  id: number;
+  label: string;
+  constructor();
+}
+
+export declare class ChangeState_Request {
+  static readonly typeName: "lifecycle_msgs/srv/ChangeState_Request";
+  transition: Transition;
+  constructor();
+}
+
+export declare class ChangeState_Response {
+  static readonly typeName: "lifecycle_msgs/srv/ChangeState_Response";
+  success: boolean;
+  constructor();
+}
+
+export declare class ChannelFloat32 {
+  static readonly typeName: "sensor_msgs/msg/ChannelFloat32";
+  name: string;
+  values: number[];
+  constructor();
+}
+
+export declare class Char {
+  static readonly typeName: "std_msgs/msg/Char";
+  data: number;
+  constructor();
+}
+
+export declare class Clock {
+  static readonly typeName: "rosgraph_msgs/msg/Clock";
+  clock: Time;
+  constructor();
+}
+
 export declare class Collections {
   static readonly typeName: "rclweb_cdr_interfaces/msg/Collections";
   fixed_i32: [number, number, number];
@@ -10,6 +357,117 @@ export declare class Collections {
   bytes_value: Uint8Array;
   bounded_string: string;
   bounded_wstring: string;
+  constructor();
+}
+
+export declare class ColorRGBA {
+  static readonly typeName: "std_msgs/msg/ColorRGBA";
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+  constructor();
+}
+
+export declare class CompressedImage {
+  static readonly typeName: "sensor_msgs/msg/CompressedImage";
+  header: Header;
+  format: string;
+  data: Uint8Array;
+  constructor();
+}
+
+export declare class DescribeParameters_Request {
+  static readonly typeName: "rcl_interfaces/srv/DescribeParameters_Request";
+  names: string[];
+  constructor();
+}
+
+export declare class FloatingPointRange {
+  static readonly typeName: "rcl_interfaces/msg/FloatingPointRange";
+  from_value: number;
+  to_value: number;
+  step: number;
+  constructor();
+}
+
+export declare class IntegerRange {
+  static readonly typeName: "rcl_interfaces/msg/IntegerRange";
+  from_value: bigint;
+  to_value: bigint;
+  step: bigint;
+  constructor();
+}
+
+export declare class ParameterDescriptor {
+  static readonly typeName: "rcl_interfaces/msg/ParameterDescriptor";
+  name: string;
+  type: number;
+  description: string;
+  additional_constraints: string;
+  read_only: boolean;
+  dynamic_typing: boolean;
+  floating_point_range: FloatingPointRange[];
+  integer_range: IntegerRange[];
+  constructor();
+}
+
+export declare class DescribeParameters_Response {
+  static readonly typeName: "rcl_interfaces/srv/DescribeParameters_Response";
+  descriptors: ParameterDescriptor[];
+  constructor();
+}
+
+export declare class DiagnosticMsgsKeyValue {
+  static readonly typeName: "diagnostic_msgs/msg/KeyValue";
+  key: string;
+  value: string;
+  constructor();
+}
+
+export declare class DiagnosticStatus {
+  static readonly typeName: "diagnostic_msgs/msg/DiagnosticStatus";
+  static readonly OK: number;
+  static readonly WARN: number;
+  static readonly ERROR: number;
+  static readonly STALE: number;
+  level: number;
+  name: string;
+  message: string;
+  hardware_id: string;
+  values: DiagnosticMsgsKeyValue[];
+  constructor();
+}
+
+export declare class DiagnosticArray {
+  static readonly typeName: "diagnostic_msgs/msg/DiagnosticArray";
+  header: Header;
+  status: DiagnosticStatus[];
+  constructor();
+}
+
+export declare class Image {
+  static readonly typeName: "sensor_msgs/msg/Image";
+  header: Header;
+  height: number;
+  width: number;
+  encoding: string;
+  is_bigendian: number;
+  step: number;
+  data: Uint8Array;
+  constructor();
+}
+
+export declare class DisparityImage {
+  static readonly typeName: "stereo_msgs/msg/DisparityImage";
+  header: Header;
+  image: Image;
+  f: number;
+  t: number;
+  valid_window: RegionOfInterest;
+  min_disparity: number;
+  max_disparity: number;
+  delta_d: number;
   constructor();
 }
 
@@ -30,13 +488,6 @@ export declare class PrimitiveScalars {
   uint64_value: bigint;
   string_value: string;
   wstring_value: string;
-  constructor();
-}
-
-export declare class Time {
-  static readonly typeName: "builtin_interfaces/msg/Time";
-  sec: number;
-  nanosec: number;
   constructor();
 }
 
@@ -61,10 +512,998 @@ export declare class EchoNested_Response {
   constructor();
 }
 
-export declare class Header {
-  static readonly typeName: "std_msgs/msg/Header";
+export declare class Empty {
+  static readonly typeName: "std_msgs/msg/Empty";
+  constructor();
+}
+
+export declare class Empty_Request {
+  static readonly typeName: "std_srvs/srv/Empty_Request";
+  constructor();
+}
+
+export declare class Empty_Response {
+  static readonly typeName: "std_srvs/srv/Empty_Response";
+  constructor();
+}
+
+export declare class FieldType {
+  static readonly typeName: "type_description_interfaces/msg/FieldType";
+  static readonly FIELD_TYPE_NOT_SET: number;
+  static readonly FIELD_TYPE_NESTED_TYPE: number;
+  static readonly FIELD_TYPE_INT8: number;
+  static readonly FIELD_TYPE_UINT8: number;
+  static readonly FIELD_TYPE_INT16: number;
+  static readonly FIELD_TYPE_UINT16: number;
+  static readonly FIELD_TYPE_INT32: number;
+  static readonly FIELD_TYPE_UINT32: number;
+  static readonly FIELD_TYPE_INT64: number;
+  static readonly FIELD_TYPE_UINT64: number;
+  static readonly FIELD_TYPE_FLOAT: number;
+  static readonly FIELD_TYPE_DOUBLE: number;
+  static readonly FIELD_TYPE_LONG_DOUBLE: number;
+  static readonly FIELD_TYPE_CHAR: number;
+  static readonly FIELD_TYPE_WCHAR: number;
+  static readonly FIELD_TYPE_BOOLEAN: number;
+  static readonly FIELD_TYPE_BYTE: number;
+  static readonly FIELD_TYPE_STRING: number;
+  static readonly FIELD_TYPE_WSTRING: number;
+  static readonly FIELD_TYPE_FIXED_STRING: number;
+  static readonly FIELD_TYPE_FIXED_WSTRING: number;
+  static readonly FIELD_TYPE_BOUNDED_STRING: number;
+  static readonly FIELD_TYPE_BOUNDED_WSTRING: number;
+  static readonly FIELD_TYPE_NESTED_TYPE_ARRAY: number;
+  static readonly FIELD_TYPE_INT8_ARRAY: number;
+  static readonly FIELD_TYPE_UINT8_ARRAY: number;
+  static readonly FIELD_TYPE_INT16_ARRAY: number;
+  static readonly FIELD_TYPE_UINT16_ARRAY: number;
+  static readonly FIELD_TYPE_INT32_ARRAY: number;
+  static readonly FIELD_TYPE_UINT32_ARRAY: number;
+  static readonly FIELD_TYPE_INT64_ARRAY: number;
+  static readonly FIELD_TYPE_UINT64_ARRAY: number;
+  static readonly FIELD_TYPE_FLOAT_ARRAY: number;
+  static readonly FIELD_TYPE_DOUBLE_ARRAY: number;
+  static readonly FIELD_TYPE_LONG_DOUBLE_ARRAY: number;
+  static readonly FIELD_TYPE_CHAR_ARRAY: number;
+  static readonly FIELD_TYPE_WCHAR_ARRAY: number;
+  static readonly FIELD_TYPE_BOOLEAN_ARRAY: number;
+  static readonly FIELD_TYPE_BYTE_ARRAY: number;
+  static readonly FIELD_TYPE_STRING_ARRAY: number;
+  static readonly FIELD_TYPE_WSTRING_ARRAY: number;
+  static readonly FIELD_TYPE_FIXED_STRING_ARRAY: number;
+  static readonly FIELD_TYPE_FIXED_WSTRING_ARRAY: number;
+  static readonly FIELD_TYPE_BOUNDED_STRING_ARRAY: number;
+  static readonly FIELD_TYPE_BOUNDED_WSTRING_ARRAY: number;
+  static readonly FIELD_TYPE_NESTED_TYPE_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_INT8_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_UINT8_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_INT16_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_UINT16_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_INT32_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_UINT32_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_INT64_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_UINT64_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_FLOAT_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_DOUBLE_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_LONG_DOUBLE_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_CHAR_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_WCHAR_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_BOOLEAN_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_BYTE_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_STRING_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_WSTRING_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_FIXED_STRING_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_FIXED_WSTRING_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_BOUNDED_STRING_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_BOUNDED_WSTRING_BOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_NESTED_TYPE_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_INT8_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_UINT8_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_INT16_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_UINT16_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_INT32_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_UINT32_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_INT64_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_UINT64_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_FLOAT_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_DOUBLE_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_LONG_DOUBLE_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_CHAR_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_WCHAR_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_BOOLEAN_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_BYTE_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_STRING_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_WSTRING_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_FIXED_STRING_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_FIXED_WSTRING_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_BOUNDED_STRING_UNBOUNDED_SEQUENCE: number;
+  static readonly FIELD_TYPE_BOUNDED_WSTRING_UNBOUNDED_SEQUENCE: number;
+  type_id: number;
+  capacity: bigint;
+  string_capacity: bigint;
+  nested_type_name: string;
+  constructor();
+}
+
+export declare class Field {
+  static readonly typeName: "type_description_interfaces/msg/Field";
+  name: string;
+  type: FieldType;
+  default_value: string;
+  constructor();
+}
+
+export declare class Float32 {
+  static readonly typeName: "std_msgs/msg/Float32";
+  data: number;
+  constructor();
+}
+
+export declare class Float32MultiArray {
+  static readonly typeName: "std_msgs/msg/Float32MultiArray";
+  layout: MultiArrayLayout;
+  data: number[];
+  constructor();
+}
+
+export declare class Float64 {
+  static readonly typeName: "std_msgs/msg/Float64";
+  data: number;
+  constructor();
+}
+
+export declare class Float64MultiArray {
+  static readonly typeName: "std_msgs/msg/Float64MultiArray";
+  layout: MultiArrayLayout;
+  data: number[];
+  constructor();
+}
+
+export declare class FluidPressure {
+  static readonly typeName: "sensor_msgs/msg/FluidPressure";
+  header: Header;
+  fluid_pressure: number;
+  variance: number;
+  constructor();
+}
+
+export declare class FrameGraph_Request {
+  static readonly typeName: "tf2_msgs/srv/FrameGraph_Request";
+  constructor();
+}
+
+export declare class FrameGraph_Response {
+  static readonly typeName: "tf2_msgs/srv/FrameGraph_Response";
+  frame_yaml: string;
+  constructor();
+}
+
+export declare class GetAvailableStates_Request {
+  static readonly typeName: "lifecycle_msgs/srv/GetAvailableStates_Request";
+  constructor();
+}
+
+export declare class State {
+  static readonly typeName: "lifecycle_msgs/msg/State";
+  static readonly PRIMARY_STATE_UNKNOWN: number;
+  static readonly PRIMARY_STATE_UNCONFIGURED: number;
+  static readonly PRIMARY_STATE_INACTIVE: number;
+  static readonly PRIMARY_STATE_ACTIVE: number;
+  static readonly PRIMARY_STATE_FINALIZED: number;
+  static readonly TRANSITION_STATE_CONFIGURING: number;
+  static readonly TRANSITION_STATE_CLEANINGUP: number;
+  static readonly TRANSITION_STATE_SHUTTINGDOWN: number;
+  static readonly TRANSITION_STATE_ACTIVATING: number;
+  static readonly TRANSITION_STATE_DEACTIVATING: number;
+  static readonly TRANSITION_STATE_ERRORPROCESSING: number;
+  id: number;
+  label: string;
+  constructor();
+}
+
+export declare class GetAvailableStates_Response {
+  static readonly typeName: "lifecycle_msgs/srv/GetAvailableStates_Response";
+  available_states: State[];
+  constructor();
+}
+
+export declare class GetAvailableTransitions_Request {
+  static readonly typeName: "lifecycle_msgs/srv/GetAvailableTransitions_Request";
+  constructor();
+}
+
+export declare class TransitionDescription {
+  static readonly typeName: "lifecycle_msgs/msg/TransitionDescription";
+  transition: Transition;
+  start_state: State;
+  goal_state: State;
+  constructor();
+}
+
+export declare class GetAvailableTransitions_Response {
+  static readonly typeName: "lifecycle_msgs/srv/GetAvailableTransitions_Response";
+  available_transitions: TransitionDescription[];
+  constructor();
+}
+
+export declare class GetInteractiveMarkers_Request {
+  static readonly typeName: "visualization_msgs/srv/GetInteractiveMarkers_Request";
+  constructor();
+}
+
+export declare class MeshFile {
+  static readonly typeName: "visualization_msgs/msg/MeshFile";
+  filename: string;
+  data: Uint8Array;
+  constructor();
+}
+
+export declare class Point {
+  static readonly typeName: "geometry_msgs/msg/Point";
+  x: number;
+  y: number;
+  z: number;
+  constructor();
+}
+
+export declare class Quaternion {
+  static readonly typeName: "geometry_msgs/msg/Quaternion";
+  x: number;
+  y: number;
+  z: number;
+  w: number;
+  constructor();
+}
+
+export declare class Pose {
+  static readonly typeName: "geometry_msgs/msg/Pose";
+  position: Point;
+  orientation: Quaternion;
+  constructor();
+}
+
+export declare class UVCoordinate {
+  static readonly typeName: "visualization_msgs/msg/UVCoordinate";
+  u: number;
+  v: number;
+  constructor();
+}
+
+export declare class Marker {
+  static readonly typeName: "visualization_msgs/msg/Marker";
+  static readonly ARROW: number;
+  static readonly CUBE: number;
+  static readonly SPHERE: number;
+  static readonly CYLINDER: number;
+  static readonly LINE_STRIP: number;
+  static readonly LINE_LIST: number;
+  static readonly CUBE_LIST: number;
+  static readonly SPHERE_LIST: number;
+  static readonly POINTS: number;
+  static readonly TEXT_VIEW_FACING: number;
+  static readonly MESH_RESOURCE: number;
+  static readonly TRIANGLE_LIST: number;
+  static readonly ARROW_STRIP: number;
+  static readonly ADD: number;
+  static readonly MODIFY: number;
+  static readonly DELETE: number;
+  static readonly DELETEALL: number;
+  header: Header;
+  ns: string;
+  id: number;
+  type: number;
+  action: number;
+  pose: Pose;
+  scale: Vector3;
+  color: ColorRGBA;
+  lifetime: Duration;
+  frame_locked: boolean;
+  points: Point[];
+  colors: ColorRGBA[];
+  texture_resource: string;
+  texture: CompressedImage;
+  uv_coordinates: UVCoordinate[];
+  text: string;
+  mesh_resource: string;
+  mesh_file: MeshFile;
+  mesh_use_embedded_materials: boolean;
+  constructor();
+}
+
+export declare class InteractiveMarkerControl {
+  static readonly typeName: "visualization_msgs/msg/InteractiveMarkerControl";
+  static readonly INHERIT: number;
+  static readonly FIXED: number;
+  static readonly VIEW_FACING: number;
+  static readonly NONE: number;
+  static readonly MENU: number;
+  static readonly BUTTON: number;
+  static readonly MOVE_AXIS: number;
+  static readonly MOVE_PLANE: number;
+  static readonly ROTATE_AXIS: number;
+  static readonly MOVE_ROTATE: number;
+  static readonly MOVE_3D: number;
+  static readonly ROTATE_3D: number;
+  static readonly MOVE_ROTATE_3D: number;
+  name: string;
+  orientation: Quaternion;
+  orientation_mode: number;
+  interaction_mode: number;
+  always_visible: boolean;
+  markers: Marker[];
+  independent_marker_orientation: boolean;
+  description: string;
+  constructor();
+}
+
+export declare class MenuEntry {
+  static readonly typeName: "visualization_msgs/msg/MenuEntry";
+  static readonly FEEDBACK: number;
+  static readonly ROSRUN: number;
+  static readonly ROSLAUNCH: number;
+  id: number;
+  parent_id: number;
+  title: string;
+  command: string;
+  command_type: number;
+  constructor();
+}
+
+export declare class InteractiveMarker {
+  static readonly typeName: "visualization_msgs/msg/InteractiveMarker";
+  header: Header;
+  pose: Pose;
+  name: string;
+  description: string;
+  scale: number;
+  menu_entries: MenuEntry[];
+  controls: InteractiveMarkerControl[];
+  constructor();
+}
+
+export declare class GetInteractiveMarkers_Response {
+  static readonly typeName: "visualization_msgs/srv/GetInteractiveMarkers_Response";
+  sequence_number: bigint;
+  markers: InteractiveMarker[];
+  constructor();
+}
+
+export declare class GetLoggerLevels_Request {
+  static readonly typeName: "rcl_interfaces/srv/GetLoggerLevels_Request";
+  names: string[];
+  constructor();
+}
+
+export declare class LoggerLevel {
+  static readonly typeName: "rcl_interfaces/msg/LoggerLevel";
+  static readonly LOG_LEVEL_UNKNOWN: number;
+  static readonly LOG_LEVEL_DEBUG: number;
+  static readonly LOG_LEVEL_INFO: number;
+  static readonly LOG_LEVEL_WARN: number;
+  static readonly LOG_LEVEL_ERROR: number;
+  static readonly LOG_LEVEL_FATAL: number;
+  name: string;
+  level: number;
+  constructor();
+}
+
+export declare class GetLoggerLevels_Response {
+  static readonly typeName: "rcl_interfaces/srv/GetLoggerLevels_Response";
+  levels: LoggerLevel[];
+  constructor();
+}
+
+export declare class GetMap_Request {
+  static readonly typeName: "nav_msgs/srv/GetMap_Request";
+  constructor();
+}
+
+export declare class MapMetaData {
+  static readonly typeName: "nav_msgs/msg/MapMetaData";
+  map_load_time: Time;
+  resolution: number;
+  width: number;
+  height: number;
+  origin: Pose;
+  constructor();
+}
+
+export declare class OccupancyGrid {
+  static readonly typeName: "nav_msgs/msg/OccupancyGrid";
+  header: Header;
+  info: MapMetaData;
+  data: number[];
+  constructor();
+}
+
+export declare class GetMap_Response {
+  static readonly typeName: "nav_msgs/srv/GetMap_Response";
+  map: OccupancyGrid;
+  constructor();
+}
+
+export declare class GetParameterTypes_Request {
+  static readonly typeName: "rcl_interfaces/srv/GetParameterTypes_Request";
+  names: string[];
+  constructor();
+}
+
+export declare class GetParameterTypes_Response {
+  static readonly typeName: "rcl_interfaces/srv/GetParameterTypes_Response";
+  types: Uint8Array;
+  constructor();
+}
+
+export declare class GetParameters_Request {
+  static readonly typeName: "rcl_interfaces/srv/GetParameters_Request";
+  names: string[];
+  constructor();
+}
+
+export declare class ParameterValue {
+  static readonly typeName: "rcl_interfaces/msg/ParameterValue";
+  type: number;
+  bool_value: boolean;
+  integer_value: bigint;
+  double_value: number;
+  string_value: string;
+  byte_array_value: Uint8Array;
+  bool_array_value: boolean[];
+  integer_array_value: bigint[];
+  double_array_value: number[];
+  string_array_value: string[];
+  constructor();
+}
+
+export declare class GetParameters_Response {
+  static readonly typeName: "rcl_interfaces/srv/GetParameters_Response";
+  values: ParameterValue[];
+  constructor();
+}
+
+export declare class PoseStamped {
+  static readonly typeName: "geometry_msgs/msg/PoseStamped";
+  header: Header;
+  pose: Pose;
+  constructor();
+}
+
+export declare class GetPlan_Request {
+  static readonly typeName: "nav_msgs/srv/GetPlan_Request";
+  start: PoseStamped;
+  goal: PoseStamped;
+  tolerance: number;
+  constructor();
+}
+
+export declare class Path {
+  static readonly typeName: "nav_msgs/msg/Path";
+  header: Header;
+  poses: PoseStamped[];
+  constructor();
+}
+
+export declare class GetPlan_Response {
+  static readonly typeName: "nav_msgs/srv/GetPlan_Response";
+  plan: Path;
+  constructor();
+}
+
+export declare class GetState_Request {
+  static readonly typeName: "lifecycle_msgs/srv/GetState_Request";
+  constructor();
+}
+
+export declare class GetState_Response {
+  static readonly typeName: "lifecycle_msgs/srv/GetState_Response";
+  current_state: State;
+  constructor();
+}
+
+export declare class GetTypeDescription_Request {
+  static readonly typeName: "type_description_interfaces/srv/GetTypeDescription_Request";
+  type_name: string;
+  type_hash: string;
+  include_type_sources: boolean;
+  constructor();
+}
+
+export declare class IndividualTypeDescription {
+  static readonly typeName: "type_description_interfaces/msg/IndividualTypeDescription";
+  type_name: string;
+  fields: Field[];
+  constructor();
+}
+
+export declare class TypeDescription {
+  static readonly typeName: "type_description_interfaces/msg/TypeDescription";
+  type_description: IndividualTypeDescription;
+  referenced_type_descriptions: IndividualTypeDescription[];
+  constructor();
+}
+
+export declare class TypeDescriptionInterfacesKeyValue {
+  static readonly typeName: "type_description_interfaces/msg/KeyValue";
+  key: string;
+  value: string;
+  constructor();
+}
+
+export declare class TypeSource {
+  static readonly typeName: "type_description_interfaces/msg/TypeSource";
+  type_name: string;
+  encoding: string;
+  raw_file_contents: string;
+  constructor();
+}
+
+export declare class GetTypeDescription_Response {
+  static readonly typeName: "type_description_interfaces/srv/GetTypeDescription_Response";
+  successful: boolean;
+  failure_reason: string;
+  type_description: TypeDescription;
+  type_sources: TypeSource[];
+  extra_information: TypeDescriptionInterfacesKeyValue[];
+  constructor();
+}
+
+export declare class GoalStatus {
+  static readonly typeName: "action_msgs/msg/GoalStatus";
+  static readonly STATUS_UNKNOWN: number;
+  static readonly STATUS_ACCEPTED: number;
+  static readonly STATUS_EXECUTING: number;
+  static readonly STATUS_CANCELING: number;
+  static readonly STATUS_SUCCEEDED: number;
+  static readonly STATUS_CANCELED: number;
+  static readonly STATUS_ABORTED: number;
+  goal_info: GoalInfo;
+  status: number;
+  constructor();
+}
+
+export declare class GoalStatusArray {
+  static readonly typeName: "action_msgs/msg/GoalStatusArray";
+  status_list: GoalStatus[];
+  constructor();
+}
+
+export declare class Goals {
+  static readonly typeName: "nav_msgs/msg/Goals";
+  header: Header;
+  goals: PoseStamped[];
+  constructor();
+}
+
+export declare class Node {
+  static readonly typeName: "rosgraph_msgs/msg/Node";
+  name: string;
+  parameters: ParameterDescriptor[];
+  parameter_values: ParameterValue[];
+  publishers: Topic[];
+  subscriptions: Topic[];
+  service_clients: Service[];
+  service_servers: Service[];
+  action_clients: Action[];
+  action_servers: Action[];
+  constructor();
+}
+
+export declare class Graph {
+  static readonly typeName: "rosgraph_msgs/msg/Graph";
+  nodes: Node[];
+  constructor();
+}
+
+export declare class GridCells {
+  static readonly typeName: "nav_msgs/msg/GridCells";
+  header: Header;
+  cell_width: number;
+  cell_height: number;
+  cells: Point[];
+  constructor();
+}
+
+export declare class Illuminance {
+  static readonly typeName: "sensor_msgs/msg/Illuminance";
+  header: Header;
+  illuminance: number;
+  variance: number;
+  constructor();
+}
+
+export declare class ImageMarker {
+  static readonly typeName: "visualization_msgs/msg/ImageMarker";
+  static readonly CIRCLE: number;
+  static readonly LINE_STRIP: number;
+  static readonly LINE_LIST: number;
+  static readonly POLYGON: number;
+  static readonly POINTS: number;
+  static readonly ADD: number;
+  static readonly REMOVE: number;
+  header: Header;
+  ns: string;
+  id: number;
+  type: number;
+  action: number;
+  position: Point;
+  scale: number;
+  outline_color: ColorRGBA;
+  filled: number;
+  fill_color: ColorRGBA;
+  lifetime: Duration;
+  points: Point[];
+  outline_colors: ColorRGBA[];
+  constructor();
+}
+
+export declare class Imu {
+  static readonly typeName: "sensor_msgs/msg/Imu";
+  header: Header;
+  orientation: Quaternion;
+  orientation_covariance: [number, number, number, number, number, number, number, number, number];
+  angular_velocity: Vector3;
+  angular_velocity_covariance: [number, number, number, number, number, number, number, number, number];
+  linear_acceleration: Vector3;
+  linear_acceleration_covariance: [number, number, number, number, number, number, number, number, number];
+  constructor();
+}
+
+export declare class Inertia {
+  static readonly typeName: "geometry_msgs/msg/Inertia";
+  m: number;
+  com: Vector3;
+  ixx: number;
+  ixy: number;
+  ixz: number;
+  iyy: number;
+  iyz: number;
+  izz: number;
+  constructor();
+}
+
+export declare class InertiaStamped {
+  static readonly typeName: "geometry_msgs/msg/InertiaStamped";
+  header: Header;
+  inertia: Inertia;
+  constructor();
+}
+
+export declare class Int16 {
+  static readonly typeName: "std_msgs/msg/Int16";
+  data: number;
+  constructor();
+}
+
+export declare class Int16MultiArray {
+  static readonly typeName: "std_msgs/msg/Int16MultiArray";
+  layout: MultiArrayLayout;
+  data: number[];
+  constructor();
+}
+
+export declare class Int32 {
+  static readonly typeName: "std_msgs/msg/Int32";
+  data: number;
+  constructor();
+}
+
+export declare class Int32MultiArray {
+  static readonly typeName: "std_msgs/msg/Int32MultiArray";
+  layout: MultiArrayLayout;
+  data: number[];
+  constructor();
+}
+
+export declare class Int64 {
+  static readonly typeName: "std_msgs/msg/Int64";
+  data: bigint;
+  constructor();
+}
+
+export declare class Int64MultiArray {
+  static readonly typeName: "std_msgs/msg/Int64MultiArray";
+  layout: MultiArrayLayout;
+  data: bigint[];
+  constructor();
+}
+
+export declare class Int8 {
+  static readonly typeName: "std_msgs/msg/Int8";
+  data: number;
+  constructor();
+}
+
+export declare class Int8MultiArray {
+  static readonly typeName: "std_msgs/msg/Int8MultiArray";
+  layout: MultiArrayLayout;
+  data: number[];
+  constructor();
+}
+
+export declare class InteractiveMarkerFeedback {
+  static readonly typeName: "visualization_msgs/msg/InteractiveMarkerFeedback";
+  static readonly KEEP_ALIVE: number;
+  static readonly POSE_UPDATE: number;
+  static readonly MENU_SELECT: number;
+  static readonly BUTTON_CLICK: number;
+  static readonly MOUSE_DOWN: number;
+  static readonly MOUSE_UP: number;
+  header: Header;
+  client_id: string;
+  marker_name: string;
+  control_name: string;
+  event_type: number;
+  pose: Pose;
+  menu_entry_id: number;
+  mouse_point: Point;
+  mouse_point_valid: boolean;
+  constructor();
+}
+
+export declare class InteractiveMarkerInit {
+  static readonly typeName: "visualization_msgs/msg/InteractiveMarkerInit";
+  server_id: string;
+  seq_num: bigint;
+  markers: InteractiveMarker[];
+  constructor();
+}
+
+export declare class InteractiveMarkerPose {
+  static readonly typeName: "visualization_msgs/msg/InteractiveMarkerPose";
+  header: Header;
+  pose: Pose;
+  name: string;
+  constructor();
+}
+
+export declare class InteractiveMarkerUpdate {
+  static readonly typeName: "visualization_msgs/msg/InteractiveMarkerUpdate";
+  static readonly KEEP_ALIVE: number;
+  static readonly UPDATE: number;
+  server_id: string;
+  seq_num: bigint;
+  type: number;
+  markers: InteractiveMarker[];
+  poses: InteractiveMarkerPose[];
+  erases: string[];
+  constructor();
+}
+
+export declare class JointState {
+  static readonly typeName: "sensor_msgs/msg/JointState";
+  header: Header;
+  name: string[];
+  position: number[];
+  velocity: number[];
+  effort: number[];
+  constructor();
+}
+
+export declare class JointTrajectoryPoint {
+  static readonly typeName: "trajectory_msgs/msg/JointTrajectoryPoint";
+  positions: number[];
+  velocities: number[];
+  accelerations: number[];
+  effort: number[];
+  time_from_start: Duration;
+  constructor();
+}
+
+export declare class JointTrajectory {
+  static readonly typeName: "trajectory_msgs/msg/JointTrajectory";
+  header: Header;
+  joint_names: string[];
+  points: JointTrajectoryPoint[];
+  constructor();
+}
+
+export declare class Joy {
+  static readonly typeName: "sensor_msgs/msg/Joy";
+  header: Header;
+  axes: number[];
+  buttons: number[];
+  constructor();
+}
+
+export declare class JoyFeedback {
+  static readonly typeName: "sensor_msgs/msg/JoyFeedback";
+  static readonly TYPE_LED: number;
+  static readonly TYPE_RUMBLE: number;
+  static readonly TYPE_BUZZER: number;
+  type: number;
+  id: number;
+  intensity: number;
+  constructor();
+}
+
+export declare class JoyFeedbackArray {
+  static readonly typeName: "sensor_msgs/msg/JoyFeedbackArray";
+  array: JoyFeedback[];
+  constructor();
+}
+
+export declare class LaserEcho {
+  static readonly typeName: "sensor_msgs/msg/LaserEcho";
+  echoes: number[];
+  constructor();
+}
+
+export declare class LaserScan {
+  static readonly typeName: "sensor_msgs/msg/LaserScan";
+  header: Header;
+  angle_min: number;
+  angle_max: number;
+  angle_increment: number;
+  time_increment: number;
+  scan_time: number;
+  range_min: number;
+  range_max: number;
+  ranges: number[];
+  intensities: number[];
+  constructor();
+}
+
+export declare class ListNodes_Request {
+  static readonly typeName: "composition_interfaces/srv/ListNodes_Request";
+  constructor();
+}
+
+export declare class ListNodes_Response {
+  static readonly typeName: "composition_interfaces/srv/ListNodes_Response";
+  full_node_names: string[];
+  unique_ids: bigint[];
+  constructor();
+}
+
+export declare class ListParametersResult {
+  static readonly typeName: "rcl_interfaces/msg/ListParametersResult";
+  names: string[];
+  prefixes: string[];
+  constructor();
+}
+
+export declare class ListParameters_Request {
+  static readonly typeName: "rcl_interfaces/srv/ListParameters_Request";
+  static readonly DEPTH_RECURSIVE: bigint;
+  prefixes: string[];
+  depth: bigint;
+  constructor();
+}
+
+export declare class ListParameters_Response {
+  static readonly typeName: "rcl_interfaces/srv/ListParameters_Response";
+  result: ListParametersResult;
+  constructor();
+}
+
+export declare class LoadMap_Request {
+  static readonly typeName: "nav_msgs/srv/LoadMap_Request";
+  map_url: string;
+  constructor();
+}
+
+export declare class LoadMap_Response {
+  static readonly typeName: "nav_msgs/srv/LoadMap_Response";
+  static readonly RESULT_SUCCESS: number;
+  static readonly RESULT_MAP_DOES_NOT_EXIST: number;
+  static readonly RESULT_INVALID_MAP_DATA: number;
+  static readonly RESULT_INVALID_MAP_METADATA: number;
+  static readonly RESULT_UNDEFINED_FAILURE: number;
+  map: OccupancyGrid;
+  result: number;
+  constructor();
+}
+
+export declare class Parameter {
+  static readonly typeName: "rcl_interfaces/msg/Parameter";
+  name: string;
+  value: ParameterValue;
+  constructor();
+}
+
+export declare class LoadNode_Request {
+  static readonly typeName: "composition_interfaces/srv/LoadNode_Request";
+  package_name: string;
+  plugin_name: string;
+  node_name: string;
+  node_namespace: string;
+  log_level: number;
+  remap_rules: string[];
+  parameters: Parameter[];
+  extra_arguments: Parameter[];
+  constructor();
+}
+
+export declare class LoadNode_Response {
+  static readonly typeName: "composition_interfaces/srv/LoadNode_Response";
+  success: boolean;
+  error_message: string;
+  full_node_name: string;
+  unique_id: bigint;
+  constructor();
+}
+
+export declare class Log {
+  static readonly typeName: "rcl_interfaces/msg/Log";
+  static readonly DEBUG: number;
+  static readonly INFO: number;
+  static readonly WARN: number;
+  static readonly ERROR: number;
+  static readonly FATAL: number;
   stamp: Time;
-  frame_id: string;
+  level: number;
+  name: string;
+  msg: string;
+  file: string;
+  function: string;
+  line: number;
+  constructor();
+}
+
+export declare class LookupTransform_Feedback {
+  static readonly typeName: "tf2_msgs/action/LookupTransform_Feedback";
+  constructor();
+}
+
+export declare class LookupTransform_Goal {
+  static readonly typeName: "tf2_msgs/action/LookupTransform_Goal";
+  target_frame: string;
+  source_frame: string;
+  source_time: Time;
+  timeout: Duration;
+  target_time: Time;
+  fixed_frame: string;
+  advanced: boolean;
+  constructor();
+}
+
+export declare class TF2Error {
+  static readonly typeName: "tf2_msgs/msg/TF2Error";
+  static readonly NO_ERROR: number;
+  static readonly LOOKUP_ERROR: number;
+  static readonly CONNECTIVITY_ERROR: number;
+  static readonly EXTRAPOLATION_ERROR: number;
+  static readonly INVALID_ARGUMENT_ERROR: number;
+  static readonly TIMEOUT_ERROR: number;
+  static readonly TRANSFORM_ERROR: number;
+  error: number;
+  error_string: string;
+  constructor();
+}
+
+export declare class Transform {
+  static readonly typeName: "geometry_msgs/msg/Transform";
+  translation: Vector3;
+  rotation: Quaternion;
+  constructor();
+}
+
+export declare class TransformStamped {
+  static readonly typeName: "geometry_msgs/msg/TransformStamped";
+  header: Header;
+  child_frame_id: string;
+  transform: Transform;
+  constructor();
+}
+
+export declare class LookupTransform_Result {
+  static readonly typeName: "tf2_msgs/action/LookupTransform_Result";
+  transform: TransformStamped;
+  error: TF2Error;
+  constructor();
+}
+
+export declare class MagneticField {
+  static readonly typeName: "sensor_msgs/msg/MagneticField";
+  header: Header;
+  magnetic_field: Vector3;
+  magnetic_field_covariance: [number, number, number, number, number, number, number, number, number];
+  constructor();
+}
+
+export declare class MarkerArray {
+  static readonly typeName: "visualization_msgs/msg/MarkerArray";
+  markers: Marker[];
   constructor();
 }
 
@@ -84,6 +1523,204 @@ export declare class MeasureSequence_Goal {
 export declare class MeasureSequence_Result {
   static readonly typeName: "rclweb_cdr_interfaces/action/MeasureSequence_Result";
   result: NestedSample;
+  constructor();
+}
+
+export declare class MeshTriangle {
+  static readonly typeName: "shape_msgs/msg/MeshTriangle";
+  vertex_indices: [number, number, number];
+  constructor();
+}
+
+export declare class Mesh {
+  static readonly typeName: "shape_msgs/msg/Mesh";
+  triangles: MeshTriangle[];
+  vertices: Point[];
+  constructor();
+}
+
+export declare class StatisticDataPoint {
+  static readonly typeName: "statistics_msgs/msg/StatisticDataPoint";
+  data_type: number;
+  data: number;
+  constructor();
+}
+
+export declare class MetricsMessage {
+  static readonly typeName: "statistics_msgs/msg/MetricsMessage";
+  measurement_source_name: string;
+  metrics_source: string;
+  unit: string;
+  window_start: Time;
+  window_stop: Time;
+  statistics: StatisticDataPoint[];
+  constructor();
+}
+
+export declare class Twist {
+  static readonly typeName: "geometry_msgs/msg/Twist";
+  linear: Vector3;
+  angular: Vector3;
+  constructor();
+}
+
+export declare class Wrench {
+  static readonly typeName: "geometry_msgs/msg/Wrench";
+  force: Vector3;
+  torque: Vector3;
+  constructor();
+}
+
+export declare class MultiDOFJointState {
+  static readonly typeName: "sensor_msgs/msg/MultiDOFJointState";
+  header: Header;
+  joint_names: string[];
+  transforms: Transform[];
+  twist: Twist[];
+  wrench: Wrench[];
+  constructor();
+}
+
+export declare class MultiDOFJointTrajectoryPoint {
+  static readonly typeName: "trajectory_msgs/msg/MultiDOFJointTrajectoryPoint";
+  transforms: Transform[];
+  velocities: Twist[];
+  accelerations: Twist[];
+  time_from_start: Duration;
+  constructor();
+}
+
+export declare class MultiDOFJointTrajectory {
+  static readonly typeName: "trajectory_msgs/msg/MultiDOFJointTrajectory";
+  header: Header;
+  joint_names: string[];
+  points: MultiDOFJointTrajectoryPoint[];
+  constructor();
+}
+
+export declare class MultiEchoLaserScan {
+  static readonly typeName: "sensor_msgs/msg/MultiEchoLaserScan";
+  header: Header;
+  angle_min: number;
+  angle_max: number;
+  angle_increment: number;
+  time_increment: number;
+  scan_time: number;
+  range_min: number;
+  range_max: number;
+  ranges: LaserEcho[];
+  intensities: LaserEcho[];
+  constructor();
+}
+
+export declare class NavSatStatus {
+  static readonly typeName: "sensor_msgs/msg/NavSatStatus";
+  static readonly STATUS_UNKNOWN: number;
+  static readonly STATUS_NO_FIX: number;
+  static readonly STATUS_FIX: number;
+  static readonly STATUS_SBAS_FIX: number;
+  static readonly STATUS_GBAS_FIX: number;
+  static readonly SERVICE_UNKNOWN: number;
+  static readonly SERVICE_GPS: number;
+  static readonly SERVICE_GLONASS: number;
+  static readonly SERVICE_COMPASS: number;
+  static readonly SERVICE_GALILEO: number;
+  status: number;
+  service: number;
+  constructor();
+}
+
+export declare class NavSatFix {
+  static readonly typeName: "sensor_msgs/msg/NavSatFix";
+  static readonly COVARIANCE_TYPE_UNKNOWN: number;
+  static readonly COVARIANCE_TYPE_APPROXIMATED: number;
+  static readonly COVARIANCE_TYPE_DIAGONAL_KNOWN: number;
+  static readonly COVARIANCE_TYPE_KNOWN: number;
+  header: Header;
+  status: NavSatStatus;
+  latitude: number;
+  longitude: number;
+  altitude: number;
+  position_covariance: [number, number, number, number, number, number, number, number, number];
+  position_covariance_type: number;
+  constructor();
+}
+
+export declare class PoseWithCovariance {
+  static readonly typeName: "geometry_msgs/msg/PoseWithCovariance";
+  pose: Pose;
+  covariance: number[];
+  constructor();
+}
+
+export declare class TwistWithCovariance {
+  static readonly typeName: "geometry_msgs/msg/TwistWithCovariance";
+  twist: Twist;
+  covariance: number[];
+  constructor();
+}
+
+export declare class Odometry {
+  static readonly typeName: "nav_msgs/msg/Odometry";
+  header: Header;
+  child_frame_id: string;
+  pose: PoseWithCovariance;
+  twist: TwistWithCovariance;
+  constructor();
+}
+
+export declare class ParameterEvent {
+  static readonly typeName: "rcl_interfaces/msg/ParameterEvent";
+  stamp: Time;
+  node: string;
+  new_parameters: Parameter[];
+  changed_parameters: Parameter[];
+  deleted_parameters: Parameter[];
+  constructor();
+}
+
+export declare class ParameterEventDescriptors {
+  static readonly typeName: "rcl_interfaces/msg/ParameterEventDescriptors";
+  new_parameters: ParameterDescriptor[];
+  changed_parameters: ParameterDescriptor[];
+  deleted_parameters: ParameterDescriptor[];
+  constructor();
+}
+
+export declare class ParameterType {
+  static readonly typeName: "rcl_interfaces/msg/ParameterType";
+  static readonly PARAMETER_NOT_SET: number;
+  static readonly PARAMETER_BOOL: number;
+  static readonly PARAMETER_INTEGER: number;
+  static readonly PARAMETER_DOUBLE: number;
+  static readonly PARAMETER_STRING: number;
+  static readonly PARAMETER_BYTE_ARRAY: number;
+  static readonly PARAMETER_BOOL_ARRAY: number;
+  static readonly PARAMETER_INTEGER_ARRAY: number;
+  static readonly PARAMETER_DOUBLE_ARRAY: number;
+  static readonly PARAMETER_STRING_ARRAY: number;
+  constructor();
+}
+
+export declare class Plane {
+  static readonly typeName: "shape_msgs/msg/Plane";
+  coef: [number, number, number, number];
+  constructor();
+}
+
+export declare class Point32 {
+  static readonly typeName: "geometry_msgs/msg/Point32";
+  x: number;
+  y: number;
+  z: number;
+  constructor();
+}
+
+export declare class PointCloud {
+  static readonly typeName: "sensor_msgs/msg/PointCloud";
+  header: Header;
+  points: Point32[];
+  channels: ChannelFloat32[];
   constructor();
 }
 
@@ -118,11 +1755,534 @@ export declare class PointCloud2 {
   constructor();
 }
 
+export declare class PointStamped {
+  static readonly typeName: "geometry_msgs/msg/PointStamped";
+  header: Header;
+  point: Point;
+  constructor();
+}
+
+export declare class Polygon {
+  static readonly typeName: "geometry_msgs/msg/Polygon";
+  points: Point32[];
+  constructor();
+}
+
+export declare class PolygonInstance {
+  static readonly typeName: "geometry_msgs/msg/PolygonInstance";
+  polygon: Polygon;
+  id: bigint;
+  constructor();
+}
+
+export declare class PolygonInstanceStamped {
+  static readonly typeName: "geometry_msgs/msg/PolygonInstanceStamped";
+  header: Header;
+  polygon: PolygonInstance;
+  constructor();
+}
+
+export declare class PolygonStamped {
+  static readonly typeName: "geometry_msgs/msg/PolygonStamped";
+  header: Header;
+  polygon: Polygon;
+  constructor();
+}
+
+export declare class Pose2D {
+  static readonly typeName: "geometry_msgs/msg/Pose2D";
+  x: number;
+  y: number;
+  theta: number;
+  constructor();
+}
+
+export declare class PoseArray {
+  static readonly typeName: "geometry_msgs/msg/PoseArray";
+  header: Header;
+  poses: Pose[];
+  constructor();
+}
+
+export declare class PoseWithCovarianceStamped {
+  static readonly typeName: "geometry_msgs/msg/PoseWithCovarianceStamped";
+  header: Header;
+  pose: PoseWithCovariance;
+  constructor();
+}
+
+export declare class QuaternionStamped {
+  static readonly typeName: "geometry_msgs/msg/QuaternionStamped";
+  header: Header;
+  quaternion: Quaternion;
+  constructor();
+}
+
+export declare class Range {
+  static readonly typeName: "sensor_msgs/msg/Range";
+  static readonly ULTRASOUND: number;
+  static readonly INFRARED: number;
+  header: Header;
+  radiation_type: number;
+  field_of_view: number;
+  min_range: number;
+  max_range: number;
+  range: number;
+  variance: number;
+  constructor();
+}
+
+export declare class RelativeHumidity {
+  static readonly typeName: "sensor_msgs/msg/RelativeHumidity";
+  header: Header;
+  relative_humidity: number;
+  variance: number;
+  constructor();
+}
+
+export declare class SelfTest_Request {
+  static readonly typeName: "diagnostic_msgs/srv/SelfTest_Request";
+  constructor();
+}
+
+export declare class SelfTest_Response {
+  static readonly typeName: "diagnostic_msgs/srv/SelfTest_Response";
+  id: string;
+  passed: number;
+  status: DiagnosticStatus[];
+  constructor();
+}
+
+export declare class SetBool_Request {
+  static readonly typeName: "std_srvs/srv/SetBool_Request";
+  data: boolean;
+  constructor();
+}
+
+export declare class SetBool_Response {
+  static readonly typeName: "std_srvs/srv/SetBool_Response";
+  success: boolean;
+  message: string;
+  constructor();
+}
+
+export declare class SetCameraInfo_Request {
+  static readonly typeName: "sensor_msgs/srv/SetCameraInfo_Request";
+  camera_info: CameraInfo;
+  constructor();
+}
+
+export declare class SetCameraInfo_Response {
+  static readonly typeName: "sensor_msgs/srv/SetCameraInfo_Response";
+  success: boolean;
+  status_message: string;
+  constructor();
+}
+
+export declare class SetLoggerLevelsResult {
+  static readonly typeName: "rcl_interfaces/msg/SetLoggerLevelsResult";
+  successful: boolean;
+  reason: string;
+  constructor();
+}
+
+export declare class SetLoggerLevels_Request {
+  static readonly typeName: "rcl_interfaces/srv/SetLoggerLevels_Request";
+  levels: LoggerLevel[];
+  constructor();
+}
+
+export declare class SetLoggerLevels_Response {
+  static readonly typeName: "rcl_interfaces/srv/SetLoggerLevels_Response";
+  results: SetLoggerLevelsResult[];
+  constructor();
+}
+
+export declare class SetMap_Request {
+  static readonly typeName: "nav_msgs/srv/SetMap_Request";
+  map: OccupancyGrid;
+  initial_pose: PoseWithCovarianceStamped;
+  constructor();
+}
+
+export declare class SetMap_Response {
+  static readonly typeName: "nav_msgs/srv/SetMap_Response";
+  success: boolean;
+  constructor();
+}
+
+export declare class SetParametersAtomically_Request {
+  static readonly typeName: "rcl_interfaces/srv/SetParametersAtomically_Request";
+  parameters: Parameter[];
+  constructor();
+}
+
+export declare class SetParametersResult {
+  static readonly typeName: "rcl_interfaces/msg/SetParametersResult";
+  successful: boolean;
+  reason: string;
+  constructor();
+}
+
+export declare class SetParametersAtomically_Response {
+  static readonly typeName: "rcl_interfaces/srv/SetParametersAtomically_Response";
+  result: SetParametersResult;
+  constructor();
+}
+
+export declare class SetParameters_Request {
+  static readonly typeName: "rcl_interfaces/srv/SetParameters_Request";
+  parameters: Parameter[];
+  constructor();
+}
+
+export declare class SetParameters_Response {
+  static readonly typeName: "rcl_interfaces/srv/SetParameters_Response";
+  results: SetParametersResult[];
+  constructor();
+}
+
+export declare class SolidPrimitive {
+  static readonly typeName: "shape_msgs/msg/SolidPrimitive";
+  static readonly BOX: number;
+  static readonly SPHERE: number;
+  static readonly CYLINDER: number;
+  static readonly CONE: number;
+  static readonly PRISM: number;
+  static readonly BOX_X: number;
+  static readonly BOX_Y: number;
+  static readonly BOX_Z: number;
+  static readonly SPHERE_RADIUS: number;
+  static readonly CYLINDER_HEIGHT: number;
+  static readonly CYLINDER_RADIUS: number;
+  static readonly CONE_HEIGHT: number;
+  static readonly CONE_RADIUS: number;
+  static readonly PRISM_HEIGHT: number;
+  type: number;
+  dimensions: number[];
+  polygon: Polygon;
+  constructor();
+}
+
+export declare class StatisticDataType {
+  static readonly typeName: "statistics_msgs/msg/StatisticDataType";
+  static readonly STATISTICS_DATA_TYPE_UNINITIALIZED: number;
+  static readonly STATISTICS_DATA_TYPE_AVERAGE: number;
+  static readonly STATISTICS_DATA_TYPE_MINIMUM: number;
+  static readonly STATISTICS_DATA_TYPE_MAXIMUM: number;
+  static readonly STATISTICS_DATA_TYPE_STDDEV: number;
+  static readonly STATISTICS_DATA_TYPE_SAMPLE_COUNT: number;
+  constructor();
+}
+
 export declare class String {
   static readonly typeName: "std_msgs/msg/String";
   data: string;
   constructor();
 }
+
+export declare class TFMessage {
+  static readonly typeName: "tf2_msgs/msg/TFMessage";
+  transforms: TransformStamped[];
+  constructor();
+}
+
+export declare class Temperature {
+  static readonly typeName: "sensor_msgs/msg/Temperature";
+  header: Header;
+  temperature: number;
+  variance: number;
+  constructor();
+}
+
+export declare class TimeReference {
+  static readonly typeName: "sensor_msgs/msg/TimeReference";
+  header: Header;
+  time_ref: Time;
+  source: string;
+  constructor();
+}
+
+export declare class TrajectoryPoint {
+  static readonly typeName: "nav_msgs/msg/TrajectoryPoint";
+  header: Header;
+  pose: Pose;
+  velocity: Twist;
+  acceleration: Accel;
+  effort: Wrench;
+  constructor();
+}
+
+export declare class Trajectory {
+  static readonly typeName: "nav_msgs/msg/Trajectory";
+  header: Header;
+  points: TrajectoryPoint[];
+  constructor();
+}
+
+export declare class TransitionEvent {
+  static readonly typeName: "lifecycle_msgs/msg/TransitionEvent";
+  timestamp: bigint;
+  transition: Transition;
+  start_state: State;
+  goal_state: State;
+  constructor();
+}
+
+export declare class Trigger_Request {
+  static readonly typeName: "std_srvs/srv/Trigger_Request";
+  constructor();
+}
+
+export declare class Trigger_Response {
+  static readonly typeName: "std_srvs/srv/Trigger_Response";
+  success: boolean;
+  message: string;
+  constructor();
+}
+
+export declare class TwistStamped {
+  static readonly typeName: "geometry_msgs/msg/TwistStamped";
+  header: Header;
+  twist: Twist;
+  constructor();
+}
+
+export declare class TwistWithCovarianceStamped {
+  static readonly typeName: "geometry_msgs/msg/TwistWithCovarianceStamped";
+  header: Header;
+  twist: TwistWithCovariance;
+  constructor();
+}
+
+export declare class UInt16 {
+  static readonly typeName: "std_msgs/msg/UInt16";
+  data: number;
+  constructor();
+}
+
+export declare class UInt16MultiArray {
+  static readonly typeName: "std_msgs/msg/UInt16MultiArray";
+  layout: MultiArrayLayout;
+  data: number[];
+  constructor();
+}
+
+export declare class UInt32 {
+  static readonly typeName: "std_msgs/msg/UInt32";
+  data: number;
+  constructor();
+}
+
+export declare class UInt32MultiArray {
+  static readonly typeName: "std_msgs/msg/UInt32MultiArray";
+  layout: MultiArrayLayout;
+  data: number[];
+  constructor();
+}
+
+export declare class UInt64 {
+  static readonly typeName: "std_msgs/msg/UInt64";
+  data: bigint;
+  constructor();
+}
+
+export declare class UInt64MultiArray {
+  static readonly typeName: "std_msgs/msg/UInt64MultiArray";
+  layout: MultiArrayLayout;
+  data: bigint[];
+  constructor();
+}
+
+export declare class UInt8 {
+  static readonly typeName: "std_msgs/msg/UInt8";
+  data: number;
+  constructor();
+}
+
+export declare class UInt8MultiArray {
+  static readonly typeName: "std_msgs/msg/UInt8MultiArray";
+  layout: MultiArrayLayout;
+  data: Uint8Array;
+  constructor();
+}
+
+export declare class UnloadNode_Request {
+  static readonly typeName: "composition_interfaces/srv/UnloadNode_Request";
+  unique_id: bigint;
+  constructor();
+}
+
+export declare class UnloadNode_Response {
+  static readonly typeName: "composition_interfaces/srv/UnloadNode_Response";
+  success: boolean;
+  error_message: string;
+  constructor();
+}
+
+export declare class Vector3Stamped {
+  static readonly typeName: "geometry_msgs/msg/Vector3Stamped";
+  header: Header;
+  vector: Vector3;
+  constructor();
+}
+
+export declare class VelocityStamped {
+  static readonly typeName: "geometry_msgs/msg/VelocityStamped";
+  header: Header;
+  body_frame_id: string;
+  reference_frame_id: string;
+  velocity: Twist;
+  constructor();
+}
+
+export declare class VelocityWithCovarianceStamped {
+  static readonly typeName: "geometry_msgs/msg/VelocityWithCovarianceStamped";
+  header: Header;
+  body_frame_id: string;
+  reference_frame_id: string;
+  velocity: TwistWithCovariance;
+  constructor();
+}
+
+export declare class WrenchStamped {
+  static readonly typeName: "geometry_msgs/msg/WrenchStamped";
+  header: Header;
+  wrench: Wrench;
+  constructor();
+}
+
+export declare const CancelGoal: {
+  readonly typeName: "action_msgs/srv/CancelGoal";
+  readonly Request: typeof CancelGoal_Request;
+  readonly Response: typeof CancelGoal_Response;
+};
+
+export declare const ListNodes: {
+  readonly typeName: "composition_interfaces/srv/ListNodes";
+  readonly Request: typeof ListNodes_Request;
+  readonly Response: typeof ListNodes_Response;
+};
+
+export declare const LoadNode: {
+  readonly typeName: "composition_interfaces/srv/LoadNode";
+  readonly Request: typeof LoadNode_Request;
+  readonly Response: typeof LoadNode_Response;
+};
+
+export declare const UnloadNode: {
+  readonly typeName: "composition_interfaces/srv/UnloadNode";
+  readonly Request: typeof UnloadNode_Request;
+  readonly Response: typeof UnloadNode_Response;
+};
+
+export declare const AddDiagnostics: {
+  readonly typeName: "diagnostic_msgs/srv/AddDiagnostics";
+  readonly Request: typeof AddDiagnostics_Request;
+  readonly Response: typeof AddDiagnostics_Response;
+};
+
+export declare const SelfTest: {
+  readonly typeName: "diagnostic_msgs/srv/SelfTest";
+  readonly Request: typeof SelfTest_Request;
+  readonly Response: typeof SelfTest_Response;
+};
+
+export declare const ChangeState: {
+  readonly typeName: "lifecycle_msgs/srv/ChangeState";
+  readonly Request: typeof ChangeState_Request;
+  readonly Response: typeof ChangeState_Response;
+};
+
+export declare const GetAvailableStates: {
+  readonly typeName: "lifecycle_msgs/srv/GetAvailableStates";
+  readonly Request: typeof GetAvailableStates_Request;
+  readonly Response: typeof GetAvailableStates_Response;
+};
+
+export declare const GetAvailableTransitions: {
+  readonly typeName: "lifecycle_msgs/srv/GetAvailableTransitions";
+  readonly Request: typeof GetAvailableTransitions_Request;
+  readonly Response: typeof GetAvailableTransitions_Response;
+};
+
+export declare const GetState: {
+  readonly typeName: "lifecycle_msgs/srv/GetState";
+  readonly Request: typeof GetState_Request;
+  readonly Response: typeof GetState_Response;
+};
+
+export declare const GetMap: {
+  readonly typeName: "nav_msgs/srv/GetMap";
+  readonly Request: typeof GetMap_Request;
+  readonly Response: typeof GetMap_Response;
+};
+
+export declare const GetPlan: {
+  readonly typeName: "nav_msgs/srv/GetPlan";
+  readonly Request: typeof GetPlan_Request;
+  readonly Response: typeof GetPlan_Response;
+};
+
+export declare const LoadMap: {
+  readonly typeName: "nav_msgs/srv/LoadMap";
+  readonly Request: typeof LoadMap_Request;
+  readonly Response: typeof LoadMap_Response;
+};
+
+export declare const SetMap: {
+  readonly typeName: "nav_msgs/srv/SetMap";
+  readonly Request: typeof SetMap_Request;
+  readonly Response: typeof SetMap_Response;
+};
+
+export declare const DescribeParameters: {
+  readonly typeName: "rcl_interfaces/srv/DescribeParameters";
+  readonly Request: typeof DescribeParameters_Request;
+  readonly Response: typeof DescribeParameters_Response;
+};
+
+export declare const GetLoggerLevels: {
+  readonly typeName: "rcl_interfaces/srv/GetLoggerLevels";
+  readonly Request: typeof GetLoggerLevels_Request;
+  readonly Response: typeof GetLoggerLevels_Response;
+};
+
+export declare const GetParameterTypes: {
+  readonly typeName: "rcl_interfaces/srv/GetParameterTypes";
+  readonly Request: typeof GetParameterTypes_Request;
+  readonly Response: typeof GetParameterTypes_Response;
+};
+
+export declare const GetParameters: {
+  readonly typeName: "rcl_interfaces/srv/GetParameters";
+  readonly Request: typeof GetParameters_Request;
+  readonly Response: typeof GetParameters_Response;
+};
+
+export declare const ListParameters: {
+  readonly typeName: "rcl_interfaces/srv/ListParameters";
+  readonly Request: typeof ListParameters_Request;
+  readonly Response: typeof ListParameters_Response;
+};
+
+export declare const SetLoggerLevels: {
+  readonly typeName: "rcl_interfaces/srv/SetLoggerLevels";
+  readonly Request: typeof SetLoggerLevels_Request;
+  readonly Response: typeof SetLoggerLevels_Response;
+};
+
+export declare const SetParameters: {
+  readonly typeName: "rcl_interfaces/srv/SetParameters";
+  readonly Request: typeof SetParameters_Request;
+  readonly Response: typeof SetParameters_Response;
+};
+
+export declare const SetParametersAtomically: {
+  readonly typeName: "rcl_interfaces/srv/SetParametersAtomically";
+  readonly Request: typeof SetParametersAtomically_Request;
+  readonly Response: typeof SetParametersAtomically_Response;
+};
 
 export declare const EchoNested: {
   readonly typeName: "rclweb_cdr_interfaces/srv/EchoNested";
@@ -137,9 +2297,190 @@ export declare const MeasureSequence: {
   readonly Feedback: typeof MeasureSequence_Feedback;
 };
 
+export declare const SetCameraInfo: {
+  readonly typeName: "sensor_msgs/srv/SetCameraInfo";
+  readonly Request: typeof SetCameraInfo_Request;
+  readonly Response: typeof SetCameraInfo_Response;
+};
+
+export declare const StdSrvsEmpty: {
+  readonly typeName: "std_srvs/srv/Empty";
+  readonly Request: typeof Empty_Request;
+  readonly Response: typeof Empty_Response;
+};
+
+export declare const SetBool: {
+  readonly typeName: "std_srvs/srv/SetBool";
+  readonly Request: typeof SetBool_Request;
+  readonly Response: typeof SetBool_Response;
+};
+
+export declare const Trigger: {
+  readonly typeName: "std_srvs/srv/Trigger";
+  readonly Request: typeof Trigger_Request;
+  readonly Response: typeof Trigger_Response;
+};
+
+export declare const FrameGraph: {
+  readonly typeName: "tf2_msgs/srv/FrameGraph";
+  readonly Request: typeof FrameGraph_Request;
+  readonly Response: typeof FrameGraph_Response;
+};
+
+export declare const LookupTransform: {
+  readonly typeName: "tf2_msgs/action/LookupTransform";
+  readonly Goal: typeof LookupTransform_Goal;
+  readonly Result: typeof LookupTransform_Result;
+  readonly Feedback: typeof LookupTransform_Feedback;
+};
+
+export declare const GetTypeDescription: {
+  readonly typeName: "type_description_interfaces/srv/GetTypeDescription";
+  readonly Request: typeof GetTypeDescription_Request;
+  readonly Response: typeof GetTypeDescription_Response;
+};
+
+export declare const GetInteractiveMarkers: {
+  readonly typeName: "visualization_msgs/srv/GetInteractiveMarkers";
+  readonly Request: typeof GetInteractiveMarkers_Request;
+  readonly Response: typeof GetInteractiveMarkers_Response;
+};
+
+export declare const action_msgs: {
+  readonly msg: {
+    readonly GoalInfo: typeof GoalInfo;
+    readonly GoalStatus: typeof GoalStatus;
+    readonly GoalStatusArray: typeof GoalStatusArray;
+  };
+  readonly srv: {
+    readonly CancelGoal: typeof CancelGoal;
+  };
+};
+
 export declare const builtin_interfaces: {
   readonly msg: {
+    readonly Duration: typeof Duration;
     readonly Time: typeof Time;
+  };
+};
+
+export declare const composition_interfaces: {
+  readonly srv: {
+    readonly ListNodes: typeof ListNodes;
+    readonly LoadNode: typeof LoadNode;
+    readonly UnloadNode: typeof UnloadNode;
+  };
+};
+
+export declare const diagnostic_msgs: {
+  readonly msg: {
+    readonly DiagnosticArray: typeof DiagnosticArray;
+    readonly DiagnosticStatus: typeof DiagnosticStatus;
+    readonly KeyValue: typeof DiagnosticMsgsKeyValue;
+  };
+  readonly srv: {
+    readonly AddDiagnostics: typeof AddDiagnostics;
+    readonly SelfTest: typeof SelfTest;
+  };
+};
+
+export declare const geometry_msgs: {
+  readonly msg: {
+    readonly Accel: typeof Accel;
+    readonly AccelStamped: typeof AccelStamped;
+    readonly AccelWithCovariance: typeof AccelWithCovariance;
+    readonly AccelWithCovarianceStamped: typeof AccelWithCovarianceStamped;
+    readonly Inertia: typeof Inertia;
+    readonly InertiaStamped: typeof InertiaStamped;
+    readonly Point: typeof Point;
+    readonly Point32: typeof Point32;
+    readonly PointStamped: typeof PointStamped;
+    readonly Polygon: typeof Polygon;
+    readonly PolygonInstance: typeof PolygonInstance;
+    readonly PolygonInstanceStamped: typeof PolygonInstanceStamped;
+    readonly PolygonStamped: typeof PolygonStamped;
+    readonly Pose: typeof Pose;
+    readonly Pose2D: typeof Pose2D;
+    readonly PoseArray: typeof PoseArray;
+    readonly PoseStamped: typeof PoseStamped;
+    readonly PoseWithCovariance: typeof PoseWithCovariance;
+    readonly PoseWithCovarianceStamped: typeof PoseWithCovarianceStamped;
+    readonly Quaternion: typeof Quaternion;
+    readonly QuaternionStamped: typeof QuaternionStamped;
+    readonly Transform: typeof Transform;
+    readonly TransformStamped: typeof TransformStamped;
+    readonly Twist: typeof Twist;
+    readonly TwistStamped: typeof TwistStamped;
+    readonly TwistWithCovariance: typeof TwistWithCovariance;
+    readonly TwistWithCovarianceStamped: typeof TwistWithCovarianceStamped;
+    readonly Vector3: typeof Vector3;
+    readonly Vector3Stamped: typeof Vector3Stamped;
+    readonly VelocityStamped: typeof VelocityStamped;
+    readonly VelocityWithCovarianceStamped: typeof VelocityWithCovarianceStamped;
+    readonly Wrench: typeof Wrench;
+    readonly WrenchStamped: typeof WrenchStamped;
+  };
+};
+
+export declare const lifecycle_msgs: {
+  readonly msg: {
+    readonly State: typeof State;
+    readonly Transition: typeof Transition;
+    readonly TransitionDescription: typeof TransitionDescription;
+    readonly TransitionEvent: typeof TransitionEvent;
+  };
+  readonly srv: {
+    readonly ChangeState: typeof ChangeState;
+    readonly GetAvailableStates: typeof GetAvailableStates;
+    readonly GetAvailableTransitions: typeof GetAvailableTransitions;
+    readonly GetState: typeof GetState;
+  };
+};
+
+export declare const nav_msgs: {
+  readonly msg: {
+    readonly Goals: typeof Goals;
+    readonly GridCells: typeof GridCells;
+    readonly MapMetaData: typeof MapMetaData;
+    readonly OccupancyGrid: typeof OccupancyGrid;
+    readonly Odometry: typeof Odometry;
+    readonly Path: typeof Path;
+    readonly Trajectory: typeof Trajectory;
+    readonly TrajectoryPoint: typeof TrajectoryPoint;
+  };
+  readonly srv: {
+    readonly GetMap: typeof GetMap;
+    readonly GetPlan: typeof GetPlan;
+    readonly LoadMap: typeof LoadMap;
+    readonly SetMap: typeof SetMap;
+  };
+};
+
+export declare const rcl_interfaces: {
+  readonly msg: {
+    readonly FloatingPointRange: typeof FloatingPointRange;
+    readonly IntegerRange: typeof IntegerRange;
+    readonly ListParametersResult: typeof ListParametersResult;
+    readonly Log: typeof Log;
+    readonly LoggerLevel: typeof LoggerLevel;
+    readonly Parameter: typeof Parameter;
+    readonly ParameterDescriptor: typeof ParameterDescriptor;
+    readonly ParameterEvent: typeof ParameterEvent;
+    readonly ParameterEventDescriptors: typeof ParameterEventDescriptors;
+    readonly ParameterType: typeof ParameterType;
+    readonly ParameterValue: typeof ParameterValue;
+    readonly SetLoggerLevelsResult: typeof SetLoggerLevelsResult;
+    readonly SetParametersResult: typeof SetParametersResult;
+  };
+  readonly srv: {
+    readonly DescribeParameters: typeof DescribeParameters;
+    readonly GetLoggerLevels: typeof GetLoggerLevels;
+    readonly GetParameterTypes: typeof GetParameterTypes;
+    readonly GetParameters: typeof GetParameters;
+    readonly ListParameters: typeof ListParameters;
+    readonly SetLoggerLevels: typeof SetLoggerLevels;
+    readonly SetParameters: typeof SetParameters;
+    readonly SetParametersAtomically: typeof SetParametersAtomically;
   };
 };
 
@@ -157,16 +2498,210 @@ export declare const rclweb_cdr_interfaces: {
   };
 };
 
+export declare const rosgraph_msgs: {
+  readonly msg: {
+    readonly Action: typeof Action;
+    readonly Clock: typeof Clock;
+    readonly Graph: typeof Graph;
+    readonly InterfaceType: typeof InterfaceType;
+    readonly Node: typeof Node;
+    readonly QoSProfile: typeof QoSProfile;
+    readonly Service: typeof Service;
+    readonly Topic: typeof Topic;
+    readonly TypeHash: typeof TypeHash;
+  };
+};
+
 export declare const sensor_msgs: {
   readonly msg: {
+    readonly BatteryState: typeof BatteryState;
+    readonly CameraInfo: typeof CameraInfo;
+    readonly ChannelFloat32: typeof ChannelFloat32;
+    readonly CompressedImage: typeof CompressedImage;
+    readonly FluidPressure: typeof FluidPressure;
+    readonly Illuminance: typeof Illuminance;
+    readonly Image: typeof Image;
+    readonly Imu: typeof Imu;
+    readonly JointState: typeof JointState;
+    readonly Joy: typeof Joy;
+    readonly JoyFeedback: typeof JoyFeedback;
+    readonly JoyFeedbackArray: typeof JoyFeedbackArray;
+    readonly LaserEcho: typeof LaserEcho;
+    readonly LaserScan: typeof LaserScan;
+    readonly MagneticField: typeof MagneticField;
+    readonly MultiDOFJointState: typeof MultiDOFJointState;
+    readonly MultiEchoLaserScan: typeof MultiEchoLaserScan;
+    readonly NavSatFix: typeof NavSatFix;
+    readonly NavSatStatus: typeof NavSatStatus;
+    readonly PointCloud: typeof PointCloud;
     readonly PointCloud2: typeof PointCloud2;
     readonly PointField: typeof PointField;
+    readonly Range: typeof Range;
+    readonly RegionOfInterest: typeof RegionOfInterest;
+    readonly RelativeHumidity: typeof RelativeHumidity;
+    readonly Temperature: typeof Temperature;
+    readonly TimeReference: typeof TimeReference;
+  };
+  readonly srv: {
+    readonly SetCameraInfo: typeof SetCameraInfo;
+  };
+};
+
+export declare const shape_msgs: {
+  readonly msg: {
+    readonly Mesh: typeof Mesh;
+    readonly MeshTriangle: typeof MeshTriangle;
+    readonly Plane: typeof Plane;
+    readonly SolidPrimitive: typeof SolidPrimitive;
+  };
+};
+
+export declare const statistics_msgs: {
+  readonly msg: {
+    readonly MetricsMessage: typeof MetricsMessage;
+    readonly StatisticDataPoint: typeof StatisticDataPoint;
+    readonly StatisticDataType: typeof StatisticDataType;
   };
 };
 
 export declare const std_msgs: {
   readonly msg: {
+    readonly Bool: typeof Bool;
+    readonly Byte: typeof Byte;
+    readonly ByteMultiArray: typeof ByteMultiArray;
+    readonly Char: typeof Char;
+    readonly ColorRGBA: typeof ColorRGBA;
+    readonly Empty: typeof Empty;
+    readonly Float32: typeof Float32;
+    readonly Float32MultiArray: typeof Float32MultiArray;
+    readonly Float64: typeof Float64;
+    readonly Float64MultiArray: typeof Float64MultiArray;
     readonly Header: typeof Header;
+    readonly Int16: typeof Int16;
+    readonly Int16MultiArray: typeof Int16MultiArray;
+    readonly Int32: typeof Int32;
+    readonly Int32MultiArray: typeof Int32MultiArray;
+    readonly Int64: typeof Int64;
+    readonly Int64MultiArray: typeof Int64MultiArray;
+    readonly Int8: typeof Int8;
+    readonly Int8MultiArray: typeof Int8MultiArray;
+    readonly MultiArrayDimension: typeof MultiArrayDimension;
+    readonly MultiArrayLayout: typeof MultiArrayLayout;
     readonly String: typeof String;
+    readonly UInt16: typeof UInt16;
+    readonly UInt16MultiArray: typeof UInt16MultiArray;
+    readonly UInt32: typeof UInt32;
+    readonly UInt32MultiArray: typeof UInt32MultiArray;
+    readonly UInt64: typeof UInt64;
+    readonly UInt64MultiArray: typeof UInt64MultiArray;
+    readonly UInt8: typeof UInt8;
+    readonly UInt8MultiArray: typeof UInt8MultiArray;
   };
 };
+
+export declare const std_srvs: {
+  readonly srv: {
+    readonly Empty: typeof StdSrvsEmpty;
+    readonly SetBool: typeof SetBool;
+    readonly Trigger: typeof Trigger;
+  };
+};
+
+export declare const stereo_msgs: {
+  readonly msg: {
+    readonly DisparityImage: typeof DisparityImage;
+  };
+};
+
+export declare const tf2_msgs: {
+  readonly msg: {
+    readonly TF2Error: typeof TF2Error;
+    readonly TFMessage: typeof TFMessage;
+  };
+  readonly srv: {
+    readonly FrameGraph: typeof FrameGraph;
+  };
+  readonly action: {
+    readonly LookupTransform: typeof LookupTransform;
+  };
+};
+
+export declare const trajectory_msgs: {
+  readonly msg: {
+    readonly JointTrajectory: typeof JointTrajectory;
+    readonly JointTrajectoryPoint: typeof JointTrajectoryPoint;
+    readonly MultiDOFJointTrajectory: typeof MultiDOFJointTrajectory;
+    readonly MultiDOFJointTrajectoryPoint: typeof MultiDOFJointTrajectoryPoint;
+  };
+};
+
+export declare const type_description_interfaces: {
+  readonly msg: {
+    readonly Field: typeof Field;
+    readonly FieldType: typeof FieldType;
+    readonly IndividualTypeDescription: typeof IndividualTypeDescription;
+    readonly KeyValue: typeof TypeDescriptionInterfacesKeyValue;
+    readonly TypeDescription: typeof TypeDescription;
+    readonly TypeSource: typeof TypeSource;
+  };
+  readonly srv: {
+    readonly GetTypeDescription: typeof GetTypeDescription;
+  };
+};
+
+export declare const unique_identifier_msgs: {
+  readonly msg: {
+    readonly UUID: typeof UUID;
+  };
+};
+
+export declare const visualization_msgs: {
+  readonly msg: {
+    readonly ImageMarker: typeof ImageMarker;
+    readonly InteractiveMarker: typeof InteractiveMarker;
+    readonly InteractiveMarkerControl: typeof InteractiveMarkerControl;
+    readonly InteractiveMarkerFeedback: typeof InteractiveMarkerFeedback;
+    readonly InteractiveMarkerInit: typeof InteractiveMarkerInit;
+    readonly InteractiveMarkerPose: typeof InteractiveMarkerPose;
+    readonly InteractiveMarkerUpdate: typeof InteractiveMarkerUpdate;
+    readonly Marker: typeof Marker;
+    readonly MarkerArray: typeof MarkerArray;
+    readonly MenuEntry: typeof MenuEntry;
+    readonly MeshFile: typeof MeshFile;
+    readonly UVCoordinate: typeof UVCoordinate;
+  };
+  readonly srv: {
+    readonly GetInteractiveMarkers: typeof GetInteractiveMarkers;
+  };
+};
+
+export type GeneratedLayoutArray =
+  | { kind: "none" }
+  | { kind: "unbounded" }
+  | { kind: "fixed"; size: number }
+  | { kind: "bounded"; size: number };
+
+export type GeneratedLayoutField =
+  | { name: string; kind: "prim"; prim: string; array: GeneratedLayoutArray }
+  | { name: string; kind: "str"; wide: boolean; bound?: number; array: GeneratedLayoutArray }
+  | { name: string; kind: "named"; typeName: string; array: GeneratedLayoutArray };
+
+export declare const GENERATED_LAYOUTS: {
+  readonly [typeName: string]: readonly GeneratedLayoutField[];
+};
+
+export declare const GENERATED_MSG_TYPE_NAMES: ReadonlySet<string>;
+
+export declare const GENERATED_TYPE_NAMES: ReadonlySet<string>;
+
+export declare const GENERATED_OP_TYPES: {
+  readonly [typeName: string]: {
+    readonly Request?: string;
+    readonly Response?: string;
+    readonly Goal?: string;
+    readonly Result?: string;
+    readonly Feedback?: string;
+  };
+};
+
+export declare function createGenerated(typeName: string): object | undefined;

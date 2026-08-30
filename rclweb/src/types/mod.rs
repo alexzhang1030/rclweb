@@ -28,7 +28,7 @@ pub use generated::{
 pub use host_value::{
   ECHO_NESTED_TYPE_NAME, GeneratedMessage, GeneratedOpKind, GeneratedValueError,
   MEASURE_SEQUENCE_TYPE_NAME, decode_generated_cdr, decode_host_value, encode_generated_cdr,
-  encode_host_value, generated_op_type_name, sample_echo_nested_request,
+  encode_generated_or_cdr, encode_host_value, generated_op_type_name, sample_echo_nested_request,
   sample_echo_nested_response, sample_measure_sequence_feedback, sample_measure_sequence_goal,
   sample_measure_sequence_result, sample_nested_sample, sample_primitive_scalars,
 };
