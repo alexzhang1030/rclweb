@@ -9,6 +9,7 @@
   },
   "workspaces": [
     "typescript",
+    "website",
     "examples/*"
   ],
   "scripts": {
@@ -38,6 +39,7 @@
     "test:cdr-tail-slack": "bun test scripts/cdr-tail-slack.test.ts",
     "test:generated-types": "bun test scripts/generated-types.test.ts",
     "test:rosidl-dts": "bun test scripts/rosidl-dts.test.ts",
+    "test:website": "bun test website",
     "test": "bun test"
   }
 }

@@ -1,6 +1,8 @@
 # Documentation
 
-Start here if you are writing a browser app against ROS 2:
+Rendered site: [rclweb-website.vercel.app](https://rclweb-website.vercel.app)
+(`just website` locally). Start here if you are writing a browser app
+against ROS 2:
 
 | I want to… | Read |
 |---|---|

@@ -164,8 +164,23 @@ cargo-publish: toolchain-check
 cargo-publish-check: toolchain-check
     cd "{{root}}" && bun run scripts/cargo-publish.ts --check
 
+# Fumadocs + TanStack Start site over the existing docs/ tree (ADR 0020).
+[group('docs')]
+website:
+    cd "{{root}}" && bun run --filter @rclweb/website dev
+
+# Typecheck and production build of the docs site.
+# Build first so Vite can refresh `src/routeTree.gen.ts` for tsc.
+[group('docs')]
+website-check: toolchain-check
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd "{{root}}"
+    bun run --filter @rclweb/website build
+    bun run --filter @rclweb/website types:check
+
 # Docs, protocol, corpus, generated-types, rosidl-dts, license inventory,
-# npm/crate pack members, Rust fmt/clippy, tsdown ship bundle.
+# npm/crate pack members, Rust fmt/clippy, tsdown ship bundle, docs site.
 [group('quality')]
 check: toolchain-check
     #!/usr/bin/env bash
@@ -180,6 +195,7 @@ check: toolchain-check
     just clippy
     just clippy-webtransport
     bun run --filter rcl-web check
+    just website-check
 
 # Bun tests (root scripts and TypeScript package) and Cargo workspace tests.
 [group('quality')]
@@ -192,13 +208,14 @@ test: toolchain-check
 
 # Gateway tests against real rcl (requires a sourced ROS 2 env matching the row).
 # Default committed bindings target J-FT (`/opt/ros/jazzy`).
+# Local alternative without apt ROS or Docker: `just ros-test-pixi` (RoboStack).
 [group('quality')]
 ros-test: toolchain-check
     #!/usr/bin/env bash
     set -euo pipefail
     cd "{{root}}"
     if [ -z "${AMENT_PREFIX_PATH:-}" ]; then
-        echo "error: source a ROS 2 environment first (e.g. /opt/ros/jazzy/setup.bash)" >&2
+        echo "error: source a ROS 2 environment first (e.g. /opt/ros/jazzy/setup.bash, or just ros-test-pixi)" >&2
         exit 1
     fi
     cargo test --locked -p rclwebd --features ros
@@ -217,6 +234,21 @@ ros-check: toolchain-check
     fi
     cargo check --locked -p rclwebd --features ros --tests
     cargo clippy --locked -p rclwebd --features ros --all-targets -- -D warnings
+
+# Same as ros-test, using the optional RoboStack Jazzy prefix (pixi).
+# Not a toolchain pin and not a substitute for digest-pinned Docker e2e evidence.
+[group('quality')]
+ros-test-pixi: toolchain-check
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd "{{root}}"
+    export PATH="${HOME}/.pixi/bin:${PATH}"
+    if ! command -v pixi >/dev/null 2>&1; then
+        echo "error: pixi is required for just ros-test-pixi (https://pixi.sh)" >&2
+        exit 1
+    fi
+    pixi install --locked
+    pixi run just ros-test
 
 # Compile-only ros-feature gate in the digest-pinned Jazzy image. Does not run cargo test.
 [group('quality')]

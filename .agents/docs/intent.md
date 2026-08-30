@@ -23,6 +23,8 @@ A production edge + browser path: one Rust core ([ADR 0010](../../docs/adr/0010-
 - `rclwebd` owns ROS attachment, identity, policy, scheduling, schema, audit, and operations at the edge.
 - Supported profiles carry conformance, performance, security, and deployment evidence.
 - The TypeScript package `rcl-web` at `typescript/` is the core client (`init`, `Node`, pub/sub, services, actions, shipped and generated types). Do not delete `typescript/`, drop the npm package, or rewrite that client into another language. `init()` is the local default. The page does not name the edge process. `rclwebd` stays as robot-side ROS attachment because the browser cannot bind rcl. The install path the README leads with is the GHCR image (`docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy`). `cargo install rclwebd --features ros` is the from-source path.
+- The rendered docs site at `website/` is a product (Fumadocs + TanStack Start over `docs/`). Do not delete it. Vercel project Root Directory is `website`.
+- `pixi.toml` is the optional RoboStack Jazzy prefix for `just ros-test-pixi`. Do not delete it.
 - The current version is `0.0.6` across npm and crates. This cut ships `npx rcl-web gen`. Unscoped `rclweb` is blocked on npm as too similar to `rrweb`; the publish name is `rcl-web` ([ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md)).
 - The repository is Apache-2.0; third-party crates on the published surface stay OSI-permissive ([licensing](../../docs/licensing.md)).
 

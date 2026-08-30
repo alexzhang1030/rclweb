@@ -38,6 +38,10 @@ GitHub documents this under
 
 `axum::serve(...).with_graceful_shutdown(ctrl_c)` inside the test helper made raw HTTP/1.1 GETs (`/healthz`, `/readyz`) complete the TCP handshake and then read zero bytes. WebSocket upgrades on the same listener still worked, so protocol tests stayed green. `serve()` now runs until the task is dropped; the daemon calls `serve_with_os_signals` for SIGTERM drain. Reproduce with `cargo test --locked -p rclwebd --test ws_gateway healthz_stays_plain_ok`.
 
+## Pixi ros-test must pin ROS_PREFIX over a host /opt/ros
+
+`just ros-test-pixi` exists for machines without apt ROS, but a host `/opt/ros/jazzy` on `PATH` / `LD_LIBRARY_PATH` makes link, dlopen, and `ros2 topic pub` silently use the apt prefix — mixed apt + RoboStack FastDDS then hangs the live talker e2e (GraphSnapshot / discovery) instead of failing cleanly. `scripts/pixi-ros-activate.sh` pins `ROS_PREFIX` / `AMENT_PREFIX_PATH` to `$CONDA_PREFIX`, sets `LD_LIBRARY_PATH` to that `lib` only, and forces `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` (RoboStack's activate.d defaults to `SUBNET`). The pixi env includes `ros2cli` / `ros2topic` so the talker is the same prefix. `docs-check` skips `.pixi/` so a local install does not poison `just check`. RoboStack Jazzy is still not a substitute for digest-pinned Docker e2e (`just e2e`). Landed in [`25fb42f`](https://github.com/alexzhang1030/rclweb/commit/25fb42f) (#20); reproduce with `just ros-test-pixi`. `ros2 run` is `ros-jazzy-ros2run`, not `ros-jazzy-ros2pkg` (`ros2 pkg` only). Pixi activation overwrites `AMENT_PREFIX_PATH` to `$CONDA_PREFIX`.
+
 ## Typesupport is dlopen, not link-time
 
 `rclwebd/build.rs` does not statically link `std_msgs` / `sensor_msgs` typesupport. At runtime the ROS thread `dlopen`s `lib{pkg}__rosidl_typesupport_c.so` and `lib{pkg}__rosidl_generator_c.so` under `ROS_PREFIX/lib` (or `AMENT_PREFIX_PATH`). A missing package yields wire code 10 (`schema_unavailable`) — install the interface package in the image/environment rather than adding a link line. Service/action live paths also need those packages (for example `example_interfaces` for the AddTwoInts and Fibonacci loopbacks in `just ros-test`).
@@ -260,3 +264,43 @@ says.
 ## Do not wrap cargo tests in a Docker mock lane
 
 A compose file whose image only re-ran `cargo test` inside `rust:1.97.1` once existed. Foundation already runs those tests via `just test`. Do not add a compose file whose only command is cargo tests the workspace already runs. The ros-feature compile image ([`docker/compose.ros-feature-check.yml`](../../docker/compose.ros-feature-check.yml)) is not that anti-pattern: it runs `cargo check --tests`, not `cargo test`.
+
+## Fumadocs defineDocs dir is a string literal
+
+`defineDocs` in fumadocs-mdx is a Vite macro: `dir` must be the string
+literal `"../docs"`. A computed `path.resolve` fails the transform.
+Heading `id`s share [`scripts/github-slug.ts`](../../scripts/github-slug.ts)
+with `docs-check`. Do not import [`scripts/docs-check.ts`](../../scripts/docs-check.ts)
+into the client — it pulls `node:fs/promises`.
+`export { githubHeadingSlug } from "./github-slug.ts"` does not bind the
+name in the same file; import, then re-export. In fumadocs-core 16.15,
+import `Root` / `Item` / `Node` from `fumadocs-core/page-tree` (`PageTree`
+is not a namespace). Commit `website/src/routeTree.gen.ts` so `tsc` sees
+`createFileRoute` paths; do not commit `website/.output/` or `.tanstack/`.
+Search indexes every collection page: drop the GitHub
+`docs/README.md` from storage (and filter `/docs/README` hits) or a
+Node query opens that map and the `/docs/README` redirect lands on
+how-to.
+[docs-site](./docs-site.md), [ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md).
+
+## Vercel will not start the node-server preset
+
+`https://rclweb-website.vercel.app/` returned Vercel's platform
+`NOT_FOUND` on `/` and `/docs/typescript` after a green deploy. Nitro
+was pinned to `node-server`, which writes `.output/server/index.mjs`.
+Vercel does not run that process; it looks for `.vercel/output` (Build
+Output API) or a static `dist/`. `nitroPreset()` uses `vercel` when
+`VERCEL` is set, else `node-server` for `just website` /
+`just website-check`. The Vercel project Root Directory is `website`
+(Vercel-for-GitHub payload). A repo-root `buildCommand` that copies
+`website/.vercel/output` runs with cwd already `website/` and exits 1.
+Keep `vercel.json` in `website/` and `bun run build`. [docs-site](./docs-site.md).
+
+## Docs landing SVG must min-width 0 in the flex column
+
+`body` and `#nd-home-layout` are `flex flex-col`. The homepage graph
+SVG uses a 1000-wide viewBox, so min-content is 1000px unless that
+chain can shrink — a phone then clips `rclwebd` / `ROS 2`. Bind
+`min-width: 0` on `body` / `#nd-home-layout` / `.home`,
+`contain: inline-size` on `.home-stage`, and `max-width: 100%` on the
+SVG. [docs-site](./docs-site.md).

@@ -16,7 +16,7 @@ just build
 
 `just check` is the foundation gate (docs, protocol, corpus, ROSIDL DTS,
 license inventory, npm/crate pack members, `cargo fmt`, Clippy with
-`-D warnings`, tsdown ship bundle).
+`-D warnings`, tsdown ship bundle, docs site).
 
 | Command | Purpose |
 |---|---|
@@ -36,6 +36,8 @@ license inventory, npm/crate pack members, `cargo fmt`, Clippy with
 | `just protocol-check` / `just cdr-corpus-check` | Registry, CDDL, CDR corpus |
 | `just rosidl-dts-check` / `just rosidl-dts-write` | Repo check for shipped generated classes. Users run `npx rcl-web gen` |
 | `just license-inventory` / `just license-inventory-check` | Third-party allowlist |
+| `just website` / `just website-check` | Docs site (`website/`) |
+| `just ros-test-pixi` | Optional RoboStack Jazzy prefix for `just ros-test` |
 
 Pins: Bun `.bun-version`, Rust `rust-toolchain.toml` (1.97.1 +
 `wasm32-unknown-unknown`), just `.just-version`.

@@ -15,6 +15,7 @@ rclweb keeps the language count at the minimum the platform forces: Rust for eve
 | JavaScript tooling | Bun ([ADR 0002](../../docs/adr/0002-use-bun-for-javascript-tooling.md)) | Workspaces, installation, scripts, tests, lockfile |
 | TypeScript npm bundle | tsdown ([ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md)) | Owner ruling: do not publish `.ts` source; ship ESM + `.d.ts`. `dist/cli.js` is the Node `npx rcl-web gen` bin |
 | Repository commands | just | One root command surface |
+| Docs site | Fumadocs UI + TanStack Start (`website/`) | Owner named the look (Fumadocs over VitePress) and the host ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md)). Markdown stays in `docs/` |
 
 A second language for the browser runtime would duplicate every shared contract. The single-core choice reopens only if wasm artifact size is unacceptable for a required profile ([ADR 0010](../../docs/adr/0010-restructure-single-rust-core.md)). `just build` prints staged wasm size.
 
@@ -34,6 +35,8 @@ just check
 just test
 just build
 ```
+
+Pixi is not in that pin set. `pixi.toml` is an optional local Jazzy prefix for `just ros-test` on machines without apt ROS or Docker; see [Optional local ROS prefix](#optional-local-ros-prefix).
 
 ## Rust workspace infrastructure
 
@@ -61,9 +64,11 @@ Vendored `rclwebd/src/ros/ffi/bindings.rs` is `rustfmt::skip` so regenerate does
 | `rclweb/` | Cargo crate: the core (native + wasm32); `cdylib` exports the hand-written poll ABI. crates.io publish unit |
 | `rclwebd/` | Cargo crate: the gateway. crates.io publish unit (`--features ros` for the binary) |
 | `typescript/` | Bun workspace package `rcl-web` (public). tsdown ship bundle + `npx rcl-web gen`. Customer docs: [how to](../../docs/typescript.md), [API](../../docs/api.md). `rcl-web/internal` is host/ABI/test helpers ([ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md), [ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md)). Publish is GitHub OIDC ([release](../../docs/release.md), [ADR 0016](../../docs/adr/0016-oidc-trusted-publish.md)) |
+| `website/` | Private Bun workspace `@rclweb/website`. Fumadocs UI + TanStack Start over `docs/` ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md), [docs-site](./docs-site.md)). Not on the published `rcl-web` graph |
 | `typescript/wasm/` | Staged `rclweb.wasm` from `scripts/build-wasm.ts` (fat LTO) |
 | `protocol/` | Normative contracts, registries, schemas, and frozen fixtures |
 | `conformance/` | CDR corpus and qualification workloads |
+| `pixi.toml` | Optional RoboStack J-FT prefix for `just ros-test-pixi`; not a toolchain pin |
 | `rustfmt.toml`, `clippy.toml` | Rust format and Clippy knobs; see [Rust workspace infrastructure](#rust-workspace-infrastructure) |
 | `CONTRIBUTING.md` | Clone → `just setup` / `just check` |
 
@@ -74,6 +79,12 @@ Live talker e2e covers J-FT. Corpus data for all six rows stays committed. Humbl
 ## ROS-feature tests
 
 `just check` / `just test` / `just build` stay ROS-free. Compiling the ros-feature tests (`just ros-check`, or `just ros-check-docker` / CI `ros-feature-check`) and running them (`just ros-test`) need a Jazzy prefix matching the committed bindings (typically `source /opt/ros/jazzy/setup.bash`). Digest-pinned Docker compose (`just e2e`) remains the talker → gateway → SDK gate.
+
+## Optional local ROS prefix
+
+For machines where apt ROS or Docker is too heavy, `pixi.toml` installs a RoboStack Jazzy prefix (`just ros-test-pixi` / `pixi run just ros-test`). That path is optional: pixi is not a toolchain pin, not checked by `just toolchain-check`, and not CI evidence. Digest-pinned Docker compose (`just e2e`) remains the talker → gateway → SDK gate. This env is J-FT only.
+
+RoboStack Jazzy is a conda-forge rebuild, not Ubuntu's `/opt/ros/jazzy`. A green `ros-test-pixi` does not substitute for the Ubuntu Jazzy e2e lane. Landed in [`25fb42f`](https://github.com/alexzhang1030/rclweb/commit/25fb42f) (#20); reproduce with `just ros-test-pixi`.
 
 ## Licensing
 

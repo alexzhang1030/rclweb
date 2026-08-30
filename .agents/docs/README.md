@@ -19,6 +19,7 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | Traps already paid for | [Gotchas](./gotchas.md) |
 | Evidence and gate authority | [Validation](./validation.md) |
 | TypeScript package (`typescript/` is the core client; keep the npm package) | [How to](../../docs/typescript.md), [API reference](../../docs/api.md), [Intent](./intent.md), [ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md), [ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md) |
+| Rendered docs site | [Docs site renderer](./docs-site.md), [ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md) — Fumadocs + TanStack Start at `website/` |
 | Publish | [Release](../../docs/release.md), [ADR 0016](../../docs/adr/0016-oidc-trusted-publish.md) |
 | License | [Licensing](../../docs/licensing.md) |
 
@@ -70,4 +71,6 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | `docker/Dockerfile.ros-feature-check`, `docker/compose.ros-feature-check.yml` | Compile-only Jazzy gate for ros-feature tests (`just ros-check-docker`); not a `cargo test` mock lane ([gotchas](./gotchas.md#no-ci-lane-compiles-the-ros-feature-tests)) |
 | `.github/workflows/release.yml` | npm trusted publishing + crates.io ([release](../../docs/release.md), [ADR 0016](../../docs/adr/0016-oidc-trusted-publish.md)); GHCR Jazzy and Humble images ([ADR 0018](../../docs/adr/0018-prebuilt-gateway-distribution.md), [deploy](../../docs/deploy.md#prebuilt-image)). npm identity is the workflow filename, not a GitHub environment ([gotchas](./gotchas.md#npm-oidc-identity-is-the-workflow-file)). Do not set `NODE_AUTH_TOKEN` ([gotchas](./gotchas.md#do-not-put-nodeauthtoken-on-the-npm-oidc-job)). First crates.io publish is manual ([gotchas](./gotchas.md#cratesio-oidc-cannot-create-the-first-crate)) |
 | `scripts/build-wasm.ts` | Fat-LTO wasm ship ([gotchas](./gotchas.md#release-wasm-inherits-native-release-settings)) |
+| `website/` | Fumadocs UI on TanStack Start over `docs/` ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md), [docs-site](./docs-site.md)). `just website` / `just website-check`. Macro/`dir` and slug import traps: [gotchas](./gotchas.md#fumadocs-definedocs-dir-is-a-string-literal). Landing SVG shrink: [gotchas](./gotchas.md#docs-landing-svg-must-min-width-0-in-the-flex-column). Vercel `node-server` 404: [gotchas](./gotchas.md#vercel-will-not-start-the-node-server-preset) |
+| `pixi.toml` | Optional RoboStack J-FT ([technology stack](./technology-stack.md#optional-local-ros-prefix), [gotchas](./gotchas.md#pixi-ros-test-must-pin-rosprefix-over-a-host-optros)) |
 | Support matrix | Human matrix edit; no committed measurement JSON ([gotchas](./gotchas.md#do-not-commit-measurement-json)) |
