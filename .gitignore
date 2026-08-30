@@ -13,16 +13,9 @@ secrets/
 *.key
 *.pem
 *.secret.asc
-rclweb-apt-gnupg-*/
 
 # JavaScript and Bun
 node_modules/
-website/.output/
-website/.nitro/
-website/.tanstack/
-website/.source/
-website/.vercel/
-.vercel/
 .bun/
 dist/
 coverage/
@@ -37,9 +30,6 @@ typescript/*.tgz
 target/
 lcov.info
 *.profraw
-
-# Optional RoboStack prefix (pixi)
-.pixi/
 
 # Logs and temporary artifacts
 *.log

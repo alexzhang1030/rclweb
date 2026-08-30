@@ -5,33 +5,11 @@ links the [`rclweb`](https://crates.io/crates/rclweb) core, terminates
 R2WP over WebSocket (and optional WebTransport), and attaches to ROS 2
 through a serialized adapter ABI.
 
-Prebuilt images (six support rows; `jazzy` = J-FT, `humble` = H-FT):
+Prebuilt images (`jazzy` = J-FT, `humble` = H-FT):
 
 ```bash
 docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy
 ```
-
-Ubuntu apt ([`docs/deploy.md#apt`](../docs/deploy.md#apt)):
-
-```bash
-curl -fsSL https://alexzhang1030.github.io/rclweb/enable-apt.sh | sudo bash
-```
-
-Prebuilt binaries for a sourced Jazzy / Humble environment. The
-installer also writes an ament overlay:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/install-rclwebd.sh | bash
-source /opt/ros/$ROS_DISTRO/setup.bash
-source ~/.local/share/rclwebd/local_setup.bash
-ros2 run rclwebd rclwebd
-```
-
-`ros2 run`: [`docs/deploy.md#ros2-run`](../docs/deploy.md#ros2-run).
-Host systemd units for unattended machines:
-[`docs/deploy.md#systemd`](../docs/deploy.md#systemd)
-(`./scripts/install-rclwebd.sh --systemd`). Kubernetes host-network
-units: [`docs/deploy.md#kubernetes`](../docs/deploy.md#kubernetes).
 
 Building from source requires `--features ros` and a sourced ROS 2
 prefix (`ROS_PREFIX` / `AMENT_PREFIX_PATH`). Add `webtransport` for the

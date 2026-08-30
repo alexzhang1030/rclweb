@@ -22,13 +22,13 @@ A production edge + browser path: one Rust core ([ADR 0010](../../docs/adr/0010-
 - R2WP carries CDR and control data over bounded, observable transports.
 - `rclwebd` owns ROS attachment, identity, policy, scheduling, schema, audit, and operations at the edge.
 - Supported profiles carry conformance, performance, security, and deployment evidence.
-- The TypeScript package `rcl-web` exposes an rclcpp-shaped public application contract (`init` / `Node`). `init()` is the local default. The page does not name the edge process. `rclwebd` stays as robot-side ROS attachment because the browser cannot bind rcl. Interactive start on the robot is `ros2 run rclwebd rclwebd` after the ament overlay or `apt install rclwebd` ([ADR 0019](../../docs/adr/0019-own-apt-repository.md)); systemd stays for unattended hosts. The overlay is not bloom.
-- The current version is `0.0.6` across npm and crates (aligned from `v0.0.5`; earlier `rcl-web@0.0.4` with crates `0.0.3`). This cut ships `npx rcl-web gen`. `0.0.1` on npm shipped TypeScript source; `0.0.2` was the first tsdown tarball. The npm tarball must include the repository `LICENSE` and `NOTICE`. First OIDC automatic publish landed from tag `v0.0.3` ([release run](https://github.com/alexzhang1030/rclweb/actions/runs/31713576156), [release](../../docs/release.md), [ADR 0016](../../docs/adr/0016-oidc-trusted-publish.md)). Unscoped `rclweb` is blocked on npm as too similar to `rrweb`; the publish name is `rcl-web` ([ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md)).
+- The TypeScript package `rcl-web` at `typescript/` is the core client (`init`, `Node`, pub/sub, services, actions, shipped and generated types). Do not delete `typescript/`, drop the npm package, or rewrite that client into another language. `init()` is the local default. The page does not name the edge process. `rclwebd` stays as robot-side ROS attachment because the browser cannot bind rcl. The install path the README leads with is the GHCR image (`docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy`). `cargo install rclwebd --features ros` is the from-source path.
+- The current version is `0.0.6` across npm and crates. This cut ships `npx rcl-web gen`. Unscoped `rclweb` is blocked on npm as too similar to `rrweb`; the publish name is `rcl-web` ([ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md)).
 - The repository is Apache-2.0; third-party crates on the published surface stay OSI-permissive ([licensing](../../docs/licensing.md)).
 
 ## Non-goals
 
 - No JSON transcoding on the sample path; CDR stays end to end.
 - No client library reinvention: the browser core is an R2WP protocol client with rcl-shaped semantics, and the gateway binds the serialized-only rcl surface (owner constraint in ADR 0010).
-- Not a visual IDE. Studio is an optional post-release UI ([studio-ui](../../docs/prototypes/studio-ui.md)).
+- Not a visual IDE.
 - Contracts harden after they carry traffic; platform expansion enters through the [support matrix](../../docs/support-matrix.md).

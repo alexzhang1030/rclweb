@@ -1,9 +1,9 @@
 # rcl-web
 
 TypeScript client for ROS 2 in the browser. On the machine that can
-see the ROS graph, start the edge process (`ros2 run rclwebd rclwebd`
-or the [image](https://github.com/alexzhang1030/rclweb/pkgs/container/rclwebd)),
-then use `Node` like rclcpp.
+see the ROS graph, start the edge process
+([image](https://github.com/alexzhang1030/rclweb/pkgs/container/rclwebd)
+or `cargo install rclwebd --features ros`), then use `Node` like rclcpp.
 
 ```ts
 import { init, Node, std_msgs } from "rcl-web";

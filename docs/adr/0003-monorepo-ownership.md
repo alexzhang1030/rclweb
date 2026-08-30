@@ -55,4 +55,4 @@ Use one monorepo for Rust, MoonBit, TypeScript, R2WP contracts and fixtures, con
 
 ## Source
 
-Architecture ownership and dependency order in [architecture](../architecture.md) and [architecture rationale](../../.agents/docs/architecture.md). Stack and repository tooling in [technology stack rationale](../../.agents/docs/technology-stack.md). Delivery sequence in [implementation plan](../../tasks/plan.md).
+Architecture ownership and dependency order in [architecture](../architecture.md) and [architecture rationale](../../.agents/docs/architecture.md). Stack and repository tooling in [technology stack rationale](../../.agents/docs/technology-stack.md).

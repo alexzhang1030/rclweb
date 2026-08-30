@@ -11,7 +11,7 @@ Start here if you are writing a browser app against ROS 2:
 | Send or host an action | [Actions](./typescript.md#actions) |
 | Look up every method | [API reference](./api.md) |
 | Generate types from `.msg` / `.action` | [Your own message types](./typescript.md#your-own-message-types) |
-| Run `rclwebd` | [`apt`](./deploy.md#apt), [`ros2 run`](./deploy.md#ros2-run), [systemd](./deploy.md#systemd), [Kubernetes](./deploy.md#kubernetes), [Deploy `rclwebd`](./deploy.md) |
+| Run `rclwebd` | [Deploy `rclwebd`](./deploy.md) |
 
 Runnable demo: [`examples/subscribe-chatter`](../examples/subscribe-chatter/).
 
@@ -24,7 +24,6 @@ These pages are for people changing this repository, not for calling `Node`.
 | What ships, what does not | [Product scope](./product-scope.md) |
 | Process boundaries | [Architecture](./architecture.md) |
 | Sample path vs Foxglove / rosbridge | [Performance](./performance.md) |
-| Related projects | [Landscape](./landscape.md), [references](./references.md) |
 | Wire protocol | [R2WP](./protocol/r2wp.md) |
 | Rust core / CDR | [`rclweb` core](./runtime/core.md), [CDR](./runtime/cdr.md), [generated types](./runtime/generated-types.md) |
 | Gateway internals | [`rclwebd`](./gateway/rclwebd.md), [security](./security.md), [ACL reference](./acl-reference.json) |
@@ -33,9 +32,6 @@ These pages are for people changing this repository, not for calling `Node`.
 | License | [Licensing](./licensing.md), [third-party inventory](./third-party.md) |
 | Publish to npm / crates.io | [Release](./release.md) |
 | Decisions | [ADR register](./adr/README.md) |
-| Open work | [Open work](../tasks/plan.md) |
-| Studio (not in tree) | [Studio prototype](./prototypes/studio-ui.md), [design system](../.agents/docs/DESIGN.md) |
 
 Workspace routes for contributors: [CONTRIBUTING.md](../CONTRIBUTING.md),
-[PCR map](../.agents/docs/README.md). The rendered site is
-[`website/`](../website/README.md) ([ADR 0020](./adr/0020-fumadocs-tanstack-docs-site.md)).
+[PCR map](../.agents/docs/README.md).

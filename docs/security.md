@@ -13,7 +13,7 @@
 
 Robot private keys stay in the edge enclave.
 
-Authenticate is evaluated at the gateway. Default `off` accepts any credential and keeps SessionReady field 21 as `anonymous` (no audit). `oidc` mode verifies JWT issuer, audience, expiry, and signature (HS256 secret or JWKS) and fails with wire code 26. A named OIDC tenant and SROS2 keystore are out of scope ([open work](../tasks/plan.md)); leave `RCLWEBD_AUTH_MODE` off. This process does not embed a vendor.
+Authenticate is evaluated at the gateway. Default `off` accepts any credential and keeps SessionReady field 21 as `anonymous` (no audit). `oidc` mode verifies JWT issuer, audience, expiry, and signature (HS256 secret or JWKS) and fails with wire code 26. A named OIDC tenant and SROS2 keystore are out of scope; leave `RCLWEBD_AUTH_MODE` off. This process does not embed a vendor.
 
 ## Authorization
 
@@ -41,7 +41,7 @@ Sessions and channels receive hard ceilings for connections, streams, channels, 
 
 ## SROS2
 
-SROS2 enclave wiring is parked ([open work](../tasks/plan.md)). The design still follows ROS 2 [access-control policy](https://design.ros2.org/articles/ros2_access_control_policies.html) and [security enclave](https://design.ros2.org/articles/ros2_security_enclaves.html) concepts; this process does not ship a keystore.
+SROS2 enclave wiring is parked. The design still follows ROS 2 [access-control policy](https://design.ros2.org/articles/ros2_access_control_policies.html) and [security enclave](https://design.ros2.org/articles/ros2_security_enclaves.html) concepts; this process does not ship a keystore.
 
 ## Audit
 

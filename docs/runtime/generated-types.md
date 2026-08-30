@@ -259,7 +259,6 @@ Error payloads carry the fault code and stable diagnostic context (offending fie
 | Corpus layout and bridge commands | [Corpus README](../../conformance/cdr/README.md) |
 | Runtime package placement | [`rclweb` core](./core.md) |
 | Evidence | [Validation](../validation.md) |
-| Open work | [Open work](../../tasks/plan.md), [checklist](../../tasks/todo.md) |
 
 ## Out of scope
 

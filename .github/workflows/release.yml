@@ -1,9 +1,6 @@
 # Publish rcl-web (npm trusted publishing), rclweb / rclwebd (crates.io),
-# the six rclwebd runtime images (GHCR), prebuilt gateway binaries
-# (GitHub Release assets), and the own apt repo (ADR 0019) when
-# RCLWEB_APT_GPG_PRIVATE_KEY is set. ADR 0018 covers image / binary
-# distribution. A rebuild-v<version> tag republishes only images,
-# binaries, and apt for an existing version (registries refuse
+# and the Jazzy / Humble rclwebd runtime images (GHCR). A rebuild-v<version>
+# tag republishes only images for an existing version (registries refuse
 # duplicates; GHCR tags move).
 # npm OIDC identity is this filename only — do not rename without updating
 # npmjs.com. No GitHub environment on the npm job (leave Environment blank
@@ -23,14 +20,6 @@ on:
         default: true
       images:
         description: Publish rclwebd runtime images to GHCR
-        type: boolean
-        default: true
-      binaries:
-        description: Upload prebuilt rclwebd binaries to the GitHub Release
-        type: boolean
-        default: true
-      apt:
-        description: Pack rclwebd debs and publish the signed apt repo when the archive key secret is set
         type: boolean
         default: true
   push:
@@ -220,12 +209,9 @@ jobs:
             sleep 20
           done
 
-  # Six-row runtime images (ADR 0018 stage 1), linux/amd64 + linux/arm64.
-  # Each arch builds natively (arm64 on ubuntu-24.04-arm; QEMU-emulated
-  # cargo builds are impractical) and pushes <version>-<row>-<arch>;
-  # publish-image-manifests combines them into the user-facing tags:
-  # <version>-<row> plus rolling <row>, and aliases jazzy (J-FT),
-  # humble (H-FT), latest (J-FT).
+  # J-FT and H-FT runtime images, linux/amd64 + linux/arm64.
+  # Each arch builds natively and pushes <version>-<row>-<arch>;
+  # publish-image-manifests combines them into jazzy / humble / latest.
   publish-images:
     name: publish-image (${{ matrix.row }}, ${{ matrix.arch }})
     if: github.event_name == 'push' || inputs.images
@@ -238,38 +224,12 @@ jobs:
       fail-fast: false
       matrix:
         arch: [amd64, arm64]
-        row: [j-ft, j-cy, j-zn, h-ft, h-cy, h-zn]
+        row: [j-ft, h-ft]
         include:
           - row: j-ft
             dockerfile: docker/Dockerfile.rclwebd
-            build_args: ""
-          - row: j-cy
-            dockerfile: docker/Dockerfile.rclwebd
-            build_args: >-
-              --build-arg SUPPORT_ROW=J-CY
-              --build-arg RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-              --build-arg RMW_APT_PACKAGES=ros-jazzy-rmw-cyclonedds-cpp
-          - row: j-zn
-            dockerfile: docker/Dockerfile.rclwebd
-            build_args: >-
-              --build-arg SUPPORT_ROW=J-ZN
-              --build-arg RMW_IMPLEMENTATION=rmw_zenoh_cpp
-              --build-arg RMW_APT_PACKAGES=ros-jazzy-rmw-zenoh-cpp
           - row: h-ft
             dockerfile: docker/Dockerfile.rclwebd-h-ft
-            build_args: ""
-          - row: h-cy
-            dockerfile: docker/Dockerfile.rclwebd-h-ft
-            build_args: >-
-              --build-arg SUPPORT_ROW=H-CY
-              --build-arg RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-              --build-arg RMW_APT_PACKAGES=ros-humble-rmw-cyclonedds-cpp
-          - row: h-zn
-            dockerfile: docker/Dockerfile.rclwebd-h-ft
-            build_args: >-
-              --build-arg SUPPORT_ROW=H-ZN
-              --build-arg RMW_IMPLEMENTATION=rmw_zenoh_cpp
-              --build-arg RMW_APT_PACKAGES=ros-humble-rmw-zenoh-cpp
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -308,17 +268,13 @@ jobs:
           ROW: ${{ matrix.row }}
           ARCH: ${{ matrix.arch }}
           DOCKERFILE: ${{ matrix.dockerfile }}
-          BUILD_ARGS: ${{ matrix.build_args }}
         run: |
           set -euo pipefail
           image="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/rclwebd"
-          # shellcheck disable=SC2086 — BUILD_ARGS is a flag list by design
-          docker build -f "${DOCKERFILE}" ${BUILD_ARGS} \
+          docker build -f "${DOCKERFILE}" \
             -t "${image}:${VERSION}-${ROW}-${ARCH}" .
           docker push "${image}:${VERSION}-${ROW}-${ARCH}"
 
-  # Combine the per-arch pushes into multi-arch manifest lists for the
-  # user-facing tags. Runs once after every (row, arch) build succeeds.
   publish-image-manifests:
     name: publish-image-manifests
     if: github.event_name == 'push' || inputs.images
@@ -366,214 +322,13 @@ jobs:
         run: |
           set -euo pipefail
           image="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/rclwebd"
-          for row in j-ft j-cy j-zn h-ft h-cy h-zn; do
-            case "${row}" in
-              j-ft) aliases="jazzy latest" ;;
-              h-ft) aliases="humble" ;;
-              *) aliases="" ;;
-            esac
-            tags=(-t "${image}:${VERSION}-${row}" -t "${image}:${row}")
-            for alias in ${aliases}; do
-              tags+=(-t "${image}:${alias}")
-            done
-            docker buildx imagetools create "${tags[@]}" \
-              "${image}:${VERSION}-${row}-amd64" \
-              "${image}:${VERSION}-${row}-arm64"
-          done
-
-  # Prebuilt gateway binaries (ADR 0018 stage 4), amd64 + arm64 (native
-  # runners). Built inside the same digest-pinned builder stages the runtime
-  # images use, so the glibc floor matches each distro's Ubuntu base and
-  # Humble gets regenerated bindings. Uploaded to the GitHub Release for the
-  # version tag (created if missing).
-  publish-binaries:
-    name: publish-binary (${{ matrix.distro }}, ${{ matrix.arch }})
-    if: github.event_name == 'push' || inputs.binaries
-    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
-    timeout-minutes: 120
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: [amd64, arm64]
-        distro: [jazzy, humble]
-        include:
-          - distro: jazzy
-            dockerfile: docker/Dockerfile.rclwebd
-          - distro: humble
-            dockerfile: docker/Dockerfile.rclwebd-h-ft
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-
-      - name: Resolve release version and tag
-        id: version
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
-            version="${GITHUB_REF_NAME#rebuild-}"
-            version="${version#v}"
-          else
-            version="$(awk -F'"' '/^\[workspace\.package\]/{p=1} p && /^version/{print $2; exit}' Cargo.toml)"
-          fi
-          if [[ -z "${version}" ]]; then
-            echo "error: could not resolve a release version" >&2
-            exit 1
-          fi
-          echo "version=${version}" >> "${GITHUB_OUTPUT}"
-          echo "tag=v${version}" >> "${GITHUB_OUTPUT}"
-
-      - name: Build gateway binary in the builder stage
-        shell: bash
-        env:
-          VERSION: ${{ steps.version.outputs.version }}
-          DISTRO: ${{ matrix.distro }}
-          DOCKERFILE: ${{ matrix.dockerfile }}
-        run: |
-          set -euo pipefail
-          case "$(uname -m)" in
-            x86_64) arch=amd64 ;;
-            aarch64) arch=arm64 ;;
-            *) echo "error: unsupported runner architecture $(uname -m)" >&2; exit 1 ;;
-          esac
-          asset="rclwebd-${VERSION}-${DISTRO}-${arch}"
-          docker build --target builder -f "${DOCKERFILE}" \
-            -t "rclwebd-builder-${DISTRO}" .
-          cid="$(docker create "rclwebd-builder-${DISTRO}")"
-          docker cp "${cid}:/src/target/release/rclwebd" "${asset}"
-          docker rm "${cid}"
-          sha256sum "${asset}" > "${asset}.sha256"
-          echo "asset=${asset}" >> "${GITHUB_ENV}"
-          echo "arch=${arch}" >> "${GITHUB_ENV}"
-
-      - name: Set up Bun from .bun-version
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version-file: .bun-version
-
-      - name: Pack rclwebd .deb
-        shell: bash
-        env:
-          DISTRO: ${{ matrix.distro }}
-        run: |
-          set -euo pipefail
-          mkdir -p debs
-          bun run scripts/pack-rclwebd-deb.ts \
-            --bin "${asset}" \
-            --distro "${DISTRO}" \
-            --arch "${arch}" \
-            --out-dir debs
-          sha256sum debs/*.deb > "debs/$(basename debs/*.deb).sha256"
-
-      - name: Upload deb artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: deb-${{ matrix.distro }}-${{ matrix.arch }}
-          path: debs/
-          if-no-files-found: error
-
-      - name: Upload to the GitHub Release
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ steps.version.outputs.tag }}
-        run: |
-          set -euo pipefail
-          if ! gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
-            # The two matrix jobs can race create; losing the race is fine
-            # as long as the release exists afterwards.
-            gh release create "${TAG}" --repo "${GITHUB_REPOSITORY}" \
-              --verify-tag --generate-notes \
-              || gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null
-          fi
-          gh release upload "${TAG}" "${asset}" "${asset}.sha256" debs/*.deb debs/*.sha256 \
-            --repo "${GITHUB_REPOSITORY}" --clobber
-
-  # Own apt repo (ADR 0019). Needs the four rclwebd debs. Signs and
-  # publishes gh-pages only when RCLWEB_APT_GPG_PRIVATE_KEY is set.
-  publish-apt:
-    name: publish-apt
-    needs: publish-binaries
-    if: github.event_name == 'push' || inputs.apt
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    permissions:
-      contents: write
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-
-      - name: Resolve release version and tag
-        id: version
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
-            version="${GITHUB_REF_NAME#rebuild-}"
-            version="${version#v}"
-          else
-            version="$(awk -F'"' '/^\[workspace\.package\]/{p=1} p && /^version/{print $2; exit}' Cargo.toml)"
-          fi
-          echo "version=${version}" >> "${GITHUB_OUTPUT}"
-          echo "tag=v${version}" >> "${GITHUB_OUTPUT}"
-
-      - name: Set up Bun from .bun-version
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version-file: .bun-version
-
-      - name: Install apt repo tools
-        shell: bash
-        run: sudo apt-get update && sudo apt-get install -y dpkg-dev gnupg
-
-      - name: Download rclwebd debs
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          pattern: deb-*
-          path: collected-debs
-
-      - name: Publish signed apt repo
-        id: apt
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ steps.version.outputs.tag }}
-          VERSION: ${{ steps.version.outputs.version }}
-          RCLWEB_APT_GPG_PRIVATE_KEY: ${{ secrets.RCLWEB_APT_GPG_PRIVATE_KEY }}
-          RCLWEB_APT_GPG_PASSPHRASE: ${{ secrets.RCLWEB_APT_GPG_PASSPHRASE }}
-        run: |
-          set -euo pipefail
-          mkdir -p debs
-          mapfile -t packed < <(find collected-debs -name 'rclwebd_*.deb' -type f | sort)
-          if (( ${#packed[@]} != 4 )); then
-            echo "error: expected 4 rclwebd debs, found ${#packed[@]}" >&2
-            find collected-debs -type f >&2
-            exit 1
-          fi
-          cp "${packed[@]}" debs/
-          scripts/publish-signed-apt.sh --debs-dir debs --out-dir repo
-          if [[ -f repo/index.html ]]; then
-            tar -C repo -czf "rclweb-apt-repo-${VERSION}.tar.gz" \
-              apt index.html .nojekyll \
-              rclweb-archive-keyring.gpg enable-apt.sh
-            sha256sum "rclweb-apt-repo-${VERSION}.tar.gz" debs/rclweb-apt-source_*.deb > apt-extra.sha256
-            gh release upload "${TAG}" \
-              debs/rclweb-apt-source_*.deb \
-              "rclweb-apt-repo-${VERSION}.tar.gz" \
-              apt-extra.sha256 \
-              --repo "${GITHUB_REPOSITORY}" --clobber
-          fi
-
-      - name: Publish GitHub Pages
-        if: steps.apt.outputs.signed == '1'
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.version.outputs.version }}
-        run: scripts/push-apt-gh-pages.sh --repo-dir repo
+          docker buildx imagetools create \
+            -t "${image}:${VERSION}-j-ft" -t "${image}:j-ft" \
+            -t "${image}:jazzy" -t "${image}:latest" \
+            "${image}:${VERSION}-j-ft-amd64" \
+            "${image}:${VERSION}-j-ft-arm64"
+          docker buildx imagetools create \
+            -t "${image}:${VERSION}-h-ft" -t "${image}:h-ft" \
+            -t "${image}:humble" \
+            "${image}:${VERSION}-h-ft-amd64" \
+            "${image}:${VERSION}-h-ft-arm64"

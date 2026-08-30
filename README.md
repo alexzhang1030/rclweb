@@ -51,33 +51,6 @@ no clone, no toolchain (`:humble` for Humble):
 docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy
 ```
 
-On Ubuntu 24.04 (Jazzy) or 22.04 (Humble)
-([deploy](./docs/deploy.md#apt)):
-
-```bash
-curl -fsSL https://alexzhang1030.github.io/rclweb/enable-apt.sh | sudo bash
-source /opt/ros/$ROS_DISTRO/setup.bash
-source /opt/rclwebd/local_setup.bash
-ros2 run rclwebd rclwebd
-```
-
-Or install a prebuilt binary into a sourced ROS 2 environment (Jazzy or
-Humble; the support row is auto-detected from that environment). The
-installer also writes an ament overlay so the process starts like a
-normal ROS node:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/install-rclwebd.sh | bash
-source /opt/ros/$ROS_DISTRO/setup.bash
-source ~/.local/share/rclwebd/local_setup.bash
-ros2 run rclwebd rclwebd
-```
-
-Host systemd units (`--systemd`) are for unattended machines:
-[deploy](./docs/deploy.md#systemd). Cluster units (host-network, same
-shape as compose): [deploy](./docs/deploy.md#kubernetes). `ros2 run`
-details: [deploy](./docs/deploy.md#ros2-run).
-
 Or build from source (needs Rust plus the ROS 2 development libraries):
 
 ```bash
