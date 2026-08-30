@@ -20,26 +20,12 @@ pub enum Disposition {
   StaleSequence = 3,
 }
 
-impl Disposition {
-  #[must_use]
-  pub const fn as_str(self) -> &'static str {
-    match self {
-      Self::Delivered => "delivered",
-      Self::SequenceGap => "sequence_gap",
-      Self::StaleSequence => "stale_sequence",
-    }
-  }
-}
-
 /// Observable disposition counters for one gateway process / connection.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct DispositionCounters {
   pub delivered: u64,
   pub sequence_gap: u64,
   pub stale_sequence: u64,
-  /// Reliable inbound samples dropped because the write queue was full
-  /// (never framed — client sequence stays contiguous).
-  pub reliable_queue_drop: u64,
 }
 
 impl DispositionCounters {
@@ -94,11 +80,6 @@ impl SampleWriteQueue {
   }
 
   #[must_use]
-  pub fn bytes(&self) -> usize {
-    self.bytes
-  }
-
-  #[must_use]
   pub fn can_fit(&self, frame_len: usize) -> bool {
     if frame_len > self.max_bytes {
       return false;
@@ -135,7 +116,7 @@ impl SampleWriteQueue {
   ///
   /// Returns false when the queue cannot accept another frame without
   /// eviction (reliable never evicts). Does not mutate disposition counters;
-  /// the caller records [`DispositionCounters::reliable_queue_drop`].
+  /// the caller records the drop on process telemetry.
   pub fn try_reserve_reliable(&mut self, frame_len: usize) -> bool {
     self.can_fit(frame_len)
   }
@@ -152,14 +133,6 @@ impl SampleWriteQueue {
 
   pub fn record_delivered(&mut self) {
     self.dispositions.record(Disposition::Delivered);
-  }
-
-  pub fn record_stale_sequence(&mut self) {
-    self.dispositions.record(Disposition::StaleSequence);
-  }
-
-  pub fn record_sequence_gap(&mut self) {
-    self.dispositions.record(Disposition::SequenceGap);
   }
 
   fn push(&mut self, channel_id: u32, reliable: bool, frame: Bytes) {

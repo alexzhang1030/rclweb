@@ -22,13 +22,13 @@ pub use generated::{
   ECHO_NESTED_RESPONSE_TYPE_NAME, EchoNestedRequest, EchoNestedResponse,
   MEASURE_SEQUENCE_FEEDBACK_TYPE_NAME, MEASURE_SEQUENCE_GOAL_TYPE_NAME,
   MEASURE_SEQUENCE_RESULT_TYPE_NAME, MeasureSequenceFeedback, MeasureSequenceGoal,
-  MeasureSequenceResult, NESTED_SAMPLE_TYPE_NAME, NestedSample, PHASE1_ROOT_TYPE_NAMES,
-  POINT_CLOUD2_TYPE_NAME, PRIMITIVE_SCALARS_TYPE_NAME, PointCloud2, PrimitiveScalars, Time,
+  MeasureSequenceResult, NESTED_SAMPLE_TYPE_NAME, NestedSample, POINT_CLOUD2_TYPE_NAME,
+  PRIMITIVE_SCALARS_TYPE_NAME, PointCloud2, PrimitiveScalars, Time,
 };
 pub use host_value::{
   ECHO_NESTED_TYPE_NAME, GeneratedMessage, GeneratedOpKind, GeneratedValueError,
   MEASURE_SEQUENCE_TYPE_NAME, decode_generated_cdr, decode_host_value, encode_generated_cdr,
-  encode_host_value, generated_op_type_name, is_generated_msg_type, sample_echo_nested_request,
+  encode_host_value, generated_op_type_name, sample_echo_nested_request,
   sample_echo_nested_response, sample_measure_sequence_feedback, sample_measure_sequence_goal,
   sample_measure_sequence_result, sample_nested_sample, sample_primitive_scalars,
 };

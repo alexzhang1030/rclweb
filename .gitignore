@@ -13,7 +13,6 @@ secrets/
 *.key
 *.pem
 *.secret.asc
-rclweb-apt-gnupg-*/
 
 # JavaScript and Bun
 node_modules/

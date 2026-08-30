@@ -1,13 +1,12 @@
 # Release
 
 `rcl-web` publishes to npm with [trusted publishing](https://docs.npmjs.com/trusted-publishers)
-(OIDC). `rclweb` / `rclwebd` publish to crates.io. The six `rclwebd`
-runtime images publish to GHCR and prebuilt gateway binaries attach to
-the GitHub Release ([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md)).
+(OIDC). `rclweb` / `rclwebd` publish to crates.io. The Jazzy and Humble
+`rclwebd` runtime images publish to GHCR
+([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md)).
 There is no `NPM_TOKEN` or `CARGO_REGISTRY_TOKEN` in GitHub secrets
-after the crates.io bootstrap below; images and binaries use the
-workflow `GITHUB_TOKEN` (`packages: write` / `contents: write` on those
-jobs only).
+after the crates.io bootstrap below; images use the workflow
+`GITHUB_TOKEN` (`packages: write` on that job only).
 
 npm's trusted-publisher identity is the workflow **filename**
 `release.yml` (not the path). Do not put a GitHub `environment:` on the
@@ -59,24 +58,10 @@ as soon as this workflow is on the default branch.
    - Workflow filename: `release.yml`
    - Environment: *leave blank*
 
-5. Apt archive key ([ADR 0019](./adr/0019-own-apt-repository.md)). Generate
-   on a machine you trust. Do not commit the secret.
-
-   ```bash
-   bun run scripts/apt-archive-key.ts --generate --out-dir /tmp/rclweb-apt-key --write-secret
-   ```
-
-   Add `/tmp/rclweb-apt-key/rclweb-archive-key.secret.asc` as the
-   repository secret `RCLWEB_APT_GPG_PRIVATE_KEY`. Optional:
-   `RCLWEB_APT_GPG_PASSPHRASE` if you protected the key. Enable GitHub
-   Pages on branch `gh-pages` (site root). Until the secret exists,
-   release still uploads `rclwebd_*.deb` for `dpkg -i`.
-
 ## Publish a version
 
-Bump the version in the tree (`typescript/package.json` and/or
-`[workspace.package].version` plus the `rclweb` workspace dep version,
-and `packaging/ament/rclwebd/package.xml`),
+Bump the version in the tree (`typescript/package.json` and
+`[workspace.package].version` plus the `rclweb` workspace dep version),
 merge to `main`, then either:
 
 ```bash
@@ -84,24 +69,13 @@ git tag v0.0.6
 git push origin v0.0.6
 ```
 
-or run **Actions → release → Run workflow** (`npm` / `crates` / `images`
-/ `binaries` / `apt` checkboxes; dispatched image and binary jobs resolve the
-version from `Cargo.toml`, and the binary upload requires the matching
-`v<version>` tag to exist). The apt job packs from those binaries and
-signs the Pages repo only when `RCLWEB_APT_GPG_PRIVATE_KEY` is set.
+or run **Actions → release → Run workflow** (`npm` / `crates` /
+`images` checkboxes; dispatched image jobs resolve the version from
+`Cargo.toml`).
 
-To republish **only apt** from binaries already on the GitHub Release
-(no image or binary rebuild), push `apt-v<version>` or run
-**Actions → publish-apt → Run workflow**:
-
-```bash
-git tag apt-v0.0.6 && git push origin apt-v0.0.6
-```
-
-To republish the images, binaries, **and** apt repo of an existing
-version (for example after a workflow fix), push `rebuild-v<version>`;
-the npm and crates jobs skip (the registries refuse duplicates anyway;
-GHCR tags and release assets are replaced):
+To republish **only images** of an existing version (for example after
+a workflow fix), push `rebuild-v<version>`; the npm and crates jobs
+skip (the registries refuse duplicates anyway; GHCR tags move):
 
 ```bash
 git tag rebuild-v0.0.6 && git push origin rebuild-v0.0.6
@@ -114,36 +88,20 @@ token; provenance is automatic — do not pass `--provenance`. Do not set
 The crates job stages `LICENSE` / `NOTICE`, publishes `rclweb`, then
 retries `rclwebd` until crates.io's index sees the new core crate.
 
-The images job builds the six row images from the committed Dockerfiles
-per architecture (amd64 and arm64, each on a native runner) and pushes
+The images job builds the J-FT and H-FT images from the committed
+Dockerfiles per architecture (amd64 and arm64, each on a native
+runner) and pushes
 `ghcr.io/alexzhang1030/rclwebd:<version>-<row>-<arch>`; the manifests
-job then combines them into the user-facing multi-arch tags (table in
-[deploy](./deploy.md#prebuilt-artifacts)). The binaries job builds
-`rclwebd-<version>-{jazzy,humble}-{amd64,arm64}` (+ `.sha256`) with
-`docker build --target builder` and uploads them to the release for the
-tag, creating the release with generated notes when it does not exist
-yet — so the GitHub Release page is no longer a separate human step,
-though editing its notes still is. `scripts/install-rclwebd.sh` is the
-consumer of those assets. The same job packs `rclwebd_*~$suite_*.deb` (`~noble` = Jazzy,
-`~jammy` = Humble) so the four assets do not share a filename. When
-`RCLWEB_APT_GPG_PRIVATE_KEY` is set, `publish-apt` signs the GitHub
-Pages repo (`noble` / `jammy`) and uploads `rclweb-apt-source`
-([ADR 0019](./adr/0019-own-apt-repository.md), [deploy](./deploy.md#apt)).
-That secret is the apt exception to OIDC. Leave it unset and the
-Release still gets the `.deb` files.
+job then combines them into `jazzy` / `humble` / `latest`
+([deploy](./deploy.md#prebuilt-image)).
 
 This cut: `0.0.6` everywhere — npm and crate versions stay aligned so
-the tag-named images and binaries
-([ADR 0018](./adr/0018-prebuilt-gateway-distribution.md)) match the
-crate version. This cut ships `npx rcl-web gen` on the published
-`rcl-web` bin. Independent versioning (ADR 0003) still stands as
-policy. Earlier cuts: `0.0.5` aligned; `rcl-web@0.0.4` with crates
-`0.0.3`. First OIDC automatic publish landed 2026-08-13 from tag
-`v0.0.3` on `e8365a8`
+the tag-named images match the crate version. This cut ships
+`npx rcl-web gen` on the published `rcl-web` bin. Independent
+versioning (ADR 0003) still stands as policy. Earlier cuts: `0.0.5`
+aligned; `rcl-web@0.0.4` with crates `0.0.3`. First OIDC automatic
+publish landed 2026-08-13 from tag `v0.0.3` on `e8365a8`
 ([release run](https://github.com/alexzhang1030/rclweb/actions/runs/31713576156)).
-The GitHub Release is a separate step from the tag
-([v0.0.5](https://github.com/alexzhang1030/rclweb/releases/tag/v0.0.5);
-first page was [v0.0.3](https://github.com/alexzhang1030/rclweb/releases/tag/v0.0.3)).
 Do not retag a version already on the registry.
 
 ## Local checks
@@ -151,7 +109,6 @@ Do not retag a version already on the registry.
 ```bash
 just npm-pack-check
 just cargo-publish-check
-bun test scripts/apt-pack.test.ts
 ```
 
 `just check` runs both. Do not commit the staged `typescript/LICENSE` /

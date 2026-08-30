@@ -4,6 +4,8 @@ Current conclusion: the rendered site is **Fumadocs UI on TanStack Start**
 ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md)). Markdown
 source stays in [`docs/`](../../docs/README.md). The private package is
 `@rclweb/website` at `website/`. `just website` / `just website-check`.
+The site is a product. Hosting is the Vercel project
+`https://rclweb-website.vercel.app` (Root Directory `website`).
 
 ## What already exists
 
@@ -15,12 +17,9 @@ gate: GitHub-style heading slugs, local links, and enrollment from
 those two README maps. PCR stays in [`.agents/docs/`](./README.md) and
 is not the product site.
 
-GitHub Pages is already live for apt
-([ADR 0019](../../docs/adr/0019-own-apt-repository.md)):
-`https://alexzhang1030.github.io/rclweb/` with the archive under
-`/apt`. [`scripts/push-apt-gh-pages.sh`](../../scripts/push-apt-gh-pages.sh)
-force-pushes an orphan `gh-pages`. ADR 0020 does not change that
-publisher. Same-origin hosting is a follow-up.
+The landing graph is the core path: `rcl-web` → `Node` → R2WP →
+`rclwebd` → ROS 2. Customer nav is how-to, API, deploy. Protocol and
+the other internals stay in the Internals folder.
 
 ## Human comparison
 
@@ -40,23 +39,19 @@ TanStack stack. No further rationale.
   `docs-check` uses). Do not import `docs-check.ts` into the client.
 - **Customer nav first.** How to, API, deploy. Internals are a folder.
   The GitHub `docs/README.md` index is not a site page (`/docs`
-  redirects to how-to). PCR and `tasks/` stay off the public nav.
+  redirects to how-to). PCR stays off the public nav.
   Links that leave `docs/` become GitHub blob URLs.
 - **Keep the site off the published `rcl-web` graph.** Direct npm deps
   stay on the OSI-permissive allowlist.
-- **Pages coexistence** is still open. Do not teach the apt
-  force-push to delete a future site tree, or the other way around.
-  A Vercel project (`https://rclweb-website.vercel.app`) is not that
-  apt host. Nitro must emit the `vercel` preset there, and
+- **Nitro must emit the `vercel` preset** on Vercel, and
   `vercel.json` lives in `website/` because Root Directory is
   `website`
   ([gotchas](./gotchas.md#vercel-will-not-start-the-node-server-preset)).
-- **DESIGN.md is Studio**, not the docs chrome.
 - **Landing is chrome.** The homepage is a node field: decorative
   dots, five live nodes on the Browser → R2WP → rclwebd → ROS 2
   path from [architecture](../../docs/architecture.md), and a hover
-  chip. It is not a docs index and does not take Studio tokens.
-  The field SVG must shrink in the `body` flex column
+  chip. It is not a docs index. The field SVG must shrink in the
+  `body` flex column
   ([gotchas](./gotchas.md#docs-landing-svg-must-min-width-0-in-the-flex-column)).
 - **Mark.** The site mark is a viewport, a node inside it, and a wire
   to a smaller edge node. Not the ROS turtle. SVG in

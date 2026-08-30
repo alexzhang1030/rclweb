@@ -14,5 +14,5 @@ pub use batch::{
   APP_SUBSCRIBE_FAILED, APP_SUBSCRIBED, BATCH_MAGIC, BatchError, CMD_AUTHENTICATE, CMD_CLOSE,
   CMD_START, CMD_SUBSCRIBE, CMD_UNSUBSCRIBE, EVENT_COMMAND, EVENT_RELEASE, EVENT_TIMER,
   EVENT_WS_BYTES, FLAG_INLINE_WS_BYTES, LAYOUT_VERSION, RESULT_MAGIC, decode_host_batch,
-  encode_host_batch_inline, encode_poll_result,
+  encode_host_batch_inline, encode_poll_result_into,
 };

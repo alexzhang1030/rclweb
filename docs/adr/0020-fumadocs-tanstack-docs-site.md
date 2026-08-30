@@ -59,5 +59,5 @@ for TanStack over Next.js.
 ## Source
 
 Owner 2026-08-27: Fumadocs looks better than VitePress; use the
-Fumadocs + TanStack stack. Recorded in
-[docs-site](../../.agents/docs/docs-site.md).
+Fumadocs + TanStack stack. Markdown stays in `docs/`. The site
+package is `website/`.

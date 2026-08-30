@@ -6,6 +6,7 @@ test("every interactive node has a docs slug", () => {
   expect(slugs.has("typescript")).toBe(true);
   expect(slugs.has("api")).toBe(true);
   expect(slugs.has("deploy")).toBe(true);
+  expect(slugs.has("protocol/r2wp")).toBe(true);
   expect(slugs.has("architecture")).toBe(true);
 });
 

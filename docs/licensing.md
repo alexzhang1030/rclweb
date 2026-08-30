@@ -45,8 +45,7 @@ Outside this inventory (they are not crate/npm release units):
 
 - ROS distro libraries loaded from `ROS_PREFIX` at runtime (typically Apache-2.0)
 - Docker base images and OS packages in the runtime images
-- optional local pixi / RoboStack prefixes
-- `fuzz/` (cargo-fuzz; `libfuzzer-sys` is Apache-2.0 WITH LLVM-exception; not shipped)
+- optional local ROS prefixes used only for `just ros-test`
 
 ## Manifests and publish
 

@@ -6,7 +6,7 @@ rclweb keeps the language count at the minimum the platform forces: Rust for eve
 
 | Area | Choice | Rationale |
 |---|---|---|
-| Core (protocol, CDR, ROS state) | Rust, native + `wasm32-unknown-unknown` | One codebase for gateway and browser removes the N-implementation tax ([ADR 0010](../../docs/adr/0010-restructure-single-rust-core.md)); mature fuzzing/benchmark tooling; borrow checker enforces the borrowed-view CDR contract. Wasm32 uses [Talc](https://docs.rs/talc/latest/talc/wasm/index.html) (`WasmDynamicTalc`) instead of default dlmalloc ([dlmalloc-rs](https://github.com/alexcrichton/dlmalloc-rs) is explicit that it is not the fast allocator). `opt-level = "z"` stays until size vs `just poll-latency` reopen [ADR 0010](../../docs/adr/0010-restructure-single-rust-core.md) |
+| Core (protocol, CDR, ROS state) | Rust, native + `wasm32-unknown-unknown` | One codebase for gateway and browser removes the N-implementation tax ([ADR 0010](../../docs/adr/0010-restructure-single-rust-core.md)); borrow checker enforces the borrowed-view CDR contract. Wasm32 uses [Talc](https://docs.rs/talc/latest/talc/wasm/index.html) (`WasmDynamicTalc`) instead of default dlmalloc ([dlmalloc-rs](https://github.com/alexcrichton/dlmalloc-rs) is explicit that it is not the fast allocator). `opt-level = "z"` stays until staged wasm size reopens [ADR 0010](../../docs/adr/0010-restructure-single-rust-core.md) |
 | Browser host and SDK | TypeScript Workers | Native browser APIs, scheduling, buffer transfer, and public bindings; no protocol parsing |
 | Edge gateway | Rust (`rclwebd`, thin over the core; tokio + axum for the WebSocket endpoint) | Concurrent transport, bounded scheduling, policy, telemetry; axum's `ws` feature gives RFC 6455 binary messaging on the tokio stack without a second server framework |
 | ROS boundary | Versioned serialized adapter ABI (`serialized-adapter-v1`, [ADR 0006](../../docs/adr/0006-edge-ros-c-abi-boundary.md)) with dynamic typesupport | Isolates distribution/RMW variation without embedding or depending on a client library (owner constraint) |
@@ -17,7 +17,7 @@ rclweb keeps the language count at the minimum the platform forces: Rust for eve
 | Repository commands | just | One root command surface |
 | Docs site | Fumadocs UI + TanStack Start (`website/`) | Owner named the look (Fumadocs over VitePress) and the host ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md)). Markdown stays in `docs/` |
 
-A second language for the browser runtime would duplicate every shared contract. The single-core choice reopens only if wasm artifact size or poll latency is unacceptable for a required profile ([ADR 0010](../../docs/adr/0010-restructure-single-rust-core.md)). `just build` prints staged wasm size; `just poll-latency` prints p50/p99.
+A second language for the browser runtime would duplicate every shared contract. The single-core choice reopens only if wasm artifact size is unacceptable for a required profile ([ADR 0010](../../docs/adr/0010-restructure-single-rust-core.md)). `just build` prints staged wasm size.
 
 ## Toolchain pins
 
@@ -55,7 +55,7 @@ Committed rustfmt/clippy knobs, workspace lints, shared crate versions, and name
 | `just fmt` / `fmt-check` / `clippy` / `clippy-webtransport` / `lint-rust` / `fix-rust` / `doctor` / `setup` | Named recipes | Faster rust-only loops. `just check` stays the full foundation gate (docs, protocol, corpus, fmt, clippy, `rclwebd --features webtransport` clippy, SDK) |
 | `.gitattributes` | `* text=auto eol=lf` | LF in the repo |
 
-`fuzz/` stays outside the workspace (cargo-fuzz). Vendored `rclwebd/src/ros/ffi/bindings.rs` is `rustfmt::skip` so regenerate does not fight the formatter; `scripts/generate-rcl-bindings.sh` emits that attribute.
+Vendored `rclwebd/src/ros/ffi/bindings.rs` is `rustfmt::skip` so regenerate does not fight the formatter; `scripts/generate-rcl-bindings.sh` emits that attribute.
 
 ## Workspace ownership
 
@@ -71,17 +71,18 @@ Committed rustfmt/clippy knobs, workspace lints, shared crate versions, and name
 | `pixi.toml` | Optional RoboStack J-FT prefix for `just ros-test-pixi`; not a toolchain pin |
 | `rustfmt.toml`, `clippy.toml` | Rust format and Clippy knobs; see [Rust workspace infrastructure](#rust-workspace-infrastructure) |
 | `CONTRIBUTING.md` | Clone → `just setup` / `just check` |
-| `studio/` | Optional post-release UI workspace |
 
 ## ROS profile
 
-Live talker e2e covers all six rows (H-FT, H-CY, H-ZN, J-FT, J-CY, J-ZN). Corpus data for those rows stays committed. Humble uses `rclweb-schema-v1` bundle identity and Jazzy uses `rep2011-rihs` ([ADR 0012](../../docs/adr/0012-rclweb-schema-identifiers.md)). Promotion to **Qualified** is a human edit of the [support matrix](../../docs/support-matrix.md) and is not happening on this cut ([qualification](./qualification.md)).
+Live talker e2e covers J-FT. Corpus data for all six rows stays committed. Humble uses `rclweb-schema-v1` bundle identity and Jazzy uses `rep2011-rihs` ([ADR 0012](../../docs/adr/0012-rclweb-schema-identifiers.md)). Promotion to **Qualified** is a human edit of the [support matrix](../../docs/support-matrix.md).
+
+## ROS-feature tests
+
+`just check` / `just test` / `just build` stay ROS-free. Compiling the ros-feature tests (`just ros-check`, or `just ros-check-docker` / CI `ros-feature-check`) and running them (`just ros-test`) need a Jazzy prefix matching the committed bindings (typically `source /opt/ros/jazzy/setup.bash`). Digest-pinned Docker compose (`just e2e`) remains the talker → gateway → SDK gate.
 
 ## Optional local ROS prefix
 
-`just check` / `just test` / `just build` stay ROS-free. Compiling the ros-feature tests (`just ros-check`, or `just ros-check-docker` / CI `ros-feature-check`) and running them (`just ros-test`) need a Jazzy prefix matching the committed bindings (typically `source /opt/ros/jazzy/setup.bash`).
-
-For machines where apt ROS or Docker is too heavy, `pixi.toml` installs a RoboStack Jazzy prefix (`just ros-test-pixi` / `pixi run just ros-test`). That path is optional: pixi is not a toolchain pin, not checked by `just toolchain-check`, and not CI evidence. Digest-pinned Docker compose (`just e2e` / `just e2e-h-ft`) remains the talker → gateway → SDK gate. This env is J-FT only; H-FT still needs Humble (the existing Docker image or a second prefix). The prefix also ships `ros-jazzy-ros2run` / `ros-jazzy-ros2launch` so `ros2 run rclwebd rclwebd` can be exercised against the ament overlay ([deploy](../../docs/deploy.md#ros2-run)).
+For machines where apt ROS or Docker is too heavy, `pixi.toml` installs a RoboStack Jazzy prefix (`just ros-test-pixi` / `pixi run just ros-test`). That path is optional: pixi is not a toolchain pin, not checked by `just toolchain-check`, and not CI evidence. Digest-pinned Docker compose (`just e2e`) remains the talker → gateway → SDK gate. This env is J-FT only.
 
 RoboStack Jazzy is a conda-forge rebuild, not Ubuntu's `/opt/ros/jazzy`. A green `ros-test-pixi` does not substitute for the Ubuntu Jazzy e2e lane. Landed in [`25fb42f`](https://github.com/alexzhang1030/rclweb/commit/25fb42f) (#20); reproduce with `just ros-test-pixi`.
 
@@ -98,5 +99,3 @@ is part of `just check`.
 
 - Mainline architecture decisions gain authority through ADR review and validation gates.
 - Platform changes update the support matrix and conformance evidence.
-- Studio technology choices receive their own review when that prototype starts.
-- The docs site is Fumadocs on TanStack Start ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md), [docs-site](./docs-site.md)). GitHub Pages today is the apt origin ([ADR 0019](../../docs/adr/0019-own-apt-repository.md)), not a docs host.

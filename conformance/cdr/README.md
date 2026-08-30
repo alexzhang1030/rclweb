@@ -11,7 +11,7 @@ Pinned Humble and Jazzy CDR fixtures for the six support rows:
 | J-CY | jazzy | `rmw_cyclonedds_cpp` |
 | J-ZN | jazzy | `rmw_zenoh_cpp` |
 
-This corpus is the oracle for `rclweb::cdr`. All six rows stay committed; live talker e2e covers each row. Humble identity is `rclweb-schema-v1` (SHA-256 of canonical bundle bytes); the corpus id is `rclweb-ros-cdr-v1`; interfaces live in `rclweb_cdr_interfaces` ([ADR 0012](../../docs/adr/0012-rclweb-schema-identifiers.md)). Those strings are part of the bundle hash — renaming them rehashes Humble `SchemaKey.value` without changing CDR payload bytes.
+This corpus is the oracle for `rclweb::cdr`. All six rows stay committed; live talker e2e covers J-FT. Humble identity is `rclweb-schema-v1` (SHA-256 of canonical bundle bytes); the corpus id is `rclweb-ros-cdr-v1`; interfaces live in `rclweb_cdr_interfaces` ([ADR 0012](../../docs/adr/0012-rclweb-schema-identifiers.md)). Those strings are part of the bundle hash — renaming them rehashes Humble `SchemaKey.value` without changing CDR payload bytes.
 
 ## Layout
 

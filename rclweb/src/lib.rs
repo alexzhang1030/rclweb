@@ -37,7 +37,7 @@ pub use engine::{
 };
 pub use host::{
   BATCH_MAGIC, BatchError, LAYOUT_VERSION, RESULT_MAGIC, decode_host_batch,
-  encode_host_batch_inline, encode_poll_result,
+  encode_host_batch_inline, encode_poll_result_into,
 };
 pub use protocol::{
   BOOTSTRAP_PAYLOAD_MAX_BYTES, BOOTSTRAP_PREFIX_LENGTH, BootstrapErrorRecord, BootstrapRecord,
@@ -66,10 +66,10 @@ pub use session::{
 pub use types::{
   CdrRepresentation, Collections, ENCODING_CDR1, EchoNestedRequest, EchoNestedResponse,
   LookupResult, MeasureSequenceFeedback, MeasureSequenceGoal, MeasureSequenceResult, NestedSample,
-  PHASE1_ROOT_TYPE_NAMES, PHASE1_SCHEMA_GENERATION, PointCloud2, PrimitiveScalars,
-  SCHEME_RCLWEB_SCHEMA_V1, SCHEME_REP2011_RIHS, SchemaError, SchemaErrorCode, SchemaKey,
-  SchemaRegistry, SchemaRegistryBuilder, Time, WIRE_ERROR_SCHEMA_UNAVAILABLE,
-  lookup_phase1_root_for_open, schema_identity_for_type,
+  PHASE1_SCHEMA_GENERATION, PointCloud2, PrimitiveScalars, SCHEME_RCLWEB_SCHEMA_V1,
+  SCHEME_REP2011_RIHS, SchemaError, SchemaErrorCode, SchemaKey, SchemaRegistry,
+  SchemaRegistryBuilder, Time, WIRE_ERROR_SCHEMA_UNAVAILABLE, lookup_phase1_root_for_open,
+  schema_identity_for_type,
 };
 
 #[cfg(test)]

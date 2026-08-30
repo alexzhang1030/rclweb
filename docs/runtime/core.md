@@ -2,7 +2,7 @@
 
 `rclweb` is the Rust core of the project: R2WP protocol codecs, CDR, and deterministic session/channel/ROS state. One codebase serves both sides of the wire — `rclwebd` links it natively, and the browser runtime is the same crate compiled to `wasm32-unknown-unknown` inside a TypeScript Worker host.
 
-The R2WP v0 parsers, CDR core (`rclweb/src/cdr/`), session/channel state machine (`rclweb/src/session/`), sender-side encoders (`rclweb/src/protocol/encode.rs`), client connection engine (`rclweb/src/engine/`), and hand-written host poll ABI (`rclweb/src/host/`, ADR 0004) are complete. The TypeScript package wraps the wasm artifact. See [open work](../../tasks/plan.md) and [ADR 0010](../adr/0010-restructure-single-rust-core.md).
+The R2WP v0 parsers, CDR core (`rclweb/src/cdr/`), session/channel state machine (`rclweb/src/session/`), sender-side encoders (`rclweb/src/protocol/encode.rs`), client connection engine (`rclweb/src/engine/`), and hand-written host poll ABI (`rclweb/src/host/`, ADR 0004) are complete. The TypeScript package wraps the wasm artifact. See [ADR 0010](../adr/0010-restructure-single-rust-core.md).
 
 ## Responsibilities
 
@@ -47,4 +47,4 @@ bun run scripts/build-wasm.ts
 cargo build --locked -p rclweb --target wasm32-unknown-unknown --profile release-wasm
 ```
 
-`just build` prints the staged wasm byte count and `just poll-latency` prints p50/p99 as [ADR 0010](../adr/0010-restructure-single-rust-core.md) reopen inputs. Copy counters live on the client engine (`EngineTelemetry`) and gateway (`/telemetryz`). Large-message numbers are `just large-message`. [Validation](../validation.md) owns evidence and release gates. The crate publishes to crates.io ([release](../release.md)).
+`just build` prints the staged wasm byte count as an [ADR 0010](../adr/0010-restructure-single-rust-core.md) reopen input. Copy counters live on the client engine (`EngineTelemetry`) and gateway (`/telemetryz`). [Validation](../validation.md) owns evidence and release gates. The crate publishes to crates.io ([release](../release.md)).

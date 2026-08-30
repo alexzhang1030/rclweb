@@ -2,9 +2,9 @@
 
 PCR records preserve the durable reasoning that contributors need across tasks. Formal requirements live under [`docs/`](../../docs/README.md). These records remain open to evidence-backed updates.
 
-rclweb is one Rust core (`rclweb`) serving the gateway natively and the browser as Wasm, a TypeScript package (`rcl-web` at `typescript/`), and R2WP over WebSocket and WebTransport ([ADR 0010](../../docs/adr/0010-restructure-single-rust-core.md), [ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md), [architecture](../../docs/architecture.md)).
+rclweb is one Rust core (`rclweb`) serving the gateway natively and the browser as Wasm, a TypeScript package (`rcl-web` at `typescript/`), and R2WP over WebSocket and WebTransport. The install path the README leads with is the GHCR image: `docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy`.
 
-Documentation describes the product. It is not a delivery-phase ledger. Historical task IDs (M0, R1, U0, and the rest) stay in git and in ADR Decision text.
+Documentation describes the product. It is not a delivery-phase ledger. Historical task IDs stay in git and in ADR Decision text.
 
 ## Context records
 
@@ -18,27 +18,23 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | Rust workspace (fmt, clippy, lints, just recipes) | [Technology stack — Rust workspace infrastructure](./technology-stack.md#rust-workspace-infrastructure) |
 | Traps already paid for | [Gotchas](./gotchas.md) |
 | Evidence and gate authority | [Validation](./validation.md) |
-| Qualification environment, owners, retention | [Qualification](./qualification.md) |
-| TypeScript package | [How to](../../docs/typescript.md), [API reference](../../docs/api.md), [ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md), [ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md) |
+| TypeScript package (`typescript/` is the core client; keep the npm package) | [How to](../../docs/typescript.md), [API reference](../../docs/api.md), [Intent](./intent.md), [ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md), [ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md) |
+| Rendered docs site | [Docs site renderer](./docs-site.md), [ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md) — Fumadocs + TanStack Start at `website/` |
 | Publish | [Release](../../docs/release.md), [ADR 0016](../../docs/adr/0016-oidc-trusted-publish.md) |
 | License | [Licensing](../../docs/licensing.md) |
-| Rendered docs site | [Docs site renderer](./docs-site.md), [ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md) — Fumadocs + TanStack Start at `website/` |
-| Studio visual system | [DESIGN.md](./DESIGN.md) |
 
 ## Project records
 
 | Need | Read |
 |---|---|
 | Formal documentation | [Documentation index](../../docs/README.md) (customer API first, internals second) |
-| Docs site | [Docs site renderer](./docs-site.md), [ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md) |
 | Architecture decisions | [ADR register](../../docs/adr/README.md) |
 | Humble scheme / corpus / ROS package names | [ADR 0012](../../docs/adr/0012-rclweb-schema-identifiers.md), [gotchas](./gotchas.md#bundle-files-are-named-by-type) |
 | Local WebTransport TLS | [ADR 0011](../../docs/adr/0011-local-dev-webtransport-tls.md) |
 | Intranet / lab WebTransport | [Deploy — Intranet WebTransport](../../docs/deploy.md#intranet-webtransport), [certificates](../../docs/deploy.md#intranet-certificates), [gotchas](./gotchas.md#intranet-webtransport-is-one-env-not-production-tls) |
-| Runtime images, operations endpoints, `ros2 run`, systemd, apt, and Kubernetes | [Deploy](../../docs/deploy.md), [`ros2 run`](../../docs/deploy.md#ros2-run), [systemd](../../docs/deploy.md#systemd), [apt](../../docs/deploy.md#apt), [Kubernetes](../../docs/deploy.md#kubernetes), [ADR 0019](../../docs/adr/0019-own-apt-repository.md) |
+| Runtime images and operations endpoints | [Deploy](../../docs/deploy.md) |
 | Support-matrix status | [Support matrix](../../docs/support-matrix.md) (do not stamp **Qualified**) |
 | Wide ACL reference | [acl-reference.json](../../docs/acl-reference.json), [security](../../docs/security.md) |
-| Open work | [Open work](../../tasks/plan.md), [checklist](../../tasks/todo.md) |
 
 ## Code routes
 
@@ -55,11 +51,6 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | `rclwebd/**` | [Architecture](./architecture.md), [`rclwebd`](../../docs/gateway/rclwebd.md), [security](../../docs/security.md), [deploy](../../docs/deploy.md), [ADR 0011](../../docs/adr/0011-local-dev-webtransport-tls.md). crates.io publish ([release](../../docs/release.md)) |
 | `rclwebd/src/local_dev_tls.rs`, `wt.rs` | [ADR 0011](../../docs/adr/0011-local-dev-webtransport-tls.md), [gotchas](./gotchas.md#webtransport-local-certs-are-14-days-by-browser-rule), [intranet recipe](../../docs/deploy.md#intranet-webtransport) |
 | `rclwebd/src/config.rs` | [ADR 0008](../../docs/adr/0008-one-adapter-row-per-gateway-process.md), [gotchas](./gotchas.md#one-gateway-process-binds-one-support-row). Unset `RCLWEBD_SUPPORT_ROW` derives the row from the sourced env ([ADR 0018](../../docs/adr/0018-prebuilt-gateway-distribution.md)). Unset `RCLWEBD_WT_BIND` copies the HTTP bind host to UDP 4433 ([intranet recipe](../../docs/deploy.md#intranet-webtransport)) |
-| `scripts/install-rclwebd.sh` | Prebuilt-binary installer over GitHub Releases ([ADR 0018](../../docs/adr/0018-prebuilt-gateway-distribution.md), [deploy](../../docs/deploy.md#prebuilt-artifacts)); default also writes the ament overlay. `--systemd` / `--systemd-only` rewrite unit placeholders. `--systemd-only` does not write the overlay unless `--ament`. `curl \| bash` fetches units and overlay sources from `RCLWEBD_UNIT_REF` (default `main`). Retries per [gotchas](./gotchas.md#github-releases-downloads-need-retries) |
-| `scripts/install-rclwebd-ament.sh`, `packaging/ament/rclwebd/**` | Thin ament overlay for `ros2 run rclwebd rclwebd`. Not bloom ([ADR 0018](../../docs/adr/0018-prebuilt-gateway-distribution.md), [deploy](../../docs/deploy.md#ros2-run)). `ros2 run` does not wrap `setup.bash` ([gotchas](./gotchas.md#ros2-run-already-has-a-sourced-prefix)) |
-| `scripts/apt-*.ts`, `scripts/enable-rclweb-apt.sh`, `scripts/pack-rclwebd-deb.ts`, `scripts/pack-release-debs.ts`, `scripts/pack-rclweb-apt-source.ts`, `scripts/publish-apt-repo.ts`, `scripts/publish-signed-apt.sh`, `scripts/push-apt-gh-pages.sh` | Own apt repo: first enable is the public keyring from Pages (`enable-apt.sh`), then `apt install rclwebd`. `rclweb-apt-source` is the offline / key-upgrade package. `publish-apt.yml` wraps existing Release binaries ([ADR 0019](../../docs/adr/0019-own-apt-repository.md), [deploy](../../docs/deploy.md#apt), [gotchas](./gotchas.md#own-apt-is-signed-by-not-bloom)) |
-| `packaging/systemd/**`, `scripts/rclwebd-ros.sh` | Host systemd units ExecStart the ROS wrapper; `EnvironmentFile` is not a prefix ([deploy](../../docs/deploy.md#systemd), [gotchas](./gotchas.md#systemd-environmentfile-is-not-a-sourced-ros-prefix)) |
-| `packaging/kubernetes/**` | Host-network Deployment + ClusterIP Service; same robot-edge shape as compose ([deploy](../../docs/deploy.md#kubernetes)). The image bakes the support row. `strategy: Recreate` because 8794 is a host bind. |
 | `rclwebd/src/ros/**` | [technology stack](./technology-stack.md), [adapter ABI](../../docs/gateway/rclwebd.md) |
 | `rclwebd/src/ros/backend.rs` | Same-thread loopback must pump ([gotchas](./gotchas.md#same-thread-ros-loopback-must-pump)) |
 | `rclwebd/src/ros/rcl.rs` | Action wait-set index ([gotchas](./gotchas.md#action-client-wait-set-ready-is-not-the-first-client-slot)) |
@@ -67,7 +58,7 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | `rclwebd/src/acl.rs` | [security](../../docs/security.md); `enforce` is default-deny ([gotchas](./gotchas.md#acls-default-to-off-enforce-is-default-deny)). Reference matrix: [acl-reference.json](../../docs/acl-reference.json) |
 | `rclwebd/src/audit.rs` | Opt-in file JSONL with hash chain, rotation, and copy/verify export ([security](../../docs/security.md#audit), [gotchas](./gotchas.md#audit-file-sink-is-opt-in-configz-never-dumps-events)) |
 | `rclwebd/src/ops.rs` | [deploy](../../docs/deploy.md); `/healthz` is liveness ([gotchas](./gotchas.md#healthz-is-liveness-not-readiness)) |
-| `docker/**` | [deploy](../../docs/deploy.md), digest-pinned `oven/bun` ([gotchas](./gotchas.md#github-releases-downloads-need-retries)). Runtime images compile `ros,webtransport`; [`compose.webtransport.yml`](../../docker/compose.webtransport.yml) is the intranet overlay ([gotchas](./gotchas.md#intranet-webtransport-is-one-env-not-production-tls)) |
+| `docker/**` | [deploy](../../docs/deploy.md), digest-pinned `oven/bun` ([gotchas](./gotchas.md#github-releases-downloads-need-retries)). Runtime images compile `ros,webtransport` |
 | `typescript/**` | [How to](../../docs/typescript.md), [API](../../docs/api.md), [ADR 0014](../../docs/adr/0014-typescript-package-rcl-web.md). npm blocks unscoped `rclweb` vs `rrweb` ([gotchas](./gotchas.md#unscoped-rclweb-is-blocked-on-npm-as-too-similar-to-rrweb)). Reconnect is a fresh session ([gotchas](./gotchas.md#reconnect-is-a-fresh-session-not-sessionresume)); Worker `telemetry()` is the last poll snapshot ([gotchas](./gotchas.md#worker-telemetry-is-the-last-poll-snapshot)); Worker host-retain samples transfer the WS buffer ([gotchas](./gotchas.md#worker-host-retain-samples-transfer-the-ws-buffer)); pack copies LICENSE/NOTICE ([gotchas](./gotchas.md#npm-pack-copies-license-and-notice-do-not-commit-them)). `init()` is local WebSocket; `init("192.168.1.10")` uses QUIC from localhost ([gotchas](./gotchas.md#intranet-webtransport-is-one-env-not-production-tls)) |
 | `scripts/license-inventory.ts` | OSI-permissive inventory; workspace npm deps are read from the declaring package first ([gotchas](./gotchas.md#license-inventory-looks-in-the-declaring-workspace-first)) |
 | `scripts/npm-pack.ts`, `typescript/tsdown.config.mjs` | tsdown ship bundle + LICENSE/NOTICE; tarball must not include `src/` ([ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md), [gotchas](./gotchas.md#npm-pack-ships-the-tsdown-dist-not-typescript-source)) |
@@ -78,19 +69,8 @@ Documentation describes the product. It is not a delivery-phase ledger. Historic
 | `examples/**` | [How to](../../docs/typescript.md), [API](../../docs/api.md), [examples README](../../examples/README.md) |
 | `.github/workflows/ci.yml` | [Validation](../../docs/validation.md); `ros-feature-check` compiles `--features ros --tests` ([gotchas](./gotchas.md#no-ci-lane-compiles-the-ros-feature-tests)); do not wrap cargo tests in Docker ([gotchas](./gotchas.md#do-not-wrap-cargo-tests-in-a-docker-mock-lane)). A conflicted PR never starts `ci` ([gotchas](./gotchas.md#pullrequest-ci-does-not-start-on-a-conflicted-pr)) |
 | `docker/Dockerfile.ros-feature-check`, `docker/compose.ros-feature-check.yml` | Compile-only Jazzy gate for ros-feature tests (`just ros-check-docker`); not a `cargo test` mock lane ([gotchas](./gotchas.md#no-ci-lane-compiles-the-ros-feature-tests)) |
-| `.github/workflows/release.yml` | npm trusted publishing + crates.io ([release](../../docs/release.md), [ADR 0016](../../docs/adr/0016-oidc-trusted-publish.md)); GHCR images + release binaries ([ADR 0018](../../docs/adr/0018-prebuilt-gateway-distribution.md), [deploy](../../docs/deploy.md#prebuilt-artifacts)); own apt repo when `RCLWEB_APT_GPG_PRIVATE_KEY` is set ([ADR 0019](../../docs/adr/0019-own-apt-repository.md)). npm identity is the workflow filename, not a GitHub environment ([gotchas](./gotchas.md#npm-oidc-identity-is-the-workflow-file)). Do not set `NODE_AUTH_TOKEN` ([gotchas](./gotchas.md#do-not-put-nodeauthtoken-on-the-npm-oidc-job)). First crates.io publish is manual ([gotchas](./gotchas.md#cratesio-oidc-cannot-create-the-first-crate)) |
-| `.github/workflows/publish-apt.yml` | Apt-only republish from Release binaries (`apt-v<version>`). Does not move GHCR tags ([ADR 0019](../../docs/adr/0019-own-apt-repository.md)) |
-| `pixi.toml` | Optional RoboStack J-FT ([technology stack](./technology-stack.md#optional-local-ros-prefix), [gotchas](./gotchas.md#pixi-ros-test-must-pin-rosprefix-over-a-host-optros)) |
+| `.github/workflows/release.yml` | npm trusted publishing + crates.io ([release](../../docs/release.md), [ADR 0016](../../docs/adr/0016-oidc-trusted-publish.md)); GHCR Jazzy and Humble images ([ADR 0018](../../docs/adr/0018-prebuilt-gateway-distribution.md), [deploy](../../docs/deploy.md#prebuilt-image)). npm identity is the workflow filename, not a GitHub environment ([gotchas](./gotchas.md#npm-oidc-identity-is-the-workflow-file)). Do not set `NODE_AUTH_TOKEN` ([gotchas](./gotchas.md#do-not-put-nodeauthtoken-on-the-npm-oidc-job)). First crates.io publish is manual ([gotchas](./gotchas.md#cratesio-oidc-cannot-create-the-first-crate)) |
 | `scripts/build-wasm.ts` | Fat-LTO wasm ship ([gotchas](./gotchas.md#release-wasm-inherits-native-release-settings)) |
-| Support matrix | Human matrix edit; no committed measurement JSON ([gotchas](./gotchas.md#do-not-commit-measurement-json)) |
-| `scripts/perf-baseline/**`, `scripts/measure-perf-baseline.ts` | [Performance](../../docs/performance.md); primary metrics are latency / CPU / RSS; stdout only, no committed JSON ([gotchas](./gotchas.md#do-not-commit-measurement-json)). Hops must pair by work ([gotchas](./gotchas.md#perf-baseline-hops-must-pair-by-work)). RSS snapshots retry EINTR ([gotchas](./gotchas.md#processmemoryusage-can-return-eintr)) |
 | `website/` | Fumadocs UI on TanStack Start over `docs/` ([ADR 0020](../../docs/adr/0020-fumadocs-tanstack-docs-site.md), [docs-site](./docs-site.md)). `just website` / `just website-check`. Macro/`dir` and slug import traps: [gotchas](./gotchas.md#fumadocs-definedocs-dir-is-a-string-literal). Landing SVG shrink: [gotchas](./gotchas.md#docs-landing-svg-must-min-width-0-in-the-flex-column). Vercel `node-server` 404: [gotchas](./gotchas.md#vercel-will-not-start-the-node-server-preset) |
-| `studio/` (not in the tree) | [Studio](../../docs/prototypes/studio-ui.md), [DESIGN.md](./DESIGN.md) |
-
-## Design record check
-
-```bash
-bunx @google/design.md lint .agents/docs/DESIGN.md
-```
-
-Studio adds this check to the root command surface when that prototype starts.
+| `pixi.toml` | Optional RoboStack J-FT ([technology stack](./technology-stack.md#optional-local-ros-prefix), [gotchas](./gotchas.md#pixi-ros-test-must-pin-rosprefix-over-a-host-optros)) |
+| Support matrix | Human matrix edit; no committed measurement JSON ([gotchas](./gotchas.md#do-not-commit-measurement-json)) |

@@ -554,11 +554,6 @@ export class IoHost {
     ).slice();
   }
 
-  /** Current wasm linear memory (tests: borrowed PointCloud2 views share this buffer). */
-  engineMemory(): ArrayBufferLike {
-    return this.#wasm.memory.buffer;
-  }
-
   /**
    * Borrowed PointCloud2 view. Host-retained samples view the WebSocket
    * buffer; wasm-backed samples view linear memory. Valid while the lease
@@ -764,14 +759,6 @@ export class IoHost {
       }
       this.#callbacks.onEvent(event);
     }
-  }
-
-  get started(): boolean {
-    return this.#started;
-  }
-
-  get usingWebTransport(): boolean {
-    return this.#useWebTransport;
   }
 
   /** Engine telemetry snapshot (copy counters + poll timing). */

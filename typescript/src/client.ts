@@ -232,10 +232,6 @@ export type RclwebSession = {
   onGraph(handler: GraphHandler): void;
   /** Latest GraphSnapshot/Delta view (internal). */
   graph(): GraphView;
-  /** Thin wrapper: `node/get_parameters` service call with raw CDR request bytes. */
-  getParameters(node: string, requestCdr?: Uint8Array): Promise<Uint8Array>;
-  setParameters(node: string, requestCdr?: Uint8Array): Promise<Uint8Array>;
-  listParameters(node: string, requestCdr?: Uint8Array): Promise<Uint8Array>;
 };
 
 export type RclwebClient = {
@@ -555,7 +551,6 @@ class InlineClient implements RclwebClient {
   #actionFeedback = new Map<number, ActionFeedbackHandler>();
   #actionStatus = new Map<number, ActionStatusHandler>();
   #actionServerHandlers = new Map<number, ActionServerHandlers>();
-  #channelTypes = new Map<number, string>();
   #graphHandlers = new Set<GraphHandler>();
   #graph: GraphView = { generation: 0, nodes: [], endpoints: [] };
   #connectWaiters: Array<() => void> = [];
@@ -653,12 +648,6 @@ class InlineClient implements RclwebClient {
         if (this.#graph.generation > 0) handler(this.#graph);
       },
       graph: () => this.#graph,
-      getParameters: (node, requestCdr = new Uint8Array()) =>
-        this.#paramService(node, "get_parameters", "rcl_interfaces/srv/GetParameters", requestCdr),
-      setParameters: (node, requestCdr = new Uint8Array()) =>
-        this.#paramService(node, "set_parameters", "rcl_interfaces/srv/SetParameters", requestCdr),
-      listParameters: (node, requestCdr = new Uint8Array()) =>
-        this.#paramService(node, "list_parameters", "rcl_interfaces/srv/ListParameters", requestCdr),
     };
   }
 
@@ -879,7 +868,6 @@ class InlineClient implements RclwebClient {
         if (!pending) break;
         this.#pendingServices.delete(event.channelId);
         const channelId = event.channelId;
-        this.#channelTypes.set(channelId, event.typeName);
         this.#channels.set(channelId, {
           kind: pending.client ? "serviceClient" : "serviceServer",
           topic: event.name,
@@ -896,7 +884,6 @@ class InlineClient implements RclwebClient {
             call: (request) => this.#callService(channelId, request),
             close: async () => {
               this.#channels.delete(channelId);
-              this.#channelTypes.delete(channelId);
               this.#host.unsubscribe(corrTag(0xc5), channelId);
               this.#host.flushSync();
             },
@@ -913,7 +900,6 @@ class InlineClient implements RclwebClient {
             close: async () => {
               this.#channels.delete(channelId);
               this.#serviceHandlers.delete(channelId);
-              this.#channelTypes.delete(channelId);
               this.#host.unsubscribe(corrTag(0xc6), channelId);
               this.#host.flushSync();
             },
@@ -971,7 +957,6 @@ class InlineClient implements RclwebClient {
         if (!pending) break;
         this.#pendingActions.delete(event.channelId);
         const channelId = event.channelId;
-        this.#channelTypes.set(channelId, event.typeName);
         this.#channels.set(channelId, {
           kind: pending.client ? "actionClient" : "actionServer",
           topic: event.name,
@@ -1000,7 +985,6 @@ class InlineClient implements RclwebClient {
               this.#channels.delete(channelId);
               this.#actionFeedback.delete(channelId);
               this.#actionStatus.delete(channelId);
-              this.#channelTypes.delete(channelId);
               this.#host.unsubscribe(corrTag(0xc7), channelId);
               this.#host.flushSync();
             },
@@ -1029,7 +1013,6 @@ class InlineClient implements RclwebClient {
             close: async () => {
               this.#channels.delete(channelId);
               this.#actionServerHandlers.delete(channelId);
-              this.#channelTypes.delete(channelId);
               this.#host.unsubscribe(corrTag(0xc8), channelId);
               this.#host.flushSync();
             },
@@ -1337,23 +1320,6 @@ class InlineClient implements RclwebClient {
     this.#host.flushSync();
     return { operationId, result };
   }
-
-  async #paramService(
-    node: string,
-    suffix: string,
-    typeName: string,
-    requestCdr: Uint8Array,
-  ): Promise<Uint8Array> {
-    const name = node.endsWith("/")
-      ? `${node}${suffix}`
-      : `${node}/${suffix}`;
-    const client = await this.#createServiceClient(name, typeName);
-    try {
-      return await client.call(requestCdr);
-    } finally {
-      await client.close();
-    }
-  }
 }
 
 function opidKey(channelId: number, operationId: Uint8Array): string {
@@ -1421,27 +1387,6 @@ class WorkerClient implements RclwebClient {
         if (this.#graph.generation > 0) handler(this.#graph);
       },
       graph: () => this.#graph,
-      getParameters: (node, requestCdr = new Uint8Array()) =>
-        this.#paramService(
-          node,
-          "get_parameters",
-          "rcl_interfaces/srv/GetParameters",
-          requestCdr,
-        ),
-      setParameters: (node, requestCdr = new Uint8Array()) =>
-        this.#paramService(
-          node,
-          "set_parameters",
-          "rcl_interfaces/srv/SetParameters",
-          requestCdr,
-        ),
-      listParameters: (node, requestCdr = new Uint8Array()) =>
-        this.#paramService(
-          node,
-          "list_parameters",
-          "rcl_interfaces/srv/ListParameters",
-          requestCdr,
-        ),
     };
     worker.onmessage = (ev: MessageEvent<WorkerToMain>) => {
       this.#onWorker(ev.data);
@@ -2303,23 +2248,6 @@ class WorkerClient implements RclwebClient {
       } satisfies MainToWorker);
     });
     return { operationId, result };
-  }
-
-  async #paramService(
-    node: string,
-    suffix: string,
-    typeName: string,
-    requestCdr: Uint8Array,
-  ): Promise<Uint8Array> {
-    const name = node.endsWith("/")
-      ? `${node}${suffix}`
-      : `${node}/${suffix}`;
-    const client = await this.#createServiceClient(name, typeName);
-    try {
-      return await client.call(requestCdr);
-    } finally {
-      await client.close();
-    }
   }
 
   #trackInflight(channelId: number, requestId: number): void {

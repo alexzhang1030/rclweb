@@ -1,5 +1,5 @@
 /**
- * Host, wasm poll ABI, buffer strategies, session `connect`, and test helpers.
+ * Host, wasm poll ABI, session `connect`, and test helpers.
  *
  * Application code should import `rclweb` (`init` / `Node`). This
  * submodule is for repository tests, the e2e harness internals, and
@@ -35,7 +35,6 @@ export { DEFAULT_QOS_DEPTH, isPointCloud2, isStdMsgsString } from "./client.ts";
 
 export {
   encodeHostBatch,
-  encodeHostBatchExternalWs,
   decodePollResult,
   decodePointCloud2Meta,
   loadWasm,
@@ -49,15 +48,5 @@ export type {
   PointCloud2Meta,
   SampleAppEvent,
 } from "./wasm/abi.ts";
-
-export {
-  TransferableArrayBufferStrategy,
-  SharedArrayBufferRingStrategy,
-  createBufferStrategy,
-  sharedArrayBufferConstructible,
-  type BufferStrategy,
-  type BufferStrategyName,
-  type BufferStrategyStats,
-} from "./buffer/strategies.ts";
 
 export { IoHost } from "./host.ts";

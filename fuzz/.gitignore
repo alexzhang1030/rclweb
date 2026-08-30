@@ -1,8 +1,0 @@
-# cargo-fuzz build artifacts (optional nightly path)
-target/
-artifacts/
-coverage/
-**/crash-*
-**/leak-*
-**/oom-*
-**/timeout-*

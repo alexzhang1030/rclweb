@@ -8,7 +8,7 @@ Traps already paid for in this repository, each with its why.
 
 ## Authenticate defaults to off
 
-`RCLWEBD_AUTH_MODE` defaults to `off`: any credential is accepted, SessionReady field 21 stays `anonymous`, and no audit line is emitted. `dev` is an alias for `off`. Opt in with `oidc` plus issuer/audience/keys; missing keys fail process start, bad JWT is wire code 26. Do not treat a green e2e lane as proof that identity is on. A named OIDC tenant and SROS2 keystore are out of scope ([open work](../../tasks/plan.md)); leave auth `off`. Landed in [`301c987`](https://github.com/alexzhang1030/rclweb/commit/301c987) (#18).
+`RCLWEBD_AUTH_MODE` defaults to `off`: any credential is accepted, SessionReady field 21 stays `anonymous`, and no audit line is emitted. `dev` is an alias for `off`. Opt in with `oidc` plus issuer/audience/keys; missing keys fail process start, bad JWT is wire code 26. Do not treat a green e2e lane as proof that identity is on. A named OIDC tenant and SROS2 keystore are out of scope; leave auth `off`. Landed in [`301c987`](https://github.com/alexzhang1030/rclweb/commit/301c987) (#18).
 
 ## ACLs default to off; enforce is default-deny
 
@@ -40,7 +40,7 @@ GitHub documents this under
 
 ## Pixi ros-test must pin ROS_PREFIX over a host /opt/ros
 
-`just ros-test-pixi` exists for machines without apt ROS, but a host `/opt/ros/jazzy` on `PATH` / `LD_LIBRARY_PATH` makes link, dlopen, and `ros2 topic pub` silently use the apt prefix — mixed apt + RoboStack FastDDS then hangs the live talker e2e (GraphSnapshot / discovery) instead of failing cleanly. `scripts/pixi-ros-activate.sh` pins `ROS_PREFIX` / `AMENT_PREFIX_PATH` to `$CONDA_PREFIX`, sets `LD_LIBRARY_PATH` to that `lib` only, and forces `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` (RoboStack's activate.d defaults to `SUBNET`). The pixi env includes `ros2cli` / `ros2topic` so the talker is the same prefix. `docs-check` skips `.pixi/` so a local install does not poison `just check`. RoboStack Jazzy is still not a substitute for digest-pinned Docker e2e (`just e2e` / `just e2e-h-ft`). Landed in [`25fb42f`](https://github.com/alexzhang1030/rclweb/commit/25fb42f) (#20); reproduce with `just ros-test-pixi`. `ros2 run` is `ros-jazzy-ros2run`, not `ros-jazzy-ros2pkg` (`ros2 pkg` only). Pixi activation overwrites `AMENT_PREFIX_PATH` to `$CONDA_PREFIX`; source the rclwebd overlay after that, not before.
+`just ros-test-pixi` exists for machines without apt ROS, but a host `/opt/ros/jazzy` on `PATH` / `LD_LIBRARY_PATH` makes link, dlopen, and `ros2 topic pub` silently use the apt prefix — mixed apt + RoboStack FastDDS then hangs the live talker e2e (GraphSnapshot / discovery) instead of failing cleanly. `scripts/pixi-ros-activate.sh` pins `ROS_PREFIX` / `AMENT_PREFIX_PATH` to `$CONDA_PREFIX`, sets `LD_LIBRARY_PATH` to that `lib` only, and forces `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` (RoboStack's activate.d defaults to `SUBNET`). The pixi env includes `ros2cli` / `ros2topic` so the talker is the same prefix. `docs-check` skips `.pixi/` so a local install does not poison `just check`. RoboStack Jazzy is still not a substitute for digest-pinned Docker e2e (`just e2e`). Landed in [`25fb42f`](https://github.com/alexzhang1030/rclweb/commit/25fb42f) (#20); reproduce with `just ros-test-pixi`. `ros2 run` is `ros-jazzy-ros2run`, not `ros-jazzy-ros2pkg` (`ros2 pkg` only). Pixi activation overwrites `AMENT_PREFIX_PATH` to `$CONDA_PREFIX`.
 
 ## Typesupport is dlopen, not link-time
 
@@ -93,8 +93,7 @@ still owe a rewrite. The remaining WebSocket tax is one TCP stream
 controllable copy budget and are the same tax Foxglove pays.
 WebTransport is for a remote host or an explicit
 `{ transport: "webtransport" }`, when independent streams matter.
-`just perf-baseline` does not include the socket;
-`just perf-baseline-live` does. [performance](../../docs/performance.md#websocket).
+[performance](../../docs/performance.md#websocket).
 
 ## Intranet WebTransport is one env, not production TLS
 
@@ -188,62 +187,6 @@ Canonical CDR bundles for `*_Request` / `*_Response` / `*_Goal` / `*_Result` / `
 
 `float64[<=4] bounded_f64` and `string<=16 name` contain `=`. Treating any `=` as a ROS constant drops those fields (`scripts/generated-types.ts` `parseFieldNames` still does this for metadata names). `scripts/rosidl-dts.ts` strips `<=` before looking for `TYPE NAME = value`. Do not copy the metadata skip into the DTS parser — Collections would lose `bounded_f64`, `bounded_string`, and `bounded_wstring`.
 
-## systemd EnvironmentFile is not a sourced ROS prefix
-
-systemd `EnvironmentFile=` assigns variables. It does not run
-`setup.bash`, so `AMENT_PREFIX_PATH` / `LD_LIBRARY_PATH` / `ROS_DISTRO`
-stay empty and typesupport dlopen plus row auto-detect
-([ADR 0018](../../docs/adr/0018-prebuilt-gateway-distribution.md)) fail.
-`ExecStart` must be [`scripts/rclwebd-ros.sh`](../../scripts/rclwebd-ros.sh)
-(or the installed copy), which turns nounset off around `source` — same
-trap as [`docker/rclwebd-entrypoint.sh`](../../docker/rclwebd-entrypoint.sh).
-Do not `ExecStart=` the binary directly, and do not default
-`RCLWEBD_SUPPORT_ROW` in the host wrapper (images bake a row; host
-binaries derive it). `ProtectSystem=strict` would also block `/opt/ros`.
-Units: [`packaging/systemd/`](../../packaging/systemd/),
-[deploy](../../docs/deploy.md#systemd).
-
-## ros2 run already has a sourced prefix
-
-`ros2 run rclwebd rclwebd` runs only after the caller sourced ROS (and
-the overlay). Wrapping `setup.bash` again on that executable is wrong,
-and `launch_ros.actions.Node` injects `--ros-args` that `rclwebd`
-ignores (config is env-only). The overlay binary is the process;
-[`scripts/rclwebd-ros.sh`](../../scripts/rclwebd-ros.sh) stays on
-systemd because `EnvironmentFile=` cannot source a prefix. The fallback
-wrapper must not `command -v rclwebd`: `ros2 run` puts
-`lib/rclwebd/rclwebd` first and that would recurse.
-[deploy](../../docs/deploy.md#ros2-run).
-
-## Own apt is Signed-By, not bloom
-
-`apt install rclwebd` comes from this project's GitHub Pages repo
-(`noble` = Jazzy, `jammy` = Humble), not `packages.ros.org`. The
-package name is `rclwebd`. Do not name it `ros-jazzy-rclwebd`. The
-First enable is `enable-rclweb-apt.sh`: it downloads the **public**
-keyring from Pages and writes a `Signed-By` deb822 file. Do not
-`apt-key add` and do not drop the key in `trusted.gpg.d` — that key
-would then be valid for every other source. `dpkg -i
-rclweb-apt-source_*.deb` is the offline fallback; once the source is
-on the machine, `apt` can upgrade that package to rotate the key.
-`RCLWEB_APT_GPG_PRIVATE_KEY` is the one long-lived publish secret
-(apt cannot use OIDC). Leave it unset and the Release still gets
-`.deb` files for `dpkg -i`. Debian version is
-`$upstream-1~$suite` so jazzy and humble `amd64` assets are not the
-same filename on the Release. Retry apt without moving GHCR tags with
-`apt-v<version>` (`publish-apt.yml`), not `rebuild-v<version>`.
-GNUPGHOME for signing must stay in a temp dir — `publish-apt-repo`
-used to create it under the Pages output, and a `cp -a repo/.` would
-have published `secret.asc`. The public tarball and Pages copy pack
-`apt/`, `index.html`, `.nojekyll`, the public keyring, and
-`enable-apt.sh`. Never `GNUPGHOME`. The apt URI
-`…/rclweb/apt` is a repo, not a directory listing: without
-`apt/index.html` a browser shows GitHub's 404 even while
-`…/apt/dists/noble/InRelease` and `apt-get update` succeed. Drop
-`.nojekyll` at the Pages root so Jekyll cannot strip extensionless
-`InRelease` / `Packages`. [ADR 0019](../../docs/adr/0019-own-apt-repository.md),
-[deploy](../../docs/deploy.md#apt).
-
 ## GitHub Releases downloads need retries
 
 Foundation CI installs Bun with SHA-pinned `oven-sh/setup-bun` (`.bun-version`) and just with SHA-pinned `extractions/setup-just` (`.just-version`); a failed just step waits 15s and retries once. `dtolnay/rust-toolchain` installs the channel in `rust-toolchain.toml`. E2e images copy `/usr/local/bin/bun` from digest-pinned `oven/bun` (must match `.bun-version`); do not pipe `bun.sh/install`. Cloud-agent setup has no Actions, so it uses [`scripts/install-pinned-bun.sh`](../../scripts/install-pinned-bun.sh) and [`scripts/github-release-curl.sh`](../../scripts/github-release-curl.sh). Paid flakes were GitHub Releases 503/curl 56, not a broken setup-just. Landed in [`45cacd5`](https://github.com/alexzhang1030/rclweb/commit/45cacd5) (#19).
@@ -270,7 +213,7 @@ The exact name `rclweb` is unpublished (`GET https://registry.npmjs.org/rclweb` 
 
 ## npm pack ships the tsdown dist, not TypeScript source
 
-The published `rcl-web` tarball is tsdown ESM + `.d.ts` under `dist/`, plus `wasm/rclweb.wasm` and `dist/cli.js` (`npx rcl-web gen`). `files` must not include `src/`. `just npm-pack-check` fails if the tarball contains `package/src/`. Run tsdown through Bun (`bun --bun tsdown`) so the config loader does not require the optional `unrun` peer. Workspace `import from "rcl-web"` resolves to that `dist/` — live e2e/perf images must run `bun run --filter rcl-web build` after staging wasm; they used to load `src/` through the export map. [ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md).
+The published `rcl-web` tarball is tsdown ESM + `.d.ts` under `dist/`, plus `wasm/rclweb.wasm` and `dist/cli.js` (`npx rcl-web gen`). `files` must not include `src/`. `just npm-pack-check` fails if the tarball contains `package/src/`. Run tsdown through Bun (`bun --bun tsdown`) so the config loader does not require the optional `unrun` peer. Workspace `import from "rcl-web"` resolves to that `dist/` — live e2e images must run `bun run --filter rcl-web build` after staging wasm; they used to load `src/` through the export map. [ADR 0015](../../docs/adr/0015-tsdown-ship-bundle.md).
 
 ## npm pack copies LICENSE and NOTICE; do not commit them
 
@@ -298,15 +241,7 @@ npm trusted publishing matches owner + repo + workflow **filename**. A GitHub `e
 
 ## Do not commit measurement JSON
 
-The owner deleted `docs/evidence/*.json`. Nothing in CI read those files. `just build` used to rewrite `recordedAt` on a wasm-size file, dirtying the tree. Qualification is a human edit of the [support matrix](../../docs/support-matrix.md). Measurement recipes (`just poll-latency`, `just large-message`, `just perf-baseline`) print to stdout. `just perf-baseline` leads with latency / CPU / RSS. Do not add an evidence-check job.
-
-## perf-baseline hops must pair by work
-
-`just perf-baseline` used to put `rclweb.ingest` (subscribe + flush + lease + `onMessage`) next to `foxglove.cdrDecode` (13-byte skip + our own CDR). The Foxglove row was not a Foxglove client. Paid when the owner called that comparison non-corresponding (2026-08-13). Decode hops are header skip + CDR on both sides. Deliver hops are framed bytes → callback (`rclweb.ingest` with `foxglove.deliver`). Do not mix the classes in one comparison. The first timed hop of a new payload size also pays heap growth if hops run sequentially with `tryGc` between them — decode hops are interleaved in one loop so that is not reported as a codec loss. [performance](../../docs/performance.md).
-
-## process.memoryUsage can return EINTR
-
-Bun on Linux can throw `SystemError: Failed to get memory usage` with errno 4 (`EINTR`), especially right after `Bun.gc(true)`. The perf-baseline harness retries (`scripts/perf-baseline/resources.ts`). Do not treat one failed snapshot as a leak, and do not skip RSS because of it.
+The owner deleted `docs/evidence/*.json`. Nothing in CI read those files. `just build` used to rewrite `recordedAt` on a wasm-size file, dirtying the tree. Qualification is a human edit of the [support matrix](../../docs/support-matrix.md). Do not add an evidence-check job.
 
 ## No CI lane compiles the ros-feature tests
 
@@ -325,6 +260,10 @@ foundation already runs ROS-free tests, and live talker remains
 service/action loopbacks additionally need `example_interfaces`
 installed, as the [gateway doc](../../docs/gateway/rclwebd.md#environment-contract)
 says.
+
+## Do not wrap cargo tests in a Docker mock lane
+
+A compose file whose image only re-ran `cargo test` inside `rust:1.97.1` once existed. Foundation already runs those tests via `just test`. Do not add a compose file whose only command is cargo tests the workspace already runs. The ros-feature compile image ([`docker/compose.ros-feature-check.yml`](../../docker/compose.ros-feature-check.yml)) is not that anti-pattern: it runs `cargo check --tests`, not `cargo test`.
 
 ## Fumadocs defineDocs dir is a string literal
 
@@ -365,7 +304,3 @@ chain can shrink — a phone then clips `rclwebd` / `ROS 2`. Bind
 `min-width: 0` on `body` / `#nd-home-layout` / `.home`,
 `contain: inline-size` on `.home-stage`, and `max-width: 100%` on the
 SVG. [docs-site](./docs-site.md).
-
-## Do not wrap cargo tests in a Docker mock lane
-
-`docker/compose.r3-03-h-ft.yml` once existed whose image only re-ran `cargo test` inside `rust:1.97.1`. Foundation already runs those tests via `just test`. The CI job was `workflow_dispatch`-only, so it never gated. Live Humble remains [`docker/compose.r3-03-h-ft-e2e.yml`](../../docker/compose.r3-03-h-ft-e2e.yml). Do not add a compose file whose only command is cargo tests the workspace already runs. The ros-feature compile image ([`docker/compose.ros-feature-check.yml`](../../docker/compose.ros-feature-check.yml)) is not that anti-pattern: it runs `cargo check --tests`, not `cargo test`.

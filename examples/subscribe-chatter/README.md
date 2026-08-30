@@ -25,7 +25,7 @@ The demo binds loopback only.
 
    ```bash
    just gateway
-   # or, after the ament overlay: ros2 run rclwebd rclwebd
+   # or: docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy
    ```
 
 3. Serve the page:
@@ -38,9 +38,10 @@ The demo binds loopback only.
    type a robot host first. Send from the page or from a ROS talker on
    `/chatter`.
 
-   Intranet WebTransport: `just gateway-wt` on the robot, keep this page
-   on `http://127.0.0.1:4173`, type the robot IP. Chromium. That is the
-   QUIC path. A tab opened via a LAN IP cannot use WebTransport.
+   Intranet WebTransport: `RCLWEBD_OFFER_WEBTRANSPORT=1` on the robot
+   image, keep this page on `http://127.0.0.1:4173`, type the robot IP.
+   Chromium. That is the QUIC path. A tab opened via a LAN IP cannot
+   use WebTransport.
 
 | Variable | Default | Role |
 |---|---|---|

@@ -34,7 +34,7 @@ MoonBit had been chosen for Wasm convenience. The accepted counter-argument: the
 
 ## Consequences
 
-- The R-phase plan in [tasks/plan.md](../../tasks/plan.md) replaces the M-phase plan.
+- The R-phase work replaced the M-phase plan. Historical task IDs stay in git.
 - The CDR contract, the ROS CDR corpus, tail-slack evidence, and the frozen generated-types contract survive as the oracle the Rust port must pass (R1).
 - The evidence harness does not return as a CI job in R4. Do not commit measurement JSON; promotion to Qualified is a human edit of the support matrix.
 - ADRs 0001–0009 remain historical records; where they name MoonBit as the runtime language, this ADR supersedes that choice while preserving their boundaries (0004 host boundary, 0006 C ABI direction, 0007 schema identity). [ADR 0012](./0012-rclweb-schema-identifiers.md) aligns the Humble scheme and corpus identifier strings with rclweb.

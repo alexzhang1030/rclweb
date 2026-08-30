@@ -1,6 +1,6 @@
 # e2e-harness
 
-Headless inline-host subscribe used by `just e2e` and `just e2e-h-ft`.
+Headless inline-host subscribe used by `just e2e`.
 It is not a human demo — see [subscribe-chatter](../subscribe-chatter/)
 for the browser page.
 

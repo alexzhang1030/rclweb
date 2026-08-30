@@ -34,7 +34,7 @@ R2WP, the adapter, caches, fixtures, and recordings carry schema identity `(sche
 | B | Worker, Wasm, binary WebSocket, transferable buffers | Binary WebSocket |
 | C | Declared reduced package capability set | Binary WebSocket |
 
-The support matrix pins the browser reference. Broader browser tiers come from automated and manual evidence. Studio publishes separate graphics and media tiers with the [Studio prototype](./prototypes/studio-ui.md).
+The support matrix pins the browser reference. Broader browser tiers come from automated and manual evidence.
 
 ## Transport and network
 

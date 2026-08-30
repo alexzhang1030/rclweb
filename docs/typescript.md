@@ -15,10 +15,9 @@ npm install rcl-web
 ```
 
 On the machine that can see the ROS 2 graph, start the edge process
-(`ros2 run rclwebd rclwebd` after the overlay, or
-`docker run … rclwebd:jazzy`). `init()` talks to
+(`docker run … rclwebd:jazzy`). `init()` talks to
 `ws://127.0.0.1:8794/ws`. How to run that process:
-[deploy](./deploy.md#ros2-run).
+[deploy](./deploy.md).
 
 ```ts
 import {
@@ -37,8 +36,9 @@ import {
 await init();
 ```
 
-That is the local default. Another host after `just gateway-wt` on the
-robot, page on `http://127.0.0.1`, Chromium. No CA:
+That is the local default. Another host after
+`RCLWEBD_OFFER_WEBTRANSPORT=1` on the robot, page on
+`http://127.0.0.1`, Chromium. No CA:
 
 ```ts
 await init("192.168.1.10");

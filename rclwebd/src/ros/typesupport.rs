@@ -306,17 +306,3 @@ pub fn action_type_support(type_name: &str) -> Option<ActionTypeSupport> {
 
 /// Demo types historically linked at build time (readiness / test hints).
 pub const DEMO_TYPES: [&str; 2] = ["std_msgs/msg/String", "sensor_msgs/msg/PointCloud2"];
-
-/// Whether `type_name` can be resolved from the current ROS lib path.
-pub fn is_available(type_name: &str) -> bool {
-  if let Some((_, kind, _)) = parse_type_name(type_name) {
-    match kind {
-      "msg" => message_type_support(type_name).is_some(),
-      "srv" => service_type_support(type_name).is_some(),
-      "action" => action_type_support(type_name).is_some(),
-      _ => false,
-    }
-  } else {
-    false
-  }
-}

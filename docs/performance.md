@@ -1,6 +1,6 @@
 # Performance
 
-`just perf-baseline` times **bytes already in JS → usable ROS message** (latency / CPU / RSS). Stdout only; do not commit it. Two hop classes — do not mix them:
+The sample path times **bytes already in JS → usable ROS message**. Two hop classes — do not mix them:
 
 | Class | Work | Rows |
 |---|---|---|
@@ -18,13 +18,7 @@
 
 Foxglove views PointCloud2 `data` on the WS buffer. rclweb does the same: ROS_SAMPLE stays in JS, and PointCloud2 `data` is a view of those bytes ([ADR 0017](./adr/0017-host-retain-inbound-sample-payload.md)). Engineering p99 targets are e2e, in [validation](./validation.md#engineering-targets), and are not CI fails.
 
-**Copy ceiling on this hop.** ROS_SAMPLE never enters wasm ([ADR 0017](./adr/0017-host-retain-inbound-sample-payload.md)). The 1 MiB memcpy, the 32-byte wasm header poll, and the idle-queue poll batch (enqueue / flush / `PollResult`) are closed. Host-lease `release()` is synchronous (no poll batch). The default I/O Worker transfers the host-retained WS/frame buffer to main (0 extra payload copies), including generated corpus msg roots and service/action CDR. Generated service/action sections decode in JS (`decodeOpPayload`). Wasm linear memory still cannot alias a WebSocket `ArrayBuffer` ([Wasm design #1162](https://github.com/WebAssembly/design/issues/1162)). Decode hops use the same JS CDR; a first-of-size run is not a codec loss (shared prewarm + inner batch). Remaining *deliver* latency on the inline probe is the host pin + `SampleLease` + typed sink versus Foxglove’s MessageData parse + subscription map. Live bridge e2e is another hop. RMW loans stay under [ADR 0006](./adr/0006-edge-ros-c-abi-boundary.md). `opt-level = 3` would reopen [ADR 0010](./adr/0010-restructure-single-rust-core.md) (`just build` size vs `just poll-latency`).
-
-| Command | Measures |
-|---|---|
-| `just perf-baseline` | p50/p99/mean, CPU µs/sample, RSS at 1 KiB, 32 KiB, PointCloud2 ~1 MiB |
-| `just perf-baseline-live` | Docker stamp latency + CPU/RSS vs foxglove_bridge and rosbridge |
-| `just poll-latency` | Empty timer-poll (wasm size reopen input) |
+**Copy ceiling on this hop.** ROS_SAMPLE never enters wasm ([ADR 0017](./adr/0017-host-retain-inbound-sample-payload.md)). The 1 MiB memcpy, the 32-byte wasm header poll, and the idle-queue poll batch (enqueue / flush / `PollResult`) are closed. Host-lease `release()` is synchronous (no poll batch). The default I/O Worker transfers the host-retained WS/frame buffer to main (0 extra payload copies), including generated corpus msg roots and service/action CDR. Generated service/action sections decode in JS (`decodeOpPayload`). Wasm linear memory still cannot alias a WebSocket `ArrayBuffer` ([Wasm design #1162](https://github.com/WebAssembly/design/issues/1162)). Decode hops use the same JS CDR. Remaining *deliver* latency on the inline path is the host pin + `SampleLease` + typed sink versus Foxglove’s MessageData parse + subscription map. Live bridge e2e is another hop. RMW loans stay under [ADR 0006](./adr/0006-edge-ros-c-abi-boundary.md). `opt-level = 3` would reopen [ADR 0010](./adr/0010-restructure-single-rust-core.md) (`just build` staged wasm size).
 
 ## WebSocket
 
@@ -46,9 +40,6 @@ What WebSocket still costs, and what we leave alone:
   more.
 - Kernel and browser RX buffers. They sit outside the controllable
   copy budget. Foxglove pays the same tax on the same hop.
-- `just perf-baseline` starts after the bytes are already in JS. Use
-  `just perf-baseline-live` when the socket is part of the claim.
-
 Do not put ROS_SAMPLE back into wasm to "parse the socket faster".
 Do not turn on permessage-deflate to "win" a large PointCloud2.
 Do not make local `init()` imply QUIC. Default `rclwebd` does not

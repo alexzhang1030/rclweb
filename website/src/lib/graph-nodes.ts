@@ -6,7 +6,7 @@ export type GraphNode = {
   y: number;
   label: string;
   hint: string;
-  to: "typescript" | "api" | "architecture" | "deploy";
+  to: "typescript" | "api" | "protocol/r2wp" | "deploy" | "architecture";
 };
 
 export const GRAPH_WIDTH = 1000;
@@ -15,7 +15,7 @@ export const GRAPH_HEIGHT = 560;
 export const GRAPH_NODES: readonly GraphNode[] = [
   { id: "browser", x: 150, y: 300, label: "rcl-web", hint: "How to", to: "typescript" },
   { id: "api", x: 270, y: 150, label: "Node", hint: "API", to: "api" },
-  { id: "wire", x: 430, y: 240, label: "R2WP", hint: "Architecture", to: "architecture" },
+  { id: "wire", x: 430, y: 240, label: "R2WP", hint: "Protocol", to: "protocol/r2wp" },
   { id: "edge", x: 680, y: 320, label: "rclwebd", hint: "Deploy", to: "deploy" },
   { id: "ros", x: 880, y: 180, label: "ROS 2", hint: "Graph", to: "architecture" },
 ];

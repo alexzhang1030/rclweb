@@ -16,7 +16,7 @@ just build
 
 `just check` is the foundation gate (docs, protocol, corpus, ROSIDL DTS,
 license inventory, npm/crate pack members, `cargo fmt`, Clippy with
-`-D warnings`, tsdown ship bundle, docs site build).
+`-D warnings`, tsdown ship bundle, docs site).
 
 | Command | Purpose |
 |---|---|
@@ -29,17 +29,15 @@ license inventory, npm/crate pack members, `cargo fmt`, Clippy with
 | `just build` | Native build, fat-LTO wasm, tsdown bundle |
 | `just npm-pack` / `just npm-pack-check` | npm tarball for `rcl-web` |
 | `just cargo-publish` / `just cargo-publish-check` | crates.io pack for `rclweb` / `rclwebd` |
-| `just e2e` / `just e2e-h-ft` | Live talker → gateway → `rcl-web` |
-| `just install-rclwebd-ament` | Write `~/.local/share/rclwebd` for `ros2 run rclwebd rclwebd` |
-| `just pack-rclwebd-deb` / `just pack-release-debs` / `just apt-key-generate` / `just apt-repo` | Pack `rclwebd_*~$suite_*.deb` (one binary or the four Release assets), generate the archive key, sign a local apt repo (ADR 0019) |
-| `just gateway` / `just gateway-h-ft` | Packaged gateway on the host network |
-| `just gateway-wt` / `just gateway-wt-h-ft` | Same + intranet WebTransport (`RCLWEBD_OFFER_WEBTRANSPORT=1`) |
+| `just e2e` | Live Jazzy talker → gateway → `rcl-web` |
+| `just gateway` | Packaged J-FT gateway on the host network |
 | `just ros-check` / `just ros-check-docker` | Compile `rclwebd --features ros --tests` (no `cargo test`) |
-| `just ros-test` / `just ros-test-pixi` | Gateway tests against real rcl |
+| `just ros-test` | Gateway tests against real rcl |
 | `just protocol-check` / `just cdr-corpus-check` | Registry, CDDL, CDR corpus |
 | `just rosidl-dts-check` / `just rosidl-dts-write` | Repo check for shipped generated classes. Users run `npx rcl-web gen` |
 | `just license-inventory` / `just license-inventory-check` | Third-party allowlist |
-| `just website` / `just website-check` | Fumadocs + TanStack Start site over `docs/` |
+| `just website` / `just website-check` | Docs site (`website/`) |
+| `just ros-test-pixi` | Optional RoboStack Jazzy prefix for `just ros-test` |
 
 Pins: Bun `.bun-version`, Rust `rust-toolchain.toml` (1.97.1 +
 `wasm32-unknown-unknown`), just `.just-version`.

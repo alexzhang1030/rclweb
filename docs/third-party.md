@@ -251,12 +251,12 @@ Workspace packages: `@rclweb/e2e-harness`, `@rclweb/subscribe-chatter`, `@rclweb
 | @types/node | 24.13.3 | MIT |
 | @types/react | 19.2.18 | MIT |
 | @types/react-dom | 19.2.5 | MIT |
-| @vitejs/plugin-react | 6.1.0 | MIT |
+| @vitejs/plugin-react | 6.1.1 | MIT |
 | cnfast | 0.1.0 | MIT |
 | fumadocs-core | 16.15.2 | MIT |
 | fumadocs-mdx | 15.3.1 | MIT |
 | fumadocs-ui | 16.15.2 | MIT |
-| lucide-react | 1.34.0 | ISC |
+| lucide-react | 1.37.0 | ISC |
 | nitro | 3.0.260610-beta | MIT |
 | react | 19.2.8 | MIT |
 | react-dom | 19.2.8 | MIT |
@@ -264,5 +264,5 @@ Workspace packages: `@rclweb/e2e-harness`, `@rclweb/subscribe-chatter`, `@rclweb
 | tsdown | 0.22.14 | MIT |
 | typescript | 5.9.3 | Apache-2.0 |
 | vite | 8.2.2 | MIT |
-| zod | 4.4.3 | MIT |
+| zod | 4.5.4 | MIT |
 

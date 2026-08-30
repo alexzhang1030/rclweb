@@ -184,16 +184,6 @@ export function sampleEchoNestedResponse(): EchoNested_Response {
   return msg;
 }
 
-export function sampleMeasureSequenceGoal(): MeasureSequence_Goal {
-  const msg = new MeasureSequence_Goal();
-  msg.target.fixed_i32 = [1, 2, 3];
-  msg.target.bounded_f64 = [1.0, 2.0];
-  msg.target.bytes_value = new Uint8Array([10, 20, 30]);
-  msg.target.bounded_string = "abc";
-  msg.target.bounded_wstring = "xyz";
-  return msg;
-}
-
 export function decodeGeneratedHostValue(
   typeName: string,
   bytes: Uint8Array,

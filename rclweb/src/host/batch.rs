@@ -568,17 +568,6 @@ fn decode_opid_payload(
   Ok((channel_id, operation_id, payload))
 }
 
-/// Encode a poll outcome for the host. `payload_view` maps a sample lease to
-/// `(ptr, len)` in wasm linear memory (or returns zeros for inline-only hosts).
-pub fn encode_poll_result(
-  outcome: &PollOutcome,
-  payload_view: impl FnMut(u32) -> (u32, u32),
-) -> Vec<u8> {
-  let mut out = Vec::with_capacity(64);
-  encode_poll_result_into(&mut out, outcome, payload_view);
-  out
-}
-
 /// Append an encoded poll result onto `out` (caller typically `clear`s first).
 pub fn encode_poll_result_into(
   out: &mut Vec<u8>,

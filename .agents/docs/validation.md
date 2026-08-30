@@ -2,7 +2,7 @@
 
 rclweb advances through reproducible evidence and human review. Targets guide implementation. Raw measurements and conformance results establish the accepted state.
 
-Detailed workloads live in [validation](../../docs/validation.md). What is still open lives in [open work](../../tasks/plan.md).
+Detailed workloads live in [validation](../../docs/validation.md).
 
 ## Single oracle
 
@@ -18,14 +18,13 @@ Each accepted claim records:
 - stdout from the reproducing command (not committed);
 - errors, variance, reviewer, and gate disposition.
 
-Historical evidence stays in git history. Promotion to **Qualified** is a human edit of the [support matrix](../../docs/support-matrix.md), not a CI stamp and not a committed JSON pile. Do not stamp it on this cut ([qualification](./qualification.md)). The current TypeScript package is `rcl-web@0.0.6` (`0.0.1` on npm shipped source). Publish is GitHub OIDC ([release](../../docs/release.md)). CI `ros-feature-check` compiles `rclwebd --features ros --tests` in digest-pinned Jazzy; it does not run `cargo test`.
+Historical evidence stays in git history. Promotion to **Qualified** is a human edit of the [support matrix](../../docs/support-matrix.md), not a CI stamp and not a committed JSON pile. The current TypeScript package is `rcl-web@0.0.6`. Publish is GitHub OIDC ([release](../../docs/release.md)). CI `ros-feature-check` compiles `rclwebd --features ros --tests` in digest-pinned Jazzy; it does not run `cargo test`. Live talker e2e is J-FT (`just e2e`).
 
 ## Review triggers
 
 - CDR differences reopen codec and type-system review.
-- Timing, copies, allocations, memory growth, or toolchain drift reopen runtime-boundary review; the copy budget (one controllable payload copy: the RMW take) is a standing contract. The published baseline's primary metrics are ingest latency, CPU, and RSS ([performance](../../docs/performance.md)).
+- Timing, copies, allocations, memory growth, or toolchain drift reopen runtime-boundary review; the copy budget (one controllable payload copy: the RMW take) is a standing contract. Primary metrics are ingest latency, CPU, and RSS ([performance](../../docs/performance.md)).
 - Transport, proxy, reconnect, or roaming gaps reopen channel and compatibility review.
 - QoS or semantic differences reopen runtime and RMW review.
 - Security, deployment, soak, fault, or recovery findings reopen release review.
-- Rendering, media, accessibility, or command findings reopen Studio review.
-- Rust wasm artifact size or poll latency outside an accepted envelope reopens the single-core language decision ([ADR 0010](../../docs/adr/0010-restructure-single-rust-core.md)).
+- Rust wasm artifact size outside an accepted envelope reopens the single-core language decision ([ADR 0010](../../docs/adr/0010-restructure-single-rust-core.md)).
