@@ -45,14 +45,23 @@ const msg = new my_interfaces.msg.Status();
 still covers the types `rcl-web` ships.
 
 `init()` talks to `ws://127.0.0.1:8794/ws`. On the robot (or your laptop)
-run `rclwebd` so that process can join the ROS domain. Prebuilt image,
-no clone, no toolchain (`:humble` for Humble):
+run `rclwebd` so that process can join the ROS domain. On Ubuntu 24.04
+(Jazzy) or 22.04 (Humble) the host install is apt
+([deploy](./docs/deploy.md#apt), [ADR 0019](./docs/adr/0019-own-apt-repository.md)).
+The package name is `rclwebd`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/enable-rclweb-apt.sh | sudo bash
+sudo apt update
+sudo apt install rclwebd
+```
+
+Docker (`:humble` for Humble) and a from-source crate build are
+secondary:
 
 ```bash
 docker run --rm --network host ghcr.io/alexzhang1030/rclwebd:jazzy
 ```
-
-Or build from source (needs Rust plus the ROS 2 development libraries):
 
 ```bash
 cargo install rclwebd --features ros

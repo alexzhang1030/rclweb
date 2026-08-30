@@ -5,6 +5,15 @@ links the [`rclweb`](https://crates.io/crates/rclweb) core, terminates
 R2WP over WebSocket (and optional WebTransport), and attaches to ROS 2
 through a serialized adapter ABI.
 
+Host install on Ubuntu is apt
+([deploy](../docs/deploy.md#apt), [ADR 0019](../docs/adr/0019-own-apt-repository.md)):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/alexzhang1030/rclweb/main/scripts/enable-rclweb-apt.sh | sudo bash
+sudo apt update
+sudo apt install rclwebd
+```
+
 Prebuilt images (`jazzy` = J-FT, `humble` = H-FT):
 
 ```bash
